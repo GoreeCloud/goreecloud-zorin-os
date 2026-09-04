@@ -15,6 +15,19 @@ python3 -m py_compile "$ROOT/scripts/build.py"
 bash -n "$ROOT/scripts/install.sh"
 bash -n "$ROOT/scripts/uninstall.sh"
 bash -n "$ROOT/scripts/validate.sh"
+bash -n "$ROOT/scripts/diagnose.sh"
+
+for tool in \
+  "$ROOT/scripts/build.py" \
+  "$ROOT/scripts/install.sh" \
+  "$ROOT/scripts/uninstall.sh" \
+  "$ROOT/scripts/validate.sh" \
+  "$ROOT/scripts/diagnose.sh"; do
+  if [[ ! -x "$tool" ]]; then
+    echo "Expected executable tool is not executable: $tool" >&2
+    exit 65
+  fi
+done
 
 TEMP_ROOT="$(mktemp -d)"
 TEMP_HOME="$(mktemp -d)"
