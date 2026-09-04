@@ -15,6 +15,7 @@ The current variants are:
 Each variant provides:
 
 - a GTK 3 application theme that layers GoreeCloud styling over GTK's built-in Adwaita base;
+- a small GTK 2 compatibility shim that inherits system Adwaita so classic theme-discovery paths used by Zorin/GNOME can recognize the theme package;
 - a GNOME Shell custom stylesheet for panel, overview, menus, search, quick settings, dialogs, notifications, and related shell surfaces;
 - Glaze UI V1.1 surface hierarchy, Deep Teal interaction accents, rounded control geometry, and light/dark/deep-dark mode mapping.
 
@@ -23,6 +24,8 @@ Icons and cursor themes are intentionally not replaced in this first implementat
 ## Compatibility scope
 
 The initial target is **Zorin OS 17.3**.
+
+The GTK 2 shim is a compatibility/discovery layer, not a full GoreeCloud GTK 2 visual implementation. GTK 2 applications inherit the system Adwaita GTK 2 stylesheet in this preview.
 
 This preview intentionally does **not** opt into native libadwaita theming. Zorin OS 17 and newer supports a developer opt-in mechanism for libadwaita themes, but that path requires a GTK 4 stylesheet plus extensive compatibility testing. No `gtk-4.0/.libadwaita` marker is generated until that validation is completed.
 
@@ -52,9 +55,17 @@ The installer builds the themes, backs up any existing GoreeCloud theme folders 
 ~/.local/share/themes/
 ```
 
-Then open **Zorin Appearance → Themes → Other** and choose a GoreeCloud variant in the **Applications** and **Shell** drop-downs.
+Then close and reopen **Zorin Appearance**, navigate to **Themes → Other**, and choose a GoreeCloud variant in the **Applications** and **Shell** drop-downs.
 
 You can mix variants if desired, although matching Application and Shell modes are the intended combinations.
+
+If the themes still do not appear, verify the generated compatibility files:
+
+```bash
+find ~/.local/share/themes/GoreeCloud-Zorin-* -maxdepth 2 -type f -print | sort
+```
+
+Each variant should include `index.theme`, `gtk-2.0/gtkrc`, `gtk-3.0/gtk.css`, and `gnome-shell/gnome-shell.css`.
 
 ## Uninstall / rollback
 
@@ -82,7 +93,7 @@ See `docs/validation.md` for the target-device acceptance checklist and `docs/gl
 
 ```text
 config/       Machine-readable palette and variant definitions
-src/          Shared GTK 3, GNOME Shell, and index.theme templates
+src/          Shared GTK 2 compatibility, GTK 3, GNOME Shell, and index.theme templates
 scripts/      Build, install, uninstall, and validation tooling
 docs/         Design mapping and target-device validation guidance
 .github/      Repository CI workflow
