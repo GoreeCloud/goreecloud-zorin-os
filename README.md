@@ -37,7 +37,7 @@ The GTK 2 shim is a compatibility/discovery layer, not a full GoreeCloud GTK 2 v
 
 The GTK 4/libadwaita path remains a **Development acceptance candidate**. Zorin OS 17 and newer patches libadwaita to permit explicit third-party theme opt-in when a compatible `gtk-4.0/gtk.css` and sibling `.libadwaita` marker are present. Successful local composition does not by itself prove visual compatibility or release readiness.
 
-Current Dark target evidence now verifies that Files / Nautilus 42.6 uses the intended GoreeCloud Dark `#101A20` main canvas and `#18252B` sidebar after exact Zorin GTK 3 composition. A narrower selected-state pass remains open because the captured Files selected row and Settings selected/checked states still showed pale Zorin cyan instead of the configured Dark selection/accent roles; current Development source contains target-specific selected/checked-state overrides that still require laptop retest.
+Current Dark target evidence verifies that Files / Nautilus 42.6 uses the intended GoreeCloud Dark `#101A20` main canvas and `#18252B` sidebar after exact Zorin GTK 3 composition. A narrower selected/checked-state pass remains open because the captured Files selected row and Settings selected/checked states still showed pale Zorin cyan instead of the configured Dark selection/accent roles. The current Development candidate adds target-specific selected/focus/checked-state overrides and requires another laptop retest before those states are accepted.
 
 Flatpak and Snap applications may retain styling bundled by their developers.
 
