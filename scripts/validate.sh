@@ -18,13 +18,15 @@ bash -n "$ROOT/scripts/install.sh"
 bash -n "$ROOT/scripts/uninstall.sh"
 bash -n "$ROOT/scripts/validate.sh"
 bash -n "$ROOT/scripts/diagnose.sh"
+bash -n "$ROOT/scripts/trace_gtk4_runtime.sh"
 
 for tool in \
   "$ROOT/scripts/build.py" \
   "$ROOT/scripts/install.sh" \
   "$ROOT/scripts/uninstall.sh" \
   "$ROOT/scripts/validate.sh" \
-  "$ROOT/scripts/diagnose.sh"; do
+  "$ROOT/scripts/diagnose.sh" \
+  "$ROOT/scripts/trace_gtk4_runtime.sh"; do
   if [[ ! -x "$tool" ]]; then
     echo "Expected executable tool is not executable: $tool" >&2
     exit 65
@@ -95,6 +97,7 @@ for theme_id in ids:
     gtk3 = (theme_root / "gtk-3.0" / "gtk.css").read_text(encoding="utf-8")
     gtk4 = (theme_root / "gtk-4.0" / "gtk.css").read_text(encoding="utf-8")
     shell = (theme_root / "gnome-shell" / "gnome-shell.css").read_text(encoding="utf-8")
+    variant = next(v for v in config["variants"] if v["id"] == theme_id)
 
     for label, css in (("gtk3", gtk3), ("gtk4", gtk4), ("shell", shell)):
         if css.count("{") != css.count("}"):
@@ -124,6 +127,30 @@ for theme_id in ids:
         raise SystemExit(
             f"{theme_id}: exact Nautilus 42.6 selected-sidebar override is missing"
         )
+
+    gtk3_row_pattern = re.compile(
+        r"row:selected,\s*row:selected:hover,\s*row:selected:focus\s*\{[^}]*"
+        + re.escape(f"background-color: {variant['selection']};"),
+        re.S,
+    )
+    if not gtk3_row_pattern.search(gtk3):
+        raise SystemExit(
+            f"{theme_id}: GTK 3 generic selected-row state is not mapped to the variant selection token"
+        )
+    gtk3_switch_pattern = re.compile(
+        r"switch:checked\s*\{[^}]*"
+        + re.escape(f"background-image: image({variant['accent']});"),
+        re.S,
+    )
+    if not gtk3_switch_pattern.search(gtk3):
+        raise SystemExit(
+            f"{theme_id}: GTK 3 checked-switch image layer is not mapped to the variant accent token"
+        )
+    if "switch:checked slider" not in gtk3 or "switch:backdrop:checked slider" not in gtk3:
+        raise SystemExit(
+            f"{theme_id}: GTK 3 checked-switch slider state coverage is missing"
+        )
+
     if "@define-color window_bg_color" not in gtk4:
         raise SystemExit(f"{theme_id}: GTK 4/libadwaita color-role mapping is missing")
     for expected_selector in (
@@ -135,7 +162,6 @@ for theme_id in ids:
             raise SystemExit(
                 f"{theme_id}: target GTK 4 selected-state override is missing: {expected_selector}"
             )
-    variant = next(v for v in config["variants"] if v["id"] == theme_id)
     selection_image = f"background-image: image({variant['selection']});"
     if selection_image not in gtk4:
         raise SystemExit(
