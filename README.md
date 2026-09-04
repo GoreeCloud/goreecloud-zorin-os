@@ -4,7 +4,7 @@ GoreeCloud Zorin OS Themes is the source repository for GoreeCloud desktop theme
 
 ## Current status
 
-**Development preview.** This repository contains a Glaze UI V1.1-inspired Zorin OS theme family. Source generation and automated smoke validation are implemented, and target-device testing is in progress on Zorin OS 17.3. A release or Stable claim still requires completion of rendered visual and accessibility acceptance.
+**Development preview.** This repository contains a Glaze UI V1.1-targeted Zorin OS theme family. Source generation and automated smoke validation are implemented, and target-device testing is in progress on Zorin OS 17.3. A release or Stable claim still requires completion of rendered visual and accessibility acceptance.
 
 The current variants are:
 
@@ -16,34 +16,40 @@ Each variant provides:
 
 - a GTK 3 application theme that layers GoreeCloud styling over GTK's built-in Adwaita base;
 - a small GTK 2 compatibility shim that inherits system Adwaita so classic theme-discovery paths used by Zorin/GNOME can recognize the theme package;
-- a GTK 4 stylesheet that maps Glaze UI color roles and common widget states into GTK 4/libadwaita surfaces;
+- a GTK 4/libadwaita stylesheet whose Development installation is composed over the exact verified local Zorin OS 17.3 base before GoreeCloud semantic overrides are appended;
 - Zorin's required empty `gtk-4.0/.libadwaita` opt-in marker so native libadwaita applications can participate in target-device validation;
-- a GNOME Shell custom stylesheet for panel, overview, menus, search, quick settings, dialogs, notifications, and related shell surfaces;
+- a GNOME Shell stylesheet whose Development installation is likewise composed over the verified local Zorin OS 17.3 Shell base before GoreeCloud overrides are appended;
 - Glaze UI V1.1 surface hierarchy, Deep Teal interaction accents, rounded control geometry, and light/dark/deep-dark mode mapping.
 
 Icons and cursor themes are intentionally not replaced in this implementation. They remain independently selectable in Zorin Appearance.
 
 ## Compatibility scope
 
-The initial target is **Zorin OS 17.3**.
+The current Development target is **Zorin OS 17.3** with `zorin-desktop-themes` **4.2.2**.
+
+Target-device diagnostics established that the installed Zorin 17.3 GTK 4 and GNOME Shell stylesheets are large platform-specific bases. Files and several Shell surfaces remained only partially correct when GoreeCloud used a small standalone override stylesheet. The installer therefore now composes the generated GoreeCloud overrides over the exact verified local `ZorinBlue-Light` or `ZorinBlue-Dark` base, including its supporting assets, before installation.
+
+This composition is intentionally fail-closed in Development. Before any existing GoreeCloud theme folder is moved or replaced, the installer verifies the local `zorin-desktop-themes` package version and the exact byte size/SHA-256 evidence captured from the accepted Zorin OS 17.3 target. If that base has changed, installation stops and requests a fresh `./scripts/diagnose.sh` result instead of assuming compatibility.
+
+The repository does **not** redistribute Zorin's base-theme bytes. They are copied locally from `/usr/share/themes` on the target device after verification. When available, the installed package's copyright record is also copied into each locally composed theme as `ZORIN_BASE_COPYRIGHT`, and `goreecloud-base.json` records the verified local base provenance.
 
 The GTK 2 shim is a compatibility/discovery layer, not a full GoreeCloud GTK 2 visual implementation. GTK 2 applications inherit the system Adwaita GTK 2 stylesheet in this preview.
 
-The GTK 4/libadwaita path is a **Development acceptance candidate**. Zorin OS 17 and newer patches libadwaita to permit explicit third-party theme opt-in when a compatible `gtk-4.0/gtk.css` and sibling `.libadwaita` marker are present. The files are now generated so real-device testing can cover native libadwaita applications. Their presence does not by itself prove compatibility or release readiness.
+The GTK 4/libadwaita path remains a **Development acceptance candidate**. Zorin OS 17 and newer patches libadwaita to permit explicit third-party theme opt-in when a compatible `gtk-4.0/gtk.css` and sibling `.libadwaita` marker are present. Successful local composition does not by itself prove visual compatibility or release readiness.
 
 Flatpak and Snap applications may retain styling bundled by their developers.
 
 ## Build
 
-The theme files are generated from shared source templates and palette data so the three variants do not maintain duplicated authoritative CSS.
+The GoreeCloud override files are generated from shared source templates and palette data so the three variants do not maintain duplicated authoritative GoreeCloud CSS.
 
 ```bash
 python3 scripts/build.py
 ```
 
-Generated output is written to `build/themes/` by default and is not committed.
+Generated standalone override output is written to `build/themes/` by default and is not committed. The target-specific Zorin base composition occurs during installation, not during ordinary source generation.
 
-## Install on Zorin OS
+## Install on the verified Zorin OS 17.3 target
 
 Run:
 
@@ -51,23 +57,25 @@ Run:
 ./scripts/install.sh
 ```
 
-The installer builds the themes, backs up any existing GoreeCloud theme folders into a timestamped recovery directory, and installs the generated variants under:
+The installer:
 
-```text
-~/.local/share/themes/
-```
+1. generates all three GoreeCloud variants into temporary storage;
+2. verifies `zorin-desktop-themes` 4.2.2 and the recorded ZorinBlue Light/Dark GTK 4 and Shell base hashes;
+3. locally copies the matching Zorin base directories and assets into the temporary themes;
+4. appends the generated GoreeCloud Glaze UI semantic overrides;
+5. only after successful composition, backs up any existing GoreeCloud theme folders into a timestamped recovery directory and installs the new variants under `~/.local/share/themes/`.
 
 Then close and reopen **Zorin Appearance**, navigate to **Themes → Other**, and choose a GoreeCloud variant in the **Applications** and **Shell** drop-downs.
 
 You can mix variants if desired, although matching Application and Shell modes are the intended combinations.
 
-If the themes still do not appear or a new candidate appears stale, verify the generated files:
+Verify the installed package with:
 
 ```bash
 find ~/.local/share/themes/GoreeCloud-Zorin-* -maxdepth 2 -type f -print | sort
 ```
 
-Each variant should include `index.theme`, `gtk-2.0/gtkrc`, `gtk-3.0/gtk.css`, `gtk-4.0/gtk.css`, `gtk-4.0/.libadwaita`, and `gnome-shell/gnome-shell.css`.
+In addition to the generated compatibility files, locally composed variants include copied Zorin base assets/files, `goreecloud-base.json`, and `goreecloud-overrides.css` copies used for traceability.
 
 ## Target diagnostics
 
@@ -99,7 +107,7 @@ Run the repository checks with:
 ./scripts/validate.sh
 ```
 
-CI additionally performs GTK 3 and GTK 4/libadwaita smoke-loads under a virtual display. These checks verify generated stylesheet parsing and representative widget loading on an Ubuntu 22.04-class environment; they do not replace testing on the actual Zorin laptop or Zorin's patched libadwaita theme-selection path.
+CI additionally performs GTK 3 and standalone GTK 4/libadwaita override smoke-loads under a virtual display. These checks verify generated stylesheet parsing and representative widget loading on an Ubuntu 22.04-class environment. CI also compiles and statically checks the target-composition tooling and pinned target evidence. It cannot reproduce the locally installed Zorin 17.3 base composition, Zorin's patched libadwaita theme-selection path, or the real GNOME Shell session; those remain target-device acceptance requirements.
 
 See `docs/validation.md` for the target-device acceptance checklist and `docs/glaze-ui-mapping.md` for the design-system mapping.
 
@@ -108,11 +116,11 @@ See `docs/validation.md` for the target-device acceptance checklist and `docs/gl
 ```text
 config/       Machine-readable palette and variant definitions
 src/          Shared GTK 2, GTK 3, GTK 4/libadwaita, GNOME Shell, and index.theme templates
-scripts/      Build, install, uninstall, target diagnostics, and validation tooling
+scripts/      Build, target-base composition, install, uninstall, diagnostics, and validation tooling
 docs/         Design mapping and target-device validation guidance
 .github/      Repository CI workflow
 ```
 
 ## Design-system source
 
-The implementation target is **Glaze UI V1.1 / 1.1.0**, the baseline recorded for this Development task. A downstream desktop theme is not considered Glaze UI-conformant merely because it looks similar; it must be independently implemented and validated for its platform.
+The implementation target is **Glaze UI V1.1 / 1.1.0**, the current baseline recorded for this Development task. A downstream desktop theme is not considered Glaze UI-conformant merely because it looks similar; it must be independently implemented and validated for its platform.
