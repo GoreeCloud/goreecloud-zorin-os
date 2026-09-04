@@ -21,7 +21,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes \
+            gir1.2-adw-1 \
             gir1.2-gtk-3.0 \
+            gir1.2-gtk-4.0 \
             python3-gi \
             shellcheck \
             xvfb
