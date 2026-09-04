@@ -180,9 +180,27 @@ placessidebar row:hover {
   background-color: alpha(@accent_bg_color, 0.14);
 }
 
+/* GNOME Settings 43 uses GtkListBox with the navigation-sidebar class.
+ * ZorinBlue-Dark's generic row:selected rule hard-codes its blue selection,
+ * so use the exact list.navigation-sidebar child structure observed in the
+ * target base and control-center UI. */
+window.background list.navigation-sidebar > row:selected,
+window.background list.navigation-sidebar > row:selected:hover,
+list.navigation-sidebar > row:selected,
+list.navigation-sidebar > row:selected:hover,
 .navigation-sidebar row:selected,
+placessidebar .navigation-sidebar > row:selected,
 placessidebar row:selected {
+  background-image: none;
   background-color: {{SELECTION}};
+  color: {{TEXT}};
+  box-shadow: none;
+}
+
+window.background list.navigation-sidebar > row:selected label,
+window.background list.navigation-sidebar > row:selected image,
+list.navigation-sidebar > row:selected label,
+list.navigation-sidebar > row:selected image {
   color: {{TEXT}};
 }
 
