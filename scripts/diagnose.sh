@@ -32,6 +32,25 @@ print_gsetting() {
   fi
 }
 
+print_selector_evidence() {
+  local path="$1"
+  local pattern="$2"
+  local label="$3"
+
+  printf '%s\n' "$label"
+  if [[ ! -r "$path" ]]; then
+    printf '  unavailable: %s\n' "$path"
+    return
+  fi
+
+  printf '  source: %s\n' "$path"
+  # Keep this bounded: enough exact target CSS to identify selector/color
+  # contracts without dumping the complete installed Zorin stylesheet.
+  if ! grep -nE "$pattern" "$path" 2>/dev/null | head -n 80 | sed 's/^/  /'; then
+    printf '%s\n' "  no matching selectors found"
+  fi
+}
+
 printf '%s\n' "GoreeCloud Zorin OS theme diagnostic (read-only)"
 printf '%s\n' "This script changes no settings and writes no system files."
 
@@ -86,7 +105,7 @@ shopt -u nullglob
 section "Installed Zorin base theme evidence"
 base_files=()
 for variant in ZorinBlue-Light ZorinBlue-Dark; do
-  for relative in gtk-4.0/gtk.css gtk-4.0/gtk-dark.css gnome-shell/gnome-shell.css; do
+  for relative in gtk-3.0/gtk.css gtk-4.0/gtk.css gtk-4.0/gtk-dark.css gnome-shell/gnome-shell.css; do
     path="/usr/share/themes/${variant}/${relative}"
     if [[ -f "$path" ]]; then
       base_files+=("$path")
@@ -106,6 +125,17 @@ else
   done
 fi
 
+section "Targeted base selector evidence"
+print_selector_evidence \
+  "/usr/share/themes/ZorinBlue-Dark/gtk-3.0/gtk.css" \
+  '(@define-color[[:space:]]+(theme_(base|bg|selected|fg|text)|selected_|borders)|nautilus|sidebar|stacksidebar|row:selected)' \
+  "ZorinBlue-Dark GTK 3 legacy/sidebar selectors"
+print_selector_evidence \
+  "/usr/share/themes/ZorinBlue-Dark/gtk-4.0/gtk.css" \
+  '(@define-color[[:space:]]+(accent_|window_|view_|sidebar_|card_)|navigation-sidebar|stacksidebar|row:selected|sidebar.*selected)' \
+  "ZorinBlue-Dark GTK 4 navigation/selection selectors"
+
 section "Why this output matters"
 printf '%s\n' "The repository commit and installed package/theme evidence let development stay pinned to the actual Zorin OS 17.3 implementation instead of assuming current upstream theme internals."
+printf '%s\n' "GTK 3 base hashes and bounded selector excerpts are required before extending exact-base composition to Nautilus 42.6; GTK 4 navigation excerpts identify the exact selected-row selector that must override Zorin blue in Settings."
 printf '%s\n' "If Shell colors appear stale after a reinstall, log out and back in before treating Shell selector behavior as a source failure."
