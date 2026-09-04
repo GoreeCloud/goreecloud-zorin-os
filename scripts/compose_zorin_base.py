@@ -14,9 +14,15 @@ TARGET_PACKAGE = "zorin-desktop-themes"
 TARGET_PACKAGE_VERSION = "4.2.2"
 DEFAULT_BASE_ROOT = Path("/usr/share/themes")
 DEFAULT_COPYRIGHT = Path("/usr/share/doc/zorin-desktop-themes/copyright")
+GTK3_ADWAITA_IMPORT_PREFIX = '@import url("resource:///org/gtk/libgtk/theme/Adwaita/'
 
 BASES = {
     "ZorinBlue-Light": {
+        "gtk3_css": {
+            "path": "gtk-3.0/gtk.css",
+            "bytes": 215389,
+            "sha256": "bc06ff2fac92e56951b8f4141b8324acc1e38db783ec3a0b3cf438e8c87d9fe6",
+        },
         "gtk_css": {
             "path": "gtk-4.0/gtk.css",
             "bytes": 196060,
@@ -29,6 +35,11 @@ BASES = {
         },
     },
     "ZorinBlue-Dark": {
+        "gtk3_css": {
+            "path": "gtk-3.0/gtk.css",
+            "bytes": 214797,
+            "sha256": "71e9d93ad1e58f75e52bb7b724fa38409961368b5d9edda4c3b921fac6e44604",
+        },
         "gtk_css": {
             "path": "gtk-4.0/gtk.css",
             "bytes": 195469,
@@ -114,44 +125,88 @@ def verify_base(base_root: Path, base_name: str) -> dict[str, dict[str, object]]
     return evidence
 
 
-def compose_variant(theme_root: Path, base_root: Path, theme_id: str, base_name: str, evidence: dict) -> None:
+def strip_standalone_gtk3_import(css: str) -> str:
+    """Remove the standalone Adwaita import before appending overrides to Zorin GTK 3."""
+    lines = css.splitlines()
+    kept: list[str] = []
+    removed = 0
+    for line in lines:
+        if line.strip().startswith(GTK3_ADWAITA_IMPORT_PREFIX):
+            removed += 1
+            continue
+        kept.append(line)
+    if removed != 1:
+        raise SystemExit(
+            "Generated GTK 3 override must contain exactly one standalone Adwaita import "
+            f"before Zorin base composition; found {removed}."
+        )
+    return "\n".join(kept).lstrip() + "\n"
+
+
+def compose_variant(
+    theme_root: Path,
+    base_root: Path,
+    theme_id: str,
+    base_name: str,
+    evidence: dict,
+) -> None:
     theme = theme_root / theme_id
-    gtk_dir = theme / "gtk-4.0"
+    gtk3_dir = theme / "gtk-3.0"
+    gtk4_dir = theme / "gtk-4.0"
     shell_dir = theme / "gnome-shell"
-    gtk_override_path = gtk_dir / "gtk.css"
+    gtk3_override_path = gtk3_dir / "gtk.css"
+    gtk4_override_path = gtk4_dir / "gtk.css"
     shell_override_path = shell_dir / "gnome-shell.css"
 
-    if not gtk_override_path.is_file() or not shell_override_path.is_file():
-        raise SystemExit(f"Generated override files are missing for {theme_id}")
+    for path in (gtk3_override_path, gtk4_override_path, shell_override_path):
+        if not path.is_file():
+            raise SystemExit(f"Generated override file is missing for {theme_id}: {path}")
 
-    gtk_override = gtk_override_path.read_text(encoding="utf-8")
+    gtk3_override = strip_standalone_gtk3_import(
+        gtk3_override_path.read_text(encoding="utf-8")
+    )
+    gtk4_override = gtk4_override_path.read_text(encoding="utf-8")
     shell_override = shell_override_path.read_text(encoding="utf-8")
 
     base_theme = base_root / base_name
-    shutil.copytree(base_theme / "gtk-4.0", gtk_dir, dirs_exist_ok=True)
+    shutil.copytree(base_theme / "gtk-3.0", gtk3_dir, dirs_exist_ok=True)
+    shutil.copytree(base_theme / "gtk-4.0", gtk4_dir, dirs_exist_ok=True)
     shutil.copytree(base_theme / "gnome-shell", shell_dir, dirs_exist_ok=True)
 
-    base_gtk = (base_theme / "gtk-4.0" / "gtk.css").read_text(encoding="utf-8")
+    base_gtk3 = (base_theme / "gtk-3.0" / "gtk.css").read_text(encoding="utf-8")
+    base_gtk4 = (base_theme / "gtk-4.0" / "gtk.css").read_text(encoding="utf-8")
     base_shell = (base_theme / "gnome-shell" / "gnome-shell.css").read_text(encoding="utf-8")
 
-    gtk_banner = (
+    gtk3_banner = (
         "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
-        " * Base copied locally from the verified installed Zorin OS 17.3 theme. */\n"
+        " * GTK 3 base copied locally from the verified installed Zorin OS 17.3 theme. */\n"
+    )
+    gtk4_banner = (
+        "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
+        " * GTK 4 base copied locally from the verified installed Zorin OS 17.3 theme. */\n"
     )
     shell_banner = (
         "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
         " * Base copied locally from the verified installed Zorin OS 17.3 Shell theme. */\n"
     )
-    composed_gtk = base_gtk.rstrip() + gtk_banner + gtk_override.lstrip()
+    composed_gtk3 = base_gtk3.rstrip() + gtk3_banner + gtk3_override
+    composed_gtk4 = base_gtk4.rstrip() + gtk4_banner + gtk4_override.lstrip()
     composed_shell = base_shell.rstrip() + shell_banner + shell_override.lstrip()
 
-    (gtk_dir / "gtk.css").write_text(composed_gtk, encoding="utf-8")
+    (gtk3_dir / "gtk.css").write_text(composed_gtk3, encoding="utf-8")
+    # Keep the explicitly selected GoreeCloud variant even when a GTK 3
+    # application requests a dark variant independently.
+    if (gtk3_dir / "gtk-dark.css").exists():
+        (gtk3_dir / "gtk-dark.css").write_text(composed_gtk3, encoding="utf-8")
+    (gtk3_dir / "goreecloud-overrides.css").write_text(gtk3_override, encoding="utf-8")
+
+    (gtk4_dir / "gtk.css").write_text(composed_gtk4, encoding="utf-8")
     # Keep an explicit-variant appearance even if a patched libadwaita path asks
     # for gtk-dark.css because the desktop color preference differs from the
     # Applications theme selected in Zorin Appearance.
-    (gtk_dir / "gtk-dark.css").write_text(composed_gtk, encoding="utf-8")
-    (gtk_dir / "goreecloud-overrides.css").write_text(gtk_override, encoding="utf-8")
-    (gtk_dir / ".libadwaita").write_bytes(b"")
+    (gtk4_dir / "gtk-dark.css").write_text(composed_gtk4, encoding="utf-8")
+    (gtk4_dir / "goreecloud-overrides.css").write_text(gtk4_override, encoding="utf-8")
+    (gtk4_dir / ".libadwaita").write_bytes(b"")
 
     (shell_dir / "gnome-shell.css").write_text(composed_shell, encoding="utf-8")
     (shell_dir / "goreecloud-overrides.css").write_text(shell_override, encoding="utf-8")
