@@ -104,6 +104,22 @@ for theme_id in ids:
         raise SystemExit(f"{theme_id}: GTK 2 discovery compatibility shim is missing")
     if "resource:///org/gtk/libgtk/theme/Adwaita/" not in gtk3:
         raise SystemExit(f"{theme_id}: GTK 3 compatibility base import is missing")
+    for legacy_name in (
+        "theme_fg_color",
+        "theme_text_color",
+        "theme_bg_color",
+        "theme_base_color",
+        "theme_selected_bg_color",
+        "theme_selected_fg_color",
+        "theme_unfocused_bg_color",
+        "theme_unfocused_base_color",
+        "borders",
+        "unfocused_borders",
+    ):
+        if f"@define-color {legacy_name} " not in gtk3:
+            raise SystemExit(
+                f"{theme_id}: GTK 3 legacy symbolic color mapping is missing: {legacy_name}"
+            )
     if "@define-color window_bg_color" not in gtk4:
         raise SystemExit(f"{theme_id}: GTK 4/libadwaita color-role mapping is missing")
     if marker.read_bytes() != b"":
