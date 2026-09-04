@@ -58,10 +58,13 @@ if len(ids) != len(set(ids)):
 
 for theme_id in ids:
     theme_root = generated / theme_id
+    marker = theme_root / "gtk-4.0" / ".libadwaita"
     required_files = [
         theme_root / "index.theme",
         theme_root / "gtk-2.0" / "gtkrc",
         theme_root / "gtk-3.0" / "gtk.css",
+        theme_root / "gtk-4.0" / "gtk.css",
+        marker,
         theme_root / "gnome-shell" / "gnome-shell.css",
     ]
     for path in required_files:
@@ -74,21 +77,25 @@ for theme_id in ids:
             raise SystemExit(f"Unresolved template marker in {path}")
 
     gtk2 = (theme_root / "gtk-2.0" / "gtkrc").read_text(encoding="utf-8")
-    gtk = (theme_root / "gtk-3.0" / "gtk.css").read_text(encoding="utf-8")
+    gtk3 = (theme_root / "gtk-3.0" / "gtk.css").read_text(encoding="utf-8")
+    gtk4 = (theme_root / "gtk-4.0" / "gtk.css").read_text(encoding="utf-8")
     shell = (theme_root / "gnome-shell" / "gnome-shell.css").read_text(encoding="utf-8")
 
-    for label, css in (("gtk", gtk), ("shell", shell)):
+    for label, css in (("gtk3", gtk3), ("gtk4", gtk4), ("shell", shell)):
         if css.count("{") != css.count("}"):
             raise SystemExit(f"{theme_id}: unbalanced braces in {label} stylesheet")
 
     if 'include "/usr/share/themes/Adwaita/gtk-2.0/gtkrc"' not in gtk2:
         raise SystemExit(f"{theme_id}: GTK 2 discovery compatibility shim is missing")
-    if "resource:///org/gtk/libgtk/theme/Adwaita/" not in gtk:
-        raise SystemExit(f"{theme_id}: GTK compatibility base import is missing")
-    if "gtk-4.0" in str(theme_root) or (theme_root / "gtk-4.0").exists():
-        raise SystemExit(f"{theme_id}: unvalidated GTK 4 output must not be generated")
-    if list(theme_root.rglob(".libadwaita")):
-        raise SystemExit(f"{theme_id}: libadwaita opt-in marker must not be generated")
+    if "resource:///org/gtk/libgtk/theme/Adwaita/" not in gtk3:
+        raise SystemExit(f"{theme_id}: GTK 3 compatibility base import is missing")
+    if "@define-color window_bg_color" not in gtk4:
+        raise SystemExit(f"{theme_id}: GTK 4/libadwaita color-role mapping is missing")
+    if marker.read_bytes() != b"":
+        raise SystemExit(f"{theme_id}: .libadwaita marker must remain empty")
+    markers = list(theme_root.rglob(".libadwaita"))
+    if markers != [marker]:
+        raise SystemExit(f"{theme_id}: unexpected libadwaita marker layout: {markers}")
 
     index = (theme_root / "index.theme").read_text(encoding="utf-8")
     if f"GtkTheme={theme_id}" not in index:
@@ -122,7 +129,7 @@ if [[ "$RUN_GTK" -eq 1 ]]; then
   cp -a "$TEMP_ROOT"/GoreeCloud-Zorin-* "$TEMP_HOME/.local/share/themes/"
 
   for theme in GoreeCloud-Zorin-Light GoreeCloud-Zorin-Dark GoreeCloud-Zorin-DeepDark; do
-    echo "GTK smoke-load: $theme"
+    echo "GTK 3 smoke-load: $theme"
     HOME="$TEMP_HOME" \
     GTK_THEME="$theme" \
     THEME_CSS="$TEMP_ROOT/$theme/gtk-3.0/gtk.css" \
@@ -142,11 +149,11 @@ provider.connect(
 )
 provider.load_from_path(os.environ["THEME_CSS"])
 if errors:
-    raise SystemExit("GTK CSS parsing failed: " + " | ".join(errors))
+    raise SystemExit("GTK 3 CSS parsing failed: " + " | ".join(errors))
 
 screen = Gdk.Screen.get_default()
 if screen is None:
-    raise SystemExit("GTK smoke-load could not acquire an Xvfb screen")
+    raise SystemExit("GTK 3 smoke-load could not acquire an Xvfb screen")
 Gtk.StyleContext.add_provider_for_screen(
     screen,
     provider,
@@ -164,6 +171,55 @@ window.show_all()
 while Gtk.events_pending():
     Gtk.main_iteration()
 window.destroy()
+PY
+
+    echo "GTK 4/libadwaita smoke-load: $theme"
+    HOME="$TEMP_HOME" \
+    THEME_CSS="$TEMP_ROOT/$theme/gtk-4.0/gtk.css" \
+    NO_AT_BRIDGE=1 \
+    xvfb-run -a python3 - <<'PY'
+import os
+
+import gi
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+from gi.repository import Adw, Gdk, GLib, Gtk
+
+Adw.init()
+errors = []
+provider = Gtk.CssProvider()
+provider.connect(
+    "parsing-error",
+    lambda _provider, _section, error: errors.append(str(error)),
+)
+provider.load_from_path(os.environ["THEME_CSS"])
+if errors:
+    raise SystemExit("GTK 4 CSS parsing failed: " + " | ".join(errors))
+
+display = Gdk.Display.get_default()
+if display is None:
+    raise SystemExit("GTK 4 smoke-load could not acquire an Xvfb display")
+Gtk.StyleContext.add_provider_for_display(
+    display,
+    provider,
+    Gtk.STYLE_PROVIDER_PRIORITY_USER,
+)
+
+window = Adw.Window()
+box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+box.set_margin_top(12)
+box.set_margin_bottom(12)
+box.set_margin_start(12)
+box.set_margin_end(12)
+box.append(Gtk.Entry())
+box.append(Gtk.Button(label="GoreeCloud"))
+box.append(Gtk.Switch())
+window.set_content(box)
+window.present()
+context = GLib.MainContext.default()
+while context.pending():
+    context.iteration(False)
+window.close()
 PY
   done
 fi
