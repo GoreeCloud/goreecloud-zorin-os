@@ -38,9 +38,18 @@ For read-only target evidence:
 
 ```bash
 ./scripts/diagnose.sh
+python3 ./scripts/diagnose_gtk4_runtime.py
 ```
 
-The diagnostic reports OS/session versions, relevant package versions, active theme settings, installed GoreeCloud files, exact installed Zorin base stylesheet sizes/hashes, and targeted compatibility evidence. It changes no settings and writes no system files.
+The general diagnostic reports OS/session versions, relevant package versions, active theme settings, installed GoreeCloud files, exact installed Zorin base stylesheet sizes/hashes, and targeted compatibility evidence. The GTK 4 runtime diagnostic inspects user GTK 4 configuration, installed GoreeCloud GTK 4 state rules, selected process override variables when Settings is already running, and bounded provider-path strings from the installed libadwaita library. These diagnostics change no settings and write no system files.
+
+When `strace` is already installed and direct launch-time provider evidence is required, completely close Settings first, then run:
+
+```bash
+./scripts/trace_gtk4_runtime.sh
+```
+
+The focused trace launches a temporary `gnome-control-center search` process under `strace`, captures the complete short observation window to a temporary file, filters out icon-theme noise after capture, summarizes whether user-local or system GTK 4/GTK 3 theme paths were seen or successfully opened, and removes the temporary trace on exit. It does not install packages, copy themes into system directories, populate `~/.config/gtk-4.0`, or alter theme settings. The traced Settings process is stopped by `timeout` at the end of the observation window.
 
 ## Validation
 
@@ -70,6 +79,6 @@ Flatpak and Snap applications may retain bundled or sandboxed appearance behavio
 
 Development / Draft. Do not treat installation success, theme discovery, exact-base hash verification, local composition, green CI, or individual screenshots as Stable release evidence.
 
-Current Dark target progress includes verified GoreeCloud canvas/surface rendering in Files, verified `#174F52` GoreeCloud selection styling in the Files sidebar, improved Shell Quick Settings/date-menu/application-menu states, and coherent overview/search rendering. Settings selected-navigation and checked-switch image-backed states remain under target-device acceptance after the latest GTK 4 correction.
+Current Dark target progress includes verified GoreeCloud canvas/surface rendering in Files, verified `#174F52` GoreeCloud selection styling in the Files sidebar, improved Shell Quick Settings/date-menu/application-menu states, and coherent overview/search rendering. Settings selected-navigation and checked-switch image-backed states remain under target-device acceptance pending direct GTK 4/libadwaita provider-path evidence.
 
 The current draft must remain open until the documented Zorin OS 17.3 real-device visual/accessibility checks, Light/Dark/DeepDark acceptance, representative native/libadwaita application coverage, rollback verification, review/merge, and release qualification are complete.
