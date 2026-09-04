@@ -130,21 +130,21 @@ for theme_id in ids:
 
     gtk3_row_pattern = re.compile(
         r"row:selected,\s*row:selected:hover,\s*row:selected:focus\s*\{[^}]*"
-        + re.escape(f"background-color: {variant['selection']};"),
+        + re.escape("background-color: @gc_selection;"),
         re.S,
     )
     if not gtk3_row_pattern.search(gtk3):
         raise SystemExit(
-            f"{theme_id}: GTK 3 generic selected-row state is not mapped to the variant selection token"
+            f"{theme_id}: GTK 3 generic selected-row state is not mapped to @gc_selection"
         )
     gtk3_switch_pattern = re.compile(
         r"switch:checked\s*\{[^}]*"
-        + re.escape(f"background-image: image({variant['accent']});"),
+        + re.escape("background-image: image(@gc_accent);"),
         re.S,
     )
     if not gtk3_switch_pattern.search(gtk3):
         raise SystemExit(
-            f"{theme_id}: GTK 3 checked-switch image layer is not mapped to the variant accent token"
+            f"{theme_id}: GTK 3 checked-switch image layer is not mapped to @gc_accent"
         )
     if "switch:checked slider" not in gtk3 or "switch:backdrop:checked slider" not in gtk3:
         raise SystemExit(
