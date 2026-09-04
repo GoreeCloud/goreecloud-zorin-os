@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -154,15 +155,26 @@ def strip_standalone_gtk3_import(css: str) -> str:
     return "\n".join(kept).lstrip() + "\n"
 
 
-def replace_exact_once(css: str, old: str, new: str, label: str) -> str:
-    """Replace one hash-pinned Zorin target rule, failing closed if it changed."""
-    count = css.count(old)
-    if count != 1:
+def replace_selector_rule_once(css: str, selector: str, new_rule: str, label: str) -> str:
+    """Replace one selector block in an already hash-verified Zorin GTK 4 base.
+
+    Zorin's compiled CSS declaration values and whitespace can differ between
+    Light and Dark even when the selector contract is the same. The complete
+    source file is verified by exact size and SHA-256 before this function runs,
+    so matching the exact selector block keeps the rewrite narrow without
+    duplicating fragile declaration text.
+    """
+    pattern = re.compile(
+        rf"(?m)^[ \t]*{re.escape(selector)}[ \t]*\{{[^{{}}]*\}}"
+    )
+    matches = list(pattern.finditer(css))
+    if len(matches) != 1:
         raise SystemExit(
-            "Verified Zorin GTK 4 base rule changed unexpectedly; "
-            f"refusing speculative state rewriting for {label}. Found {count} matches."
+            "Verified Zorin GTK 4 selector changed unexpectedly; "
+            f"refusing speculative state rewriting for {label}. Found {len(matches)} matches."
         )
-    return css.replace(old, new, 1)
+    match = matches[0]
+    return css[: match.start()] + new_rule + css[match.end() :]
 
 
 def rewrite_target_gtk4_states(
@@ -170,90 +182,50 @@ def rewrite_target_gtk4_states(
     base_name: str,
     palette: dict[str, str],
 ) -> tuple[str, int]:
-    """Rewrite exact Zorin selected/checked rules before appending GoreeCloud overrides.
+    """Rewrite verified Zorin selected/checked selector blocks before overrides."""
+    if base_name not in {"ZorinBlue-Light", "ZorinBlue-Dark"}:
+        raise SystemExit(f"No verified GTK 4 state rewrite profile exists for {base_name}")
 
-    The target Zorin 17.3 GTK 4 stylesheet paints navigation selection and
-    checked switches with hard-coded accent images. The file hash is verified
-    before this function runs, and every expected rule must match exactly once.
-    This keeps the correction narrow and fail-closed instead of globally
-    replacing Zorin colors that may legitimately serve other semantic roles.
-    """
     text = palette["text"]
     selection = palette["selection"]
     accent = palette["accent"]
     on_accent = palette["on_accent"]
 
-    if base_name == "ZorinBlue-Dark":
-        replacements = [
-            (
-                ".navigation-sidebar row.activatable:selected:active { background-color: #a5ddf9; background-image: image(#a5ddf9); box-shadow: none; }",
-                f".navigation-sidebar row.activatable:selected:active {{ background-color: {selection}; background-image: image({selection}); box-shadow: none; }}",
-                "dark navigation active-selected",
-            ),
-            (
-                ".navigation-sidebar row:selected { color: #161c1f; background-color: #bde6fb; background-image: image(#bde6fb); outline-color: alpha(#161c1f,0.5); }",
-                f".navigation-sidebar row:selected {{ color: {text}; background-color: {selection}; background-image: image({selection}); outline-color: alpha({text},0.5); }}",
-                "dark navigation selected",
-            ),
-            (
-                ".navigation-sidebar row:selected:backdrop, .navigation-sidebar row:selected:backdrop:hover { color: #171c1f; background-color: #8097a3; background-image: none; outline-color: alpha(#171c1f,0.5); }",
-                f".navigation-sidebar row:selected:backdrop, .navigation-sidebar row:selected:backdrop:hover {{ color: {text}; background-color: {selection}; background-image: none; outline-color: alpha({text},0.5); }}",
-                "dark navigation selected backdrop",
-            ),
-            (
-                "switch:checked { color: #161c1f; background-color: #bde6fb; background: image(#bde6fb); }",
-                f"switch:checked {{ color: {on_accent}; background-color: {accent}; background: image({accent}); }}",
-                "dark switch checked",
-            ),
-            (
-                "switch:checked:backdrop { color: #171c1f; background-color: #8097a3; background-image: none; }",
-                f"switch:checked:backdrop {{ color: {on_accent}; background-color: {accent}; background-image: none; }}",
-                "dark switch checked backdrop",
-            ),
-            (
-                "switch:checked > slider { background-color: #161c1f; }",
-                f"switch:checked > slider {{ background-color: {on_accent}; }}",
-                "dark switch checked slider",
-            ),
-        ]
-    elif base_name == "ZorinBlue-Light":
-        replacements = [
-            (
-                ".navigation-sidebar row.activatable:selected:active { background-color: #0e97dd; background-image: image(#0e97dd); box-shadow: none; }",
-                f".navigation-sidebar row.activatable:selected:active {{ background-color: {selection}; background-image: image({selection}); box-shadow: none; }}",
-                "light navigation active-selected",
-            ),
-            (
-                ".navigation-sidebar row:selected { color: white; background-color: #15a6f0; background-image: linear-gradient(65deg, #029be9, #22c5fd); outline-color: alpha(white,0.5); }",
-                f".navigation-sidebar row:selected {{ color: {text}; background-color: {selection}; background-image: image({selection}); outline-color: alpha({text},0.5); }}",
-                "light navigation selected",
-            ),
-            (
-                ".navigation-sidebar row:selected:backdrop, .navigation-sidebar row:selected:backdrop:hover { color: white; background-color: #999999; background-image: none; outline-color: alpha(white,0.5); }",
-                f".navigation-sidebar row:selected:backdrop, .navigation-sidebar row:selected:backdrop:hover {{ color: {text}; background-color: {selection}; background-image: none; outline-color: alpha({text},0.5); }}",
-                "light navigation selected backdrop",
-            ),
-            (
-                "switch:checked { color: white; background-color: #15a6f0; background: linear-gradient(65deg, #029be9, #22c5fd); }",
-                f"switch:checked {{ color: {on_accent}; background-color: {accent}; background: image({accent}); }}",
-                "light switch checked",
-            ),
-            (
-                "switch:checked:backdrop { color: white; background-color: #999999; background-image: none; }",
-                f"switch:checked:backdrop {{ color: {on_accent}; background-color: {accent}; background-image: none; }}",
-                "light switch checked backdrop",
-            ),
-            (
-                "switch:checked > slider { background-color: white; }",
-                f"switch:checked > slider {{ background-color: {on_accent}; }}",
-                "light switch checked slider",
-            ),
-        ]
-    else:
-        raise SystemExit(f"No verified GTK 4 state rewrite profile exists for {base_name}")
+    replacements = [
+        (
+            ".navigation-sidebar row.activatable:selected:active",
+            f".navigation-sidebar row.activatable:selected:active {{ background-color: {selection}; background-image: image({selection}); box-shadow: none; }}",
+            "navigation active-selected",
+        ),
+        (
+            ".navigation-sidebar row:selected",
+            f".navigation-sidebar row:selected {{ color: {text}; background-color: {selection}; background-image: image({selection}); outline-color: alpha({text},0.5); }}",
+            "navigation selected",
+        ),
+        (
+            ".navigation-sidebar row:selected:backdrop, .navigation-sidebar row:selected:backdrop:hover",
+            f".navigation-sidebar row:selected:backdrop, .navigation-sidebar row:selected:backdrop:hover {{ color: {text}; background-color: {selection}; background-image: none; outline-color: alpha({text},0.5); }}",
+            "navigation selected backdrop",
+        ),
+        (
+            "switch:checked",
+            f"switch:checked {{ color: {on_accent}; background-color: {accent}; background: image({accent}); }}",
+            "switch checked",
+        ),
+        (
+            "switch:checked:backdrop",
+            f"switch:checked:backdrop {{ color: {on_accent}; background-color: {accent}; background-image: none; }}",
+            "switch checked backdrop",
+        ),
+        (
+            "switch:checked > slider",
+            f"switch:checked > slider {{ background-color: {on_accent}; }}",
+            "switch checked slider",
+        ),
+    ]
 
-    for old, new, label in replacements:
-        css = replace_exact_once(css, old, new, label)
+    for selector, new_rule, label in replacements:
+        css = replace_selector_rule_once(css, selector, new_rule, label)
     return css, len(replacements)
 
 
@@ -304,7 +276,7 @@ def compose_variant(
     gtk4_banner = (
         "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
         " * GTK 4 base copied locally from the verified installed Zorin OS 17.3 theme.\n"
-        " * Hash-pinned Zorin selected/checked image rules were rewritten above before overrides. */\n"
+        " * Hash-pinned Zorin selected/checked selector blocks were rewritten above before overrides. */\n"
     )
     shell_banner = (
         "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
@@ -315,16 +287,11 @@ def compose_variant(
     composed_shell = base_shell.rstrip() + shell_banner + shell_override.lstrip()
 
     (gtk3_dir / "gtk.css").write_text(composed_gtk3, encoding="utf-8")
-    # Keep the explicitly selected GoreeCloud variant even when a GTK 3
-    # application requests a dark variant independently.
     if (gtk3_dir / "gtk-dark.css").exists():
         (gtk3_dir / "gtk-dark.css").write_text(composed_gtk3, encoding="utf-8")
     (gtk3_dir / "goreecloud-overrides.css").write_text(gtk3_override, encoding="utf-8")
 
     (gtk4_dir / "gtk.css").write_text(composed_gtk4, encoding="utf-8")
-    # Keep an explicit-variant appearance even if a patched libadwaita path asks
-    # for gtk-dark.css because the desktop color preference differs from the
-    # Applications theme selected in Zorin Appearance.
     (gtk4_dir / "gtk-dark.css").write_text(composed_gtk4, encoding="utf-8")
     (gtk4_dir / "goreecloud-overrides.css").write_text(gtk4_override, encoding="utf-8")
     (gtk4_dir / ".libadwaita").write_bytes(b"")
@@ -345,8 +312,8 @@ def compose_variant(
         "note": (
             "The GoreeCloud repository does not redistribute these Zorin base bytes. "
             "The installer copied them locally from this device after exact hash verification, "
-            "rewrote only the exact verified Zorin GTK 4 selected/checked state rules that "
-            "hard-code the base accent, then appended GoreeCloud Glaze UI semantic overrides."
+            "rewrote only the selector-scoped Zorin GTK 4 selected/checked state blocks in that "
+            "hash-pinned base, then appended GoreeCloud Glaze UI semantic overrides."
         ),
     }
     (theme / "goreecloud-base.json").write_text(
@@ -390,7 +357,7 @@ def main() -> int:
         )
         print(
             f"Composed {theme_id} with verified {base_name} target base "
-            "and exact GTK 4 selected/checked state rewrites"
+            "and selector-scoped GTK 4 selected/checked state rewrites"
         )
 
     return 0
