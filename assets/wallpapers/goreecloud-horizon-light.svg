@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">GoreeCloud Horizon Light</title>
+  <desc id="desc">Original GoreeCloud Glaze UI light wallpaper with a soft mineral-teal horizon, layered translucent ridges, and a restrained amber atmosphere.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.52" stop-color="#F4F7F8"/>
+      <stop offset="1" stop-color="#DCE6E8"/>
+    </linearGradient>
+    <radialGradient id="tealGlow" cx="0.72" cy="0.22" r="0.72">
+      <stop offset="0" stop-color="#8FD6D2" stop-opacity="0.68"/>
+      <stop offset="0.45" stop-color="#CDE9E7" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#F4F7F8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="amberGlow" cx="0.18" cy="0.22" r="0.40">
+      <stop offset="0" stop-color="#D9A35F" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#F4F7F8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ridgeOne" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#CDE9E7"/>
+      <stop offset="1" stop-color="#DCE6E8"/>
+    </linearGradient>
+    <linearGradient id="ridgeTwo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF0F1"/>
+      <stop offset="1" stop-color="#BFD9DB"/>
+    </linearGradient>
+    <linearGradient id="ridgeThree" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8FD6D2"/>
+      <stop offset="1" stop-color="#0F6B6F"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="3840" height="2160" fill="url(#sky)"/>
+  <rect width="3840" height="2160" fill="url(#tealGlow)"/>
+  <rect width="3840" height="2160" fill="url(#amberGlow)"/>
+
+  <g fill="none" stroke="#0F6B6F" stroke-opacity="0.11" stroke-width="2">
+    <path d="M-180 520C640 120 1360 160 2040 470S3330 890 4020 420"/>
+    <path d="M-220 650C560 260 1320 280 2010 560S3310 960 4030 560"/>
+    <path d="M-140 780C620 420 1290 420 1980 670S3260 1010 4010 700"/>
+  </g>
+
+  <path d="M0 1480L340 1320L650 1380L980 1190L1290 1330L1610 1120L1900 1260L2220 980L2520 1160L2860 920L3190 1110L3520 880L3840 1040V2160H0Z" fill="url(#ridgeOne)" opacity="0.95"/>
+  <path d="M0 1640L420 1460L770 1530L1120 1370L1460 1480L1800 1300L2150 1450L2490 1240L2830 1390L3210 1180L3530 1320L3840 1210V2160H0Z" fill="url(#ridgeTwo)" opacity="0.92"/>
+  <path d="M0 1840L460 1640L850 1730L1230 1540L1600 1690L1970 1500L2320 1640L2700 1460L3060 1600L3450 1430L3840 1530V2160H0Z" fill="url(#ridgeThree)" opacity="0.78"/>
+
+  <g fill="none" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="3">
+    <path d="M0 1840L460 1640L850 1730L1230 1540L1600 1690L1970 1500L2320 1640L2700 1460L3060 1600L3450 1430L3840 1530"/>
+    <path d="M0 1640L420 1460L770 1530L1120 1370L1460 1480L1800 1300L2150 1450L2490 1240L2830 1390L3210 1180L3530 1320L3840 1210"/>
+  </g>
+
+  <g opacity="0.18" fill="#0F6B6F">
+    <circle cx="500" cy="420" r="9"/>
+    <circle cx="760" cy="620" r="5"/>
+    <circle cx="1120" cy="340" r="7"/>
+    <circle cx="2960" cy="380" r="8"/>
+    <circle cx="3240" cy="600" r="5"/>
+    <circle cx="3500" cy="420" r="7"/>
+  </g>
+</svg>

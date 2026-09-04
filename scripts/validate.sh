@@ -20,6 +20,7 @@ bash -n "$ROOT/scripts/validate.sh"
 bash -n "$ROOT/scripts/diagnose.sh"
 bash -n "$ROOT/scripts/trace_gtk4_runtime.sh"
 bash -n "$ROOT/scripts/diagnose_settings_css.sh"
+bash -n "$ROOT/scripts/wallpaper.sh"
 
 for tool in \
   "$ROOT/scripts/build.py" \
@@ -28,7 +29,8 @@ for tool in \
   "$ROOT/scripts/validate.sh" \
   "$ROOT/scripts/diagnose.sh" \
   "$ROOT/scripts/trace_gtk4_runtime.sh" \
-  "$ROOT/scripts/diagnose_settings_css.sh"; do
+  "$ROOT/scripts/diagnose_settings_css.sh" \
+  "$ROOT/scripts/wallpaper.sh"; do
   if [[ ! -x "$tool" ]]; then
     echo "Expected executable tool is not executable: $tool" >&2
     exit 65
@@ -50,6 +52,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 root = Path(sys.argv[1])
@@ -139,6 +142,10 @@ for theme_id in ids:
         raise SystemExit(
             f"{theme_id}: GTK 3 generic selected-row state is not mapped to @gc_selection"
         )
+    if "row.activatable:selected" not in gtk3:
+        raise SystemExit(
+            f"{theme_id}: GTK 3 activatable selected-row state coverage is missing"
+        )
     gtk3_switch_pattern = re.compile(
         r"switch:checked\s*\{[^}]*"
         + re.escape("background-image: image(@gc_accent);"),
@@ -187,6 +194,79 @@ for theme_id in ids:
     if f"GtkTheme={theme_id}" not in index:
         raise SystemExit(f"{theme_id}: index.theme does not identify its GTK theme")
 
+palette_by_id = {variant["id"]: variant for variant in config["variants"]}
+wallpaper_config_path = root / "config" / "wallpapers.json"
+if not wallpaper_config_path.is_file():
+    raise SystemExit("Missing wallpaper manifest: config/wallpapers.json")
+wallpaper_config = json.loads(wallpaper_config_path.read_text(encoding="utf-8"))
+if wallpaper_config.get("design_system", {}).get("version") != config["design_system"]["version"]:
+    raise SystemExit("Wallpaper manifest Glaze UI version does not match the theme palette version")
+wallpapers = wallpaper_config.get("wallpapers", [])
+if len(wallpapers) != 3:
+    raise SystemExit("Expected exactly three GoreeCloud Horizon wallpaper variants")
+wallpaper_ids = set()
+wallpaper_modes = set()
+for wallpaper in wallpapers:
+    required_wallpaper_keys = {
+        "id", "mode", "theme_id", "file", "canvas", "accent", "accent_soft", "atmosphere_amber"
+    }
+    missing = required_wallpaper_keys - set(wallpaper)
+    if missing:
+        raise SystemExit(f"Wallpaper entry missing keys: {sorted(missing)}")
+    if wallpaper["id"] in wallpaper_ids:
+        raise SystemExit(f"Duplicate wallpaper ID: {wallpaper['id']}")
+    if wallpaper["mode"] in wallpaper_modes:
+        raise SystemExit(f"Duplicate wallpaper mode: {wallpaper['mode']}")
+    wallpaper_ids.add(wallpaper["id"])
+    wallpaper_modes.add(wallpaper["mode"])
+
+    theme_id = wallpaper["theme_id"]
+    if theme_id not in palette_by_id:
+        raise SystemExit(f"Wallpaper references unknown theme: {theme_id}")
+    palette = palette_by_id[theme_id]
+    if wallpaper["mode"] != palette["mode"]:
+        raise SystemExit(f"Wallpaper mode does not match theme mode: {wallpaper['id']}")
+    for key in ("canvas", "accent", "accent_soft", "atmosphere_amber"):
+        if wallpaper[key] != palette[key]:
+            raise SystemExit(
+                f"Wallpaper {wallpaper['id']} {key} does not match {theme_id} palette"
+            )
+
+    relative = Path(wallpaper["file"])
+    if relative.suffix.lower() != ".svg" or relative.parts[:2] != ("assets", "wallpapers"):
+        raise SystemExit(f"Wallpaper file must be an SVG under assets/wallpapers: {relative}")
+    path = root / relative
+    if not path.is_file():
+        raise SystemExit(f"Missing wallpaper artwork: {relative}")
+
+    try:
+        svg_root = ET.parse(path).getroot()
+    except ET.ParseError as exc:
+        raise SystemExit(f"Invalid SVG XML in {relative}: {exc}") from exc
+    if not svg_root.tag.endswith("svg"):
+        raise SystemExit(f"Wallpaper root is not SVG: {relative}")
+    if svg_root.attrib.get("width") != "3840" or svg_root.attrib.get("height") != "2160":
+        raise SystemExit(f"Wallpaper does not declare 3840x2160 native size: {relative}")
+    if svg_root.attrib.get("viewBox") != "0 0 3840 2160":
+        raise SystemExit(f"Wallpaper viewBox is not 0 0 3840 2160: {relative}")
+
+    for element in svg_root.iter():
+        local_name = element.tag.rsplit("}", 1)[-1].lower()
+        if local_name == "script":
+            raise SystemExit(f"Wallpaper contains executable script content: {relative}")
+        for attribute, value in element.attrib.items():
+            attr_name = attribute.rsplit("}", 1)[-1].lower()
+            if attr_name == "href" and (
+                value.startswith("http://")
+                or value.startswith("https://")
+                or value.startswith("data:")
+                or value.startswith("file:")
+            ):
+                raise SystemExit(f"Wallpaper contains an external/embedded href: {relative}")
+
+if wallpaper_modes != {"light", "dark", "deep-dark"}:
+    raise SystemExit(f"Unexpected wallpaper mode set: {sorted(wallpaper_modes)}")
+
 composer = (root / "scripts" / "compose_zorin_base.py").read_text(encoding="utf-8")
 for expected in (
     'TARGET_PACKAGE_VERSION = "4.2.2"',
@@ -198,7 +278,7 @@ for expected in (
     "b29cfbaa713955b14517798e2c15a67184136d9913944c1d0cf22fce0d1b3e0c",
     "90ffa76c872443d1549f09c814be8c22d68169a0dfb19e0508339e3613add77d",
     "3d94563d7c680be4ac0632b95bb0c205954377488c774a653d8655dbc2ca0823",
-    "e36202095055bda8de6f225a91911623775aa0896c24b8568c0d52982f8d7" if False else "e36202095055bda8de6f225227a91911623775aa0896c24b8568c0d52982f8d7",
+    "e36202095055bda8de6f225227a91911623775aa0896c24b8568c0d52982f8d7",
     'shutil.copytree(base_theme / "gtk-3.0"',
     "strip_standalone_gtk3_import",
 ):
@@ -220,7 +300,7 @@ for path in root.rglob("*"):
         if pattern.search(text):
             raise SystemExit(f"Potential reusable secret material detected in {path}")
 
-print("Static theme validation passed")
+print("Static theme and wallpaper validation passed")
 PY
 
 if [[ "$RUN_GTK" -eq 1 ]]; then

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "design_system": {
+    "name": "Glaze UI",
+    "version": "1.1.0",
+    "target": "Zorin OS 17.3"
+  },
+  "collection": {
+    "id": "goreecloud-horizon",
+    "name": "GoreeCloud Horizon",
+    "status": "Development",
+    "format": "SVG",
+    "native_size": "3840x2160",
+    "notes": "Original GoreeCloud wallpaper artwork. No Zorin wallpaper bytes are copied or redistributed."
+  },
+  "wallpapers": [
+    {
+      "id": "goreecloud-horizon-light",
+      "mode": "light",
+      "theme_id": "GoreeCloud-Zorin-Light",
+      "file": "assets/wallpapers/goreecloud-horizon-light.svg",
+      "canvas": "#F4F7F8",
+      "accent": "#0F6B6F",
+      "accent_soft": "#8FD6D2",
+      "atmosphere_amber": "#D9A35F"
+    },
+    {
+      "id": "goreecloud-horizon-dark",
+      "mode": "dark",
+      "theme_id": "GoreeCloud-Zorin-Dark",
+      "file": "assets/wallpapers/goreecloud-horizon-dark.svg",
+      "canvas": "#101A20",
+      "accent": "#1C8A8D",
+      "accent_soft": "#8FD6D2",
+      "atmosphere_amber": "#D9A35F"
+    },
+    {
+      "id": "goreecloud-horizon-deep-dark",
+      "mode": "deep-dark",
+      "theme_id": "GoreeCloud-Zorin-DeepDark",
+      "file": "assets/wallpapers/goreecloud-horizon-deep-dark.svg",
+      "canvas": "#081016",
+      "accent": "#1C8A8D",
+      "accent_soft": "#8FD6D2",
+      "atmosphere_amber": "#E7C78A"
+    }
+  ]
+}
