@@ -13,6 +13,7 @@ DEFAULT_OUTPUT = ROOT / "build" / "themes"
 PALETTES = ROOT / "config" / "palettes.json"
 TEMPLATES = {
     "index.theme": ROOT / "src" / "index.theme.in",
+    "gtk-2.0/gtkrc": ROOT / "src" / "gtk-2.0" / "gtkrc.in",
     "gtk-3.0/gtk.css": ROOT / "src" / "gtk-3.0" / "gtk.css.in",
     "gnome-shell/gnome-shell.css": ROOT / "src" / "gnome-shell" / "gnome-shell.css.in",
 }
