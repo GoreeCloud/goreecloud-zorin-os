@@ -98,6 +98,25 @@ button.destructive-action:hover {
   color: #FFFFFF;
 }
 
+/* Keep GTK stack-switcher tabs readable over the custom dark surfaces. */
+stackswitcher button {
+  border-color: @gc_border;
+  background-color: @gc_surface;
+  color: @gc_text;
+}
+
+stackswitcher button:hover {
+  border-color: @gc_accent_soft;
+  background-color: @gc_elevated;
+  color: @gc_text;
+}
+
+stackswitcher button:checked {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
 entry,
 spinbutton,
 combobox button {
