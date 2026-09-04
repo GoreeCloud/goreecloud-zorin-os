@@ -9,9 +9,10 @@ section() {
 
 print_command() {
   local label="$1"
+  local output
   shift
   printf '%-28s' "$label"
-  if output="$($@ 2>/dev/null)"; then
+  if output="$("$@" 2>/dev/null)"; then
     printf '%s\n' "$output"
   else
     printf '%s\n' "unavailable"
@@ -22,6 +23,7 @@ print_gsetting() {
   local label="$1"
   local schema="$2"
   local key="$3"
+  local output
   printf '%-28s' "$label"
   if output="$(gsettings get "$schema" "$key" 2>/dev/null)"; then
     printf '%s\n' "$output"
