@@ -120,12 +120,21 @@ for theme_id in ids:
             raise SystemExit(
                 f"{theme_id}: GTK 3 legacy symbolic color mapping is missing: {legacy_name}"
             )
+    if ".nautilus-window .sidebar-row:selected" not in gtk3:
+        raise SystemExit(
+            f"{theme_id}: exact Nautilus 42.6 selected-sidebar override is missing"
+        )
     if "@define-color window_bg_color" not in gtk4:
         raise SystemExit(f"{theme_id}: GTK 4/libadwaita color-role mapping is missing")
-    if "list.navigation-sidebar > row:selected" not in gtk4:
-        raise SystemExit(
-            f"{theme_id}: exact GTK 4 navigation-sidebar selected-row override is missing"
-        )
+    for expected_selector in (
+        "list.navigation-sidebar > row:selected",
+        "list.navigation-sidebar > row.activatable:selected",
+        "switch:checked:hover",
+    ):
+        if expected_selector not in gtk4:
+            raise SystemExit(
+                f"{theme_id}: target GTK 4 selected-state override is missing: {expected_selector}"
+            )
     if marker.read_bytes() != b"":
         raise SystemExit(f"{theme_id}: .libadwaita marker must remain empty")
     markers = list(theme_root.rglob(".libadwaita"))
