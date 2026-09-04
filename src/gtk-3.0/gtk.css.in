@@ -282,6 +282,28 @@ placessidebar row:selected {
   color: @gc_text;
 }
 
+/* Nautilus 42.6 ships a more specific .nautilus-window .sidebar-row:selected
+ * rule than the generic places-sidebar contract. Pin that exact target state
+ * to the Glaze selection token so the verified Zorin GTK 3 base cannot leave
+ * the active location on a pale Zorin-blue selection. */
+.nautilus-window .sidebar-row:selected,
+.nautilus-window .sidebar-row:selected:hover,
+.nautilus-window .sidebar-row:selected:focus {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+  box-shadow: inset 0 0 0 1px alpha(@gc_accent, 0.35);
+}
+
+.nautilus-window .sidebar-row:selected label,
+.nautilus-window .sidebar-row:selected image,
+.nautilus-window .sidebar-row:selected:hover label,
+.nautilus-window .sidebar-row:selected:hover image,
+.nautilus-window .sidebar-row:selected:focus label,
+.nautilus-window .sidebar-row:selected:focus image {
+  color: @gc_text;
+}
+
 notebook > header {
   border-color: @gc_border;
   background-color: @gc_surface;
