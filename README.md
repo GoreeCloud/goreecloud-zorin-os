@@ -39,9 +39,10 @@ For read-only target evidence:
 ```bash
 ./scripts/diagnose.sh
 python3 ./scripts/diagnose_gtk4_runtime.py
+./scripts/diagnose_settings_css.sh
 ```
 
-The general diagnostic reports OS/session versions, relevant package versions, active theme settings, installed GoreeCloud files, exact installed Zorin base stylesheet sizes/hashes, and targeted compatibility evidence. The GTK 4 runtime diagnostic inspects user GTK 4 configuration, installed GoreeCloud GTK 4 state rules, selected process override variables when Settings is already running, and bounded provider-path strings from the installed libadwaita library. These diagnostics change no settings and write no system files.
+The general diagnostic reports OS/session versions, relevant package versions, active theme settings, installed GoreeCloud files, exact installed Zorin base stylesheet sizes/hashes, and targeted compatibility evidence. The GTK 4 runtime diagnostic inspects user GTK 4 configuration, installed GoreeCloud GTK 4 state rules, selected process override variables when Settings is already running, and bounded provider-path strings from the installed libadwaita library. The Settings CSS diagnostic inspects the installed GNOME Control Center/libhandy package files and embedded GResource CSS for bounded selected-row, sidebar, search, switch, and pale-cyan state evidence. These diagnostics change no settings and write no system files.
 
 When `strace` is already installed and direct launch-time provider evidence is required, completely close Settings first, then run:
 
@@ -51,7 +52,7 @@ When `strace` is already installed and direct launch-time provider evidence is r
 
 The focused trace launches a temporary `gnome-control-center search` process under `strace`, captures the complete short observation window to a temporary file, filters icon-theme noise only after capture, summarizes whether user-local or system GTK 4/GTK 3 theme paths were seen or successfully opened, and removes the temporary trace on exit. It does not install packages, copy themes into system directories, populate `~/.config/gtk-4.0`, or alter theme settings. The traced Settings process is stopped by `timeout` at the end of the observation window.
 
-On the verified Zorin OS 17.3 target, that focused trace and direct ELF dependency inspection establish that GNOME Settings 41.7 is a GTK 3 + libhandy application: the Settings process opens the user-local GoreeCloud GTK 3 stylesheet and links directly to `libgtk-3`, `libgdk-3`, and `libhandy-1`, with no direct GTK 4/libadwaita dependency. Therefore the remaining Settings selected-row and checked-switch issue is handled as GTK 3 target compatibility rather than as a GTK 4/libadwaita provider-path defect.
+On the verified Zorin OS 17.3 target, that focused trace and direct ELF dependency inspection establish that GNOME Settings 41.7 is a GTK 3 + libhandy application: the Settings process opens the user-local GoreeCloud GTK 3 stylesheet and links directly to `libgtk-3`, `libgdk-3`, and `libhandy-1`, with no direct GTK 4/libadwaita dependency. Therefore the remaining Settings selected-row issue is handled as GTK 3/libhandy target compatibility rather than as a GTK 4/libadwaita provider-path defect.
 
 ## Validation
 
@@ -81,6 +82,6 @@ Flatpak and Snap applications may retain bundled or sandboxed appearance behavio
 
 Development / Draft. Do not treat installation success, theme discovery, exact-base hash verification, local composition, green CI, or individual screenshots as Stable release evidence.
 
-Current Dark target progress includes verified GoreeCloud canvas/surface rendering in Files, verified `#174F52` GoreeCloud selection styling in the Files sidebar, improved Shell Quick Settings/date-menu/application-menu states, and coherent overview/search rendering. The remaining Settings selected-row and checked-switch defect is now correctly classified as a GTK 3/libhandy state issue; the current GTK 3 state-mapping correction still requires target-device rendering acceptance.
+Current Dark target progress includes verified GoreeCloud canvas/surface rendering in Files, verified `#174F52` GoreeCloud selection styling in the Files sidebar, improved Shell Quick Settings/date-menu/application-menu states, coherent overview/search rendering, and target-verified Settings enabled-switch tracks at Mineral Teal `#1C8A8D`. The remaining Dark Settings blocker is now limited to the selected **Search** navigation row, which still renders Zorin pale cyan `#BDE6FB`. Because the generic GTK 3 row override did not displace that state while the switch override did, Development now uses a read-only bounded GNOME Control Center/libhandy CSS/GResource diagnostic before attempting any more specific styling change.
 
 The current draft must remain open until the documented Zorin OS 17.3 real-device visual/accessibility checks, Light/Dark/DeepDark acceptance, representative native/libadwaita application coverage, rollback verification, review/merge, and release qualification are complete.
