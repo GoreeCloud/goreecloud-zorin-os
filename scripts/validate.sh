@@ -60,6 +60,7 @@ for theme_id in ids:
     theme_root = generated / theme_id
     required_files = [
         theme_root / "index.theme",
+        theme_root / "gtk-2.0" / "gtkrc",
         theme_root / "gtk-3.0" / "gtk.css",
         theme_root / "gnome-shell" / "gnome-shell.css",
     ]
@@ -72,6 +73,7 @@ for theme_id in ids:
         if "{{" in text or "}}" in text:
             raise SystemExit(f"Unresolved template marker in {path}")
 
+    gtk2 = (theme_root / "gtk-2.0" / "gtkrc").read_text(encoding="utf-8")
     gtk = (theme_root / "gtk-3.0" / "gtk.css").read_text(encoding="utf-8")
     shell = (theme_root / "gnome-shell" / "gnome-shell.css").read_text(encoding="utf-8")
 
@@ -79,6 +81,8 @@ for theme_id in ids:
         if css.count("{") != css.count("}"):
             raise SystemExit(f"{theme_id}: unbalanced braces in {label} stylesheet")
 
+    if 'include "/usr/share/themes/Adwaita/gtk-2.0/gtkrc"' not in gtk2:
+        raise SystemExit(f"{theme_id}: GTK 2 discovery compatibility shim is missing")
     if "resource:///org/gtk/libgtk/theme/Adwaita/" not in gtk:
         raise SystemExit(f"{theme_id}: GTK compatibility base import is missing")
     if "gtk-4.0" in str(theme_root) or (theme_root / "gtk-4.0").exists():
@@ -90,7 +94,6 @@ for theme_id in ids:
     if f"GtkTheme={theme_id}" not in index:
         raise SystemExit(f"{theme_id}: index.theme does not identify its GTK theme")
 
-# Prevent accidental reusable secret material in the small text repository.
 secret_patterns = [
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
     re.compile(r"(?i)\b(api[_-]?key|access[_-]?token|client[_-]?secret)\s*[:=]\s*['\"][^'\"]+['\"]"),
@@ -131,9 +134,6 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
-# Parse the generated stylesheet explicitly. This treats GTK CSS parser
-# errors as validation failures without converting unrelated runtime warnings
-# (for example, a missing AT-SPI bus in headless CI) into fatal signals.
 errors = []
 provider = Gtk.CssProvider()
 provider.connect(
