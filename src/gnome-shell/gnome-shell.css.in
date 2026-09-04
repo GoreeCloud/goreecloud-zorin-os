@@ -1,0 +1,156 @@
+/*
+ * GoreeCloud Zorin OS GNOME Shell overlay
+ * Generated from shared source. Do not edit generated copies.
+ * Mode: {{MODE}}
+ *
+ * This stylesheet intentionally overrides selected shell surfaces while
+ * retaining the shell's default theme as the compatibility foundation.
+ */
+
+stage {
+  color: {{TEXT}};
+}
+
+#panel {
+  background-color: {{SHELL_PANEL}};
+  color: {{TEXT}};
+  box-shadow: inset 0 -1px 0 {{SHELL_BORDER}};
+}
+
+#panel .panel-button {
+  color: {{TEXT}};
+  border-radius: 16px;
+}
+
+#panel .panel-button:hover,
+#panel .panel-button:focus {
+  background-color: {{SHELL_HOVER}};
+}
+
+#panel .panel-button:active,
+#panel .panel-button:checked {
+  background-color: {{SHELL_ACTIVE}};
+}
+
+.popup-menu-boxpointer {
+  -arrow-background-color: {{SHELL_SURFACE}};
+  -arrow-border-color: {{SHELL_BORDER}};
+  -arrow-border-width: 1px;
+  -arrow-base: 24px;
+  -arrow-rise: 12px;
+}
+
+.popup-menu-content {
+  padding: 8px;
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+  box-shadow: 0 8px 28px {{SHELL_SHADOW}};
+}
+
+.popup-menu-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: {{TEXT}};
+}
+
+.popup-menu-item:focus {
+  background-color: {{SHELL_HOVER}};
+}
+
+.popup-menu-item:active,
+.popup-menu-item:checked {
+  background-color: {{SHELL_ACTIVE}};
+}
+
+.popup-separator-menu-item .popup-separator-menu-item-separator {
+  background-color: {{SHELL_BORDER}};
+}
+
+#dash .dash-background {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 24px;
+  background-color: {{SHELL_SURFACE}};
+  box-shadow: 0 8px 28px {{SHELL_SHADOW}};
+}
+
+.app-well-app .overview-icon,
+.show-apps .overview-icon {
+  border-radius: 16px;
+}
+
+.app-well-app:hover .overview-icon,
+.app-well-app:focus .overview-icon,
+.show-apps:hover .overview-icon,
+.show-apps:focus .overview-icon {
+  background-color: {{SHELL_HOVER}};
+}
+
+.app-well-app:active .overview-icon,
+.app-well-app:checked .overview-icon,
+.show-apps:active .overview-icon,
+.show-apps:checked .overview-icon {
+  background-color: {{SHELL_ACTIVE}};
+}
+
+.search-entry {
+  padding: 8px 12px;
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+  selection-background-color: {{ACCENT}};
+  selected-color: {{ON_ACCENT}};
+}
+
+.search-entry:focus {
+  border-color: {{ACCENT}};
+  box-shadow: inset 0 0 0 1px {{ACCENT}};
+}
+
+.modal-dialog {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 24px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+  box-shadow: 0 10px 36px {{SHELL_SHADOW}};
+}
+
+.message-list-section,
+.notification-banner {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+}
+
+.quick-settings {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 24px;
+  background-color: {{SHELL_SURFACE}};
+}
+
+.quick-toggle,
+.quick-menu-toggle .quick-toggle {
+  border-radius: 16px;
+  background-color: {{SHELL_ELEVATED}};
+  color: {{TEXT}};
+}
+
+.quick-toggle:hover,
+.quick-menu-toggle .quick-toggle:hover {
+  background-color: {{SHELL_HOVER}};
+}
+
+.quick-toggle:checked,
+.quick-menu-toggle .quick-toggle:checked {
+  background-color: {{ACCENT}};
+  color: {{ON_ACCENT}};
+}
+
+.slider {
+  -barlevel-active-background-color: {{ACCENT}};
+  -barlevel-background-color: {{BORDER}};
+  -barlevel-border-color: transparent;
+}

@@ -1,0 +1,33 @@
+name: Validate theme source
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install validation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            gir1.2-gtk-3.0 \
+            python3-gi \
+            shellcheck \
+            xvfb
+
+      - name: ShellCheck
+        run: shellcheck scripts/*.sh
+
+      - name: Validate generated themes
+        run: ./scripts/validate.sh --gtk

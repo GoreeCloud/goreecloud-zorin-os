@@ -1,0 +1,13 @@
+# Generated theme output
+build/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Local editor / OS state
+.DS_Store
+Thumbs.db
+*.swp
+*~

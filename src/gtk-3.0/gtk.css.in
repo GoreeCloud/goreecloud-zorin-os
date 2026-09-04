@@ -1,0 +1,311 @@
+/*
+ * GoreeCloud Zorin OS Theme
+ * Generated from shared source. Do not edit generated copies.
+ * Mode: {{MODE}}
+ *
+ * The built-in GTK 3 Adwaita stylesheet remains the compatibility base.
+ */
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/{{GTK_BASE_IMPORT}}");
+
+@define-color gc_canvas {{CANVAS}};
+@define-color gc_surface {{SURFACE}};
+@define-color gc_elevated {{ELEVATED}};
+@define-color gc_deep {{DEEP}};
+@define-color gc_text {{TEXT}};
+@define-color gc_muted {{MUTED}};
+@define-color gc_border {{BORDER}};
+@define-color gc_accent {{ACCENT}};
+@define-color gc_accent_hover {{ACCENT_HOVER}};
+@define-color gc_accent_soft {{ACCENT_SOFT}};
+@define-color gc_on_accent {{ON_ACCENT}};
+@define-color gc_selection {{SELECTION}};
+@define-color gc_destructive {{DESTRUCTIVE}};
+@define-color gc_destructive_hover {{DESTRUCTIVE_HOVER}};
+@define-color gc_atmosphere_amber {{ATMOSPHERE_AMBER}};
+
+/* Glaze UI surface hierarchy: canvas -> surface -> elevated/deep. */
+.background,
+window,
+dialog {
+  background-color: @gc_canvas;
+  color: @gc_text;
+}
+
+decoration {
+  border-radius: 24px 24px 0 0;
+}
+
+headerbar,
+.titlebar {
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+  border-color: @gc_border;
+  box-shadow: inset 0 -1px @gc_border;
+  padding: 4px 6px;
+}
+
+headerbar:backdrop,
+.titlebar:backdrop {
+  background-color: @gc_canvas;
+  color: @gc_muted;
+}
+
+headerbar button,
+.titlebar button,
+button {
+  min-height: 32px;
+  min-width: 32px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+  box-shadow: none;
+}
+
+button:hover {
+  border-color: @gc_accent_soft;
+  background-color: @gc_elevated;
+}
+
+button:active,
+button:checked,
+button.suggested-action {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+button.suggested-action:hover,
+button:active:hover,
+button:checked:hover {
+  border-color: @gc_accent_hover;
+  background-color: @gc_accent_hover;
+  color: @gc_on_accent;
+}
+
+button.destructive-action {
+  border-color: @gc_destructive;
+  background-color: @gc_destructive;
+  color: #FFFFFF;
+}
+
+button.destructive-action:hover {
+  border-color: @gc_destructive_hover;
+  background-color: @gc_destructive_hover;
+  color: #FFFFFF;
+}
+
+entry,
+spinbutton,
+combobox button {
+  min-height: 32px;
+  border-radius: 16px;
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+  box-shadow: none;
+}
+
+entry:focus,
+spinbutton:focus,
+combobox button:focus {
+  border-color: @gc_accent;
+  box-shadow: inset 0 0 0 1px @gc_accent;
+}
+
+entry selection,
+textview text selection {
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+switch {
+  min-height: 24px;
+  min-width: 44px;
+  border-radius: 999px;
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_elevated;
+  color: @gc_text;
+}
+
+switch:checked {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+switch slider {
+  min-height: 20px;
+  min-width: 20px;
+  border-radius: 999px;
+  background-color: @gc_surface;
+}
+
+check,
+radio {
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+}
+
+check {
+  border-radius: 8px;
+}
+
+radio {
+  border-radius: 999px;
+}
+
+check:checked,
+radio:checked {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+menu,
+.menu,
+popover,
+.popover {
+  border: 1px solid @gc_border;
+  border-radius: 16px;
+  background-color: @gc_surface;
+  color: @gc_text;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+menuitem,
+.menuitem,
+modelbutton {
+  min-height: 28px;
+  border-radius: 8px;
+  color: @gc_text;
+}
+
+menuitem:hover,
+.menuitem:hover,
+modelbutton:hover {
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+.view,
+treeview.view,
+iconview,
+textview text {
+  background-color: @gc_canvas;
+  color: @gc_text;
+}
+
+.view:selected,
+treeview.view:selected,
+iconview:selected {
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+.sidebar,
+placessidebar list {
+  background-color: @gc_surface;
+  color: @gc_text;
+  border-color: @gc_border;
+}
+
+.sidebar row:selected,
+placessidebar row:selected {
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+notebook > header {
+  border-color: @gc_border;
+  background-color: @gc_surface;
+}
+
+notebook > header > tabs > tab {
+  min-height: 32px;
+  padding: 4px 12px;
+  color: @gc_muted;
+  border-bottom: 2px solid transparent;
+}
+
+notebook > header > tabs > tab:hover {
+  color: @gc_text;
+}
+
+notebook > header > tabs > tab:checked {
+  color: @gc_text;
+  border-bottom-color: @gc_accent;
+}
+
+scrollbar {
+  background-color: transparent;
+}
+
+scrollbar trough {
+  background-color: transparent;
+}
+
+scrollbar slider {
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 999px;
+  background-color: @gc_border;
+}
+
+scrollbar slider:hover {
+  background-color: @gc_muted;
+}
+
+progressbar trough,
+scale trough {
+  border-radius: 999px;
+  background-color: @gc_elevated;
+}
+
+progressbar progress,
+scale highlight {
+  border-radius: 999px;
+  background-color: @gc_accent;
+}
+
+scale slider {
+  border-radius: 999px;
+  border-color: @gc_accent;
+  background-color: @gc_surface;
+}
+
+separator {
+  min-width: 1px;
+  min-height: 1px;
+  background-color: @gc_border;
+}
+
+tooltip {
+  border: 1px solid @gc_border;
+  border-radius: 8px;
+  background-color: @gc_deep;
+  color: @gc_text;
+}
+
+.osd {
+  border: 1px solid @gc_border;
+  border-radius: 16px;
+  background-color: @gc_deep;
+  color: @gc_text;
+}
+
+levelbar block.filled {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+}
+
+*:disabled {
+  color: @gc_muted;
+}
