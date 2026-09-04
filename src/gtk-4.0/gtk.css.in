@@ -181,26 +181,43 @@ placessidebar row:hover {
 }
 
 /* GNOME Settings 43 uses GtkListBox with the navigation-sidebar class.
- * ZorinBlue-Dark's generic row:selected rule hard-codes its blue selection,
- * so use the exact list.navigation-sidebar child structure observed in the
- * target base and control-center UI. */
+ * ZorinBlue-Dark's generic selected-row styling also has focused/activatable
+ * variants, so cover those exact target states rather than allowing a pale
+ * Zorin-blue fill to win when the row owns keyboard focus. */
 window.background list.navigation-sidebar > row:selected,
 window.background list.navigation-sidebar > row:selected:hover,
+window.background list.navigation-sidebar > row:selected:focus,
+window.background list.navigation-sidebar > row.activatable:selected,
+window.background list.navigation-sidebar > row.activatable:selected:hover,
+window.background list.navigation-sidebar > row.activatable:selected:focus,
 list.navigation-sidebar > row:selected,
 list.navigation-sidebar > row:selected:hover,
+list.navigation-sidebar > row:selected:focus,
+list.navigation-sidebar > row.activatable:selected,
+list.navigation-sidebar > row.activatable:selected:hover,
+list.navigation-sidebar > row.activatable:selected:focus,
 .navigation-sidebar row:selected,
+.navigation-sidebar row:selected:focus,
 placessidebar .navigation-sidebar > row:selected,
 placessidebar row:selected {
   background-image: none;
   background-color: {{SELECTION}};
   color: {{TEXT}};
-  box-shadow: none;
+  box-shadow: inset 0 0 0 1px alpha(@accent_color, 0.35);
 }
 
 window.background list.navigation-sidebar > row:selected label,
 window.background list.navigation-sidebar > row:selected image,
+window.background list.navigation-sidebar > row:selected:focus label,
+window.background list.navigation-sidebar > row:selected:focus image,
+window.background list.navigation-sidebar > row.activatable:selected label,
+window.background list.navigation-sidebar > row.activatable:selected image,
 list.navigation-sidebar > row:selected label,
-list.navigation-sidebar > row:selected image {
+list.navigation-sidebar > row:selected image,
+list.navigation-sidebar > row:selected:focus label,
+list.navigation-sidebar > row:selected:focus image,
+list.navigation-sidebar > row.activatable:selected label,
+list.navigation-sidebar > row.activatable:selected image {
   color: {{TEXT}};
 }
 
@@ -210,9 +227,14 @@ preferencesgroup > box > box {
   border-radius: 16px;
 }
 
-switch:checked {
+switch:checked,
+switch:checked:hover,
+switch:checked:focus {
+  background-image: none;
   background-color: @accent_bg_color;
+  border-color: @accent_color;
   color: @accent_fg_color;
+  box-shadow: none;
 }
 
 progressbar > trough > progress,
