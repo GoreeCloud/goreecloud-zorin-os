@@ -51,7 +51,7 @@ When `strace` is already installed and direct launch-time provider evidence is r
 
 The focused trace launches a temporary `gnome-control-center search` process under `strace`, captures the complete short observation window to a temporary file, filters icon-theme noise only after capture, summarizes whether user-local or system GTK 4/GTK 3 theme paths were seen or successfully opened, and removes the temporary trace on exit. It does not install packages, copy themes into system directories, populate `~/.config/gtk-4.0`, or alter theme settings. The traced Settings process is stopped by `timeout` at the end of the observation window.
 
-GTK 3 path activity from a traced child process is not sufficient to classify the GTK 4/libadwaita provider path. A valid provider conclusion requires direct user-local or system GTK 4 path evidence from the complete focused trace rather than a live stream truncated by unrelated icon lookups.
+GTK 3 path activity from a traced child process is not sufficient to classify the GTK 4/libadwaita provider path. A valid provider conclusion requires direct user-local or system GTK 4 path evidence from the complete focused trace rather than a live stream truncated by unrelated icon lookups. The first manual trace on the target laptop demonstrated this limitation: it opened the user-local GoreeCloud GTK 3 stylesheet but the broad `ZorinBlue` filter filled the first 250 displayed lines with icon-path activity before decisive GTK 4 provider evidence appeared.
 
 ## Validation
 
