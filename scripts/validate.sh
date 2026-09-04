@@ -103,7 +103,7 @@ for theme_id in ids:
     if 'include "/usr/share/themes/Adwaita/gtk-2.0/gtkrc"' not in gtk2:
         raise SystemExit(f"{theme_id}: GTK 2 discovery compatibility shim is missing")
     if "resource:///org/gtk/libgtk/theme/Adwaita/" not in gtk3:
-        raise SystemExit(f"{theme_id}: GTK 3 compatibility base import is missing")
+        raise SystemExit(f"{theme_id}: GTK 3 standalone compatibility-base import is missing")
     for legacy_name in (
         "theme_fg_color",
         "theme_text_color",
@@ -122,6 +122,10 @@ for theme_id in ids:
             )
     if "@define-color window_bg_color" not in gtk4:
         raise SystemExit(f"{theme_id}: GTK 4/libadwaita color-role mapping is missing")
+    if "list.navigation-sidebar > row:selected" not in gtk4:
+        raise SystemExit(
+            f"{theme_id}: exact GTK 4 navigation-sidebar selected-row override is missing"
+        )
     if marker.read_bytes() != b"":
         raise SystemExit(f"{theme_id}: .libadwaita marker must remain empty")
     markers = list(theme_root.rglob(".libadwaita"))
@@ -138,10 +142,14 @@ for expected in (
     '"GoreeCloud-Zorin-Light": "ZorinBlue-Light"',
     '"GoreeCloud-Zorin-Dark": "ZorinBlue-Dark"',
     '"GoreeCloud-Zorin-DeepDark": "ZorinBlue-Dark"',
+    "bc06ff2fac92e56951b8f4141b8324acc1e38db783ec3a0b3cf438e8c87d9fe6",
+    "71e9d93ad1e58f75e52bb7b724fa38409961368b5d9edda4c3b921fac6e44604",
     "b29cfbaa713955b14517798e2c15a67184136d9913944c1d0cf22fce0d1b3e0c",
     "90ffa76c872443d1549f09c814be8c22d68169a0dfb19e0508339e3613add77d",
     "3d94563d7c680be4ac0632b95bb0c205954377488c774a653d8655dbc2ca0823",
     "e36202095055bda8de6f225227a91911623775aa0896c24b8568c0d52982f8d7",
+    'shutil.copytree(base_theme / "gtk-3.0"',
+    "strip_standalone_gtk3_import",
 ):
     if expected not in composer:
         raise SystemExit(f"Target Zorin 17.3 base-composition evidence is missing: {expected}")
