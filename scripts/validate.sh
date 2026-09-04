@@ -138,6 +138,7 @@ if [[ "$RUN_GTK" -eq 1 ]]; then
 import os
 
 import gi
+gi.require_version("Gdk", "3.0")
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
@@ -181,6 +182,7 @@ PY
 import os
 
 import gi
+gi.require_version("Gdk", "4.0")
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw, Gdk, GLib, Gtk
