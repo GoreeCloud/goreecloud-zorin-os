@@ -36,7 +36,7 @@ The Stable Glaze UI atmospheric anchors are represented directly where appropria
 
 Light-mode neutrals are desktop-specific derivatives chosen to preserve readability with the same teal family.
 
-Deep Teal / Mineral Teal are used for interaction emphasis, focus, selected controls, progress, and other ordinary accent roles. Amber remains an atmospheric identity token rather than a warning/success/error semantic color; the first theme source therefore does not force Amber into semantic widget states.
+Deep Teal / Mineral Teal are used for interaction emphasis, focus, selected controls, progress, and other ordinary accent roles. Amber remains an atmospheric identity token rather than a warning/success/error semantic color; the theme source therefore does not force Amber into semantic widget states.
 
 ## Geometry mapping
 
@@ -59,14 +59,27 @@ The theme family exposes three Glaze-aligned modes:
 
 Deep Dark is intentionally distinct from Dark: it uses Canvas Black as the base with Deep Graphite and Slate Graphite layered above it.
 
+## GTK 4 / libadwaita mapping
+
+Target-device Dark-mode screenshots showed that selecting the GTK 3 + Shell theme did not bring the Files application onto the expected GoreeCloud canvas/surface hierarchy. The Development source therefore now includes a GTK 4 stylesheet and Zorin's explicit `.libadwaita` opt-in marker so native libadwaita applications can be tested instead of being treated as out of scope.
+
+The GTK 4 mapping intentionally focuses on stable libadwaita named color roles and common widget states rather than copying another theme's complete stylesheet. It maps:
+
+- `window_bg_color` and `view_bg_color` to the GoreeCloud canvas;
+- headerbar, sidebar, dialog, popover, and card roles to GoreeCloud surface/elevated layers;
+- accent/destructive roles to the existing GoreeCloud semantic tokens;
+- selected navigation rows, checked controls, focus, progress, scrollbars, and common geometry to the same interaction hierarchy used by GTK 3.
+
+Zorin OS 17+ requires an empty `gtk-4.0/.libadwaita` marker for this opt-in path. The marker is generated only as part of this Development acceptance candidate and does not constitute compatibility evidence by itself.
+
 ## Platform limitations
 
-GTK 3 and GNOME Shell CSS do not reproduce the exact optical and backdrop-blur behavior of Glaze UI's web implementation. The mapping prioritizes hierarchy, contrast, geometry, color, and interaction-state consistency instead of simulating unsupported effects.
+GTK, libadwaita, and GNOME Shell CSS do not reproduce the exact optical and backdrop-blur behavior of Glaze UI's web implementation. The mapping prioritizes hierarchy, contrast, geometry, color, and interaction-state consistency instead of simulating unsupported effects.
 
-The initial implementation does not generate a GTK 4 stylesheet or the Zorin-specific `.libadwaita` opt-in marker. Native libadwaita theming remains a separate acceptance item because Zorin requires theme developers to opt in and extensively test compatibility.
+GTK 2 remains a discovery compatibility shim rather than a full visual implementation. Browser chrome, Flatpak/Snap packaging, and application-provided CSS can also retain their own visual styling.
 
 ## Accessibility intent
 
-The theme deliberately avoids decorative animation and therefore does not introduce a new motion dependency. Interaction states retain visible boundaries, selected states use strong contrast, and focus states use a teal border/inner ring.
+The theme deliberately avoids decorative animation and therefore does not introduce a new motion dependency. Interaction states retain visible boundaries, selected states use strong contrast, and focus states use a teal border/inner ring where supported.
 
-Actual contrast, keyboard focus visibility, legibility, and state clarity must still be accepted on the target Zorin OS 17.3 laptop before release qualification.
+Actual contrast, keyboard focus visibility, legibility, state clarity, GTK 4/libadwaita compatibility, and Shell behavior must still be accepted on the target Zorin OS 17.3 laptop before release qualification.
