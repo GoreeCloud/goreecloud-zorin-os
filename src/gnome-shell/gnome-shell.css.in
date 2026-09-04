@@ -125,26 +125,148 @@ stage {
   color: {{TEXT}};
 }
 
+/* GNOME Shell's date/notification menu contains nested buttons and messages
+ * with their own default light surfaces. Map those concrete Shell classes so
+ * dark variants do not produce white cards or dark-on-dark calendar labels. */
+#calendarArea,
+.datemenu-today-button,
+.calendar,
+.message-list,
+.message-list-section {
+  color: {{TEXT}};
+}
+
+.datemenu-today-button {
+  border-radius: 16px;
+  background-color: transparent;
+  color: {{TEXT}};
+}
+
+.datemenu-today-button:hover,
+.datemenu-today-button:focus {
+  background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.datemenu-today-button .day-label,
+.datemenu-today-button .date-label,
+.calendar-month-label,
+.calendar-day-heading,
+.calendar-week-number {
+  color: {{TEXT}};
+}
+
+.calendar-day-base {
+  color: {{TEXT}};
+  border-radius: 999px;
+}
+
+.calendar-day-base:hover,
+.calendar-day-base:focus {
+  background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.calendar-day-base:selected {
+  background-color: {{ACCENT}};
+  color: {{ON_ACCENT}};
+}
+
+.events-button,
+.world-clocks-button,
+.weather-button,
+.message {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-color: {{SHELL_ELEVATED}};
+  color: {{TEXT}};
+}
+
+.events-button:hover,
+.events-button:focus,
+.world-clocks-button:hover,
+.world-clocks-button:focus,
+.weather-button:hover,
+.weather-button:focus,
+.message:hover,
+.message:focus {
+  background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.events-button:active,
+.world-clocks-button:active,
+.weather-button:active,
+.message:active {
+  background-color: {{SHELL_ACTIVE}};
+  color: {{TEXT}};
+}
+
+.world-clocks-header,
+.weather-header,
+.message-list-section-title,
+.events-section-title,
+.events-title,
+.events-button .event-time,
+.world-clocks-button .world-clocks-city,
+.world-clocks-button .world-clocks-time,
+.world-clocks-button .world-clocks-timezone {
+  color: {{MUTED}};
+}
+
+.message-title,
+.message-content,
+.message-body,
+.notification-banner .notification-title,
+.notification-banner .notification-body {
+  color: {{TEXT}};
+}
+
 .quick-settings {
   border: 1px solid {{SHELL_BORDER}};
   border-radius: 24px;
   background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
 }
 
 .quick-toggle,
-.quick-menu-toggle .quick-toggle {
+.quick-menu-toggle .quick-toggle,
+.quick-settings .quick-toggle,
+.quick-settings .quick-menu-toggle .quick-toggle {
   border-radius: 16px;
   background-color: {{SHELL_ELEVATED}};
   color: {{TEXT}};
 }
 
 .quick-toggle:hover,
-.quick-menu-toggle .quick-toggle:hover {
+.quick-menu-toggle .quick-toggle:hover,
+.quick-settings .quick-toggle:hover,
+.quick-settings .quick-menu-toggle .quick-toggle:hover {
   background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
 }
 
 .quick-toggle:checked,
-.quick-menu-toggle .quick-toggle:checked {
+.quick-menu-toggle .quick-toggle:checked,
+.quick-settings .quick-toggle:checked,
+.quick-settings .quick-menu-toggle .quick-toggle:checked {
+  background-color: {{ACCENT}};
+  color: {{ON_ACCENT}};
+}
+
+.quick-settings .icon-button {
+  background-color: {{SHELL_ELEVATED}};
+  color: {{TEXT}};
+}
+
+.quick-settings .icon-button:hover,
+.quick-settings .icon-button:focus {
+  background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.quick-settings .icon-button:active,
+.quick-settings .icon-button:checked {
   background-color: {{ACCENT}};
   color: {{ON_ACCENT}};
 }
