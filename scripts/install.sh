@@ -19,11 +19,12 @@ trap cleanup EXIT
 
 python3 "$ROOT/scripts/build.py" --output "$TEMP_ROOT"
 
-# Zorin OS 17.3's GTK 4 and Shell themes contain extensive platform-specific
-# selectors and assets. Compose the generated GoreeCloud semantic overrides on
-# top of the exact verified local Zorin 17.3 base before touching an existing
-# installed GoreeCloud theme. The composer fails closed when package version or
-# base hashes differ from the target evidence captured during Development.
+# Zorin OS 17.3's GTK 3, GTK 4, and Shell themes contain extensive
+# platform-specific selectors and assets. Compose the generated GoreeCloud
+# semantic overrides on top of the exact verified local Zorin 17.3 base before
+# touching an existing installed GoreeCloud theme. The composer fails closed
+# when package version or base hashes differ from target evidence captured
+# during Development.
 python3 "$ROOT/scripts/compose_zorin_base.py" "$TEMP_ROOT"
 
 mkdir -p -- "$DEST"
@@ -42,8 +43,8 @@ done
 echo
 echo "Installed GoreeCloud Zorin themes to:"
 echo "  $DEST"
-echo "GTK 4/libadwaita and GNOME Shell were composed from the verified"
-echo "local Zorin OS 17.3 base before GoreeCloud Glaze UI overrides."
+echo "GTK 3, GTK 4/libadwaita, and GNOME Shell were composed from the"
+echo "verified local Zorin OS 17.3 base before GoreeCloud Glaze UI overrides."
 
 if [[ "$backed_up" -eq 1 ]]; then
   echo "Previous GoreeCloud theme folders were preserved at:"
