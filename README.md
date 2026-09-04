@@ -69,6 +69,18 @@ find ~/.local/share/themes/GoreeCloud-Zorin-* -maxdepth 2 -type f -print | sort
 
 Each variant should include `index.theme`, `gtk-2.0/gtkrc`, `gtk-3.0/gtk.css`, `gtk-4.0/gtk.css`, `gtk-4.0/.libadwaita`, and `gnome-shell/gnome-shell.css`.
 
+## Target diagnostics
+
+When target-device rendering differs from the generated palette or a Zorin-specific compatibility change is being considered, run the read-only diagnostic helper:
+
+```bash
+./scripts/diagnose.sh
+```
+
+It reports the repository revision, operating-system/session information, relevant package versions, active GTK/Shell theme settings, installed GoreeCloud theme files, and hashes/sizes of installed ZorinBlue Light/Dark GTK 4 and Shell base stylesheets when available. It does not modify settings or system files. This evidence keeps compatibility work tied to the actual Zorin OS 17.3 implementation rather than assuming that another Zorin release or current upstream theme source is identical.
+
+GNOME Shell can retain a previously loaded stylesheet across a theme reinstall. When validating Shell-only visual changes, switch the Shell theme away and back or log out and back in before classifying unchanged rendering as a current-source failure.
+
 ## Uninstall / rollback
 
 First switch **Applications** and **Shell** to another theme in Zorin Appearance. Then run:
@@ -96,7 +108,7 @@ See `docs/validation.md` for the target-device acceptance checklist and `docs/gl
 ```text
 config/       Machine-readable palette and variant definitions
 src/          Shared GTK 2, GTK 3, GTK 4/libadwaita, GNOME Shell, and index.theme templates
-scripts/      Build, install, uninstall, and validation tooling
+scripts/      Build, install, uninstall, target diagnostics, and validation tooling
 docs/         Design mapping and target-device validation guidance
 .github/      Repository CI workflow
 ```
