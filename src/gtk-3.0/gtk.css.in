@@ -23,6 +23,31 @@
 @define-color gc_destructive_hover {{DESTRUCTIVE_HOVER}};
 @define-color gc_atmosphere_amber {{ATMOSPHERE_AMBER}};
 
+/* GTK 3 applications such as Nautilus 42.6 and GNOME Settings still consume
+ * the historical symbolic color API from the active theme. Map those names to
+ * the same Glaze semantic roles so application-provided CSS does not fall back
+ * to Adwaita/Zorin blue and neutral-charcoal defaults. */
+@define-color theme_fg_color {{TEXT}};
+@define-color theme_text_color {{TEXT}};
+@define-color theme_bg_color {{SURFACE}};
+@define-color theme_base_color {{CANVAS}};
+@define-color theme_selected_bg_color {{SELECTION}};
+@define-color theme_selected_fg_color {{TEXT}};
+@define-color theme_unfocused_fg_color {{MUTED}};
+@define-color theme_unfocused_text_color {{MUTED}};
+@define-color theme_unfocused_bg_color {{CANVAS}};
+@define-color theme_unfocused_base_color {{DEEP}};
+@define-color theme_unfocused_selected_bg_color {{SELECTION}};
+@define-color theme_unfocused_selected_fg_color {{MUTED}};
+@define-color theme_insensitive_bg_color {{SURFACE}};
+@define-color theme_insensitive_fg_color {{MUTED}};
+@define-color theme_tooltip_bg_color {{DEEP}};
+@define-color theme_tooltip_fg_color {{TEXT}};
+@define-color selected_bg_color {{SELECTION}};
+@define-color selected_fg_color {{TEXT}};
+@define-color borders {{BORDER}};
+@define-color unfocused_borders {{BORDER}};
+
 /* Glaze UI surface hierarchy: canvas -> surface -> elevated/deep. */
 .background,
 window,
