@@ -135,6 +135,20 @@ for theme_id in ids:
             raise SystemExit(
                 f"{theme_id}: target GTK 4 selected-state override is missing: {expected_selector}"
             )
+    variant = next(v for v in config["variants"] if v["id"] == theme_id)
+    selection_image = f"background-image: image({variant['selection']});"
+    if selection_image not in gtk4:
+        raise SystemExit(
+            f"{theme_id}: GTK 4 selected-row image layer is not mapped to the variant selection token"
+        )
+    if "background-image: image(@accent_bg_color);" not in gtk4:
+        raise SystemExit(
+            f"{theme_id}: GTK 4 checked-switch image layer is not mapped to the GoreeCloud accent"
+        )
+    if "switch:checked > slider" not in gtk4:
+        raise SystemExit(
+            f"{theme_id}: GTK 4 checked-switch slider override is missing"
+        )
     if marker.read_bytes() != b"":
         raise SystemExit(f"{theme_id}: .libadwaita marker must remain empty")
     markers = list(theme_root.rglob(".libadwaita"))
@@ -156,7 +170,7 @@ for expected in (
     "b29cfbaa713955b14517798e2c15a67184136d9913944c1d0cf22fce0d1b3e0c",
     "90ffa76c872443d1549f09c814be8c22d68169a0dfb19e0508339e3613add77d",
     "3d94563d7c680be4ac0632b95bb0c205954377488c774a653d8655dbc2ca0823",
-    "e36202095055bda8de6f225227a91911623775aa0896c24b8568c0d52982f8d7",
+    "e36202095055bda8de6f225a91911623775aa0896c24b8568c0d52982f8d7" if False else "e36202095055bda8de6f225227a91911623775aa0896c24b8568c0d52982f8d7",
     'shutil.copytree(base_theme / "gtk-3.0"',
     "strip_standalone_gtk3_import",
 ):
