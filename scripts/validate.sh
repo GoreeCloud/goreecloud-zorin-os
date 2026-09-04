@@ -122,11 +122,36 @@ if [[ "$RUN_GTK" -eq 1 ]]; then
     echo "GTK smoke-load: $theme"
     HOME="$TEMP_HOME" \
     GTK_THEME="$theme" \
-    G_DEBUG=fatal-warnings \
+    THEME_CSS="$TEMP_ROOT/$theme/gtk-3.0/gtk.css" \
+    NO_AT_BRIDGE=1 \
     xvfb-run -a python3 - <<'PY'
+import os
+
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gdk, Gtk
+
+# Parse the generated stylesheet explicitly. This treats GTK CSS parser
+# errors as validation failures without converting unrelated runtime warnings
+# (for example, a missing AT-SPI bus in headless CI) into fatal signals.
+errors = []
+provider = Gtk.CssProvider()
+provider.connect(
+    "parsing-error",
+    lambda _provider, _section, error: errors.append(str(error)),
+)
+provider.load_from_path(os.environ["THEME_CSS"])
+if errors:
+    raise SystemExit("GTK CSS parsing failed: " + " | ".join(errors))
+
+screen = Gdk.Screen.get_default()
+if screen is None:
+    raise SystemExit("GTK smoke-load could not acquire an Xvfb screen")
+Gtk.StyleContext.add_provider_for_screen(
+    screen,
+    provider,
+    Gtk.STYLE_PROVIDER_PRIORITY_USER,
+)
 
 window = Gtk.Window()
 box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
