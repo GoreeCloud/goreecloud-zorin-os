@@ -11,7 +11,9 @@ elif [[ $# -gt 0 ]]; then
   exit 64
 fi
 
-python3 -m py_compile "$ROOT/scripts/build.py"
+python3 -m py_compile \
+  "$ROOT/scripts/build.py" \
+  "$ROOT/scripts/compose_zorin_base.py"
 bash -n "$ROOT/scripts/install.sh"
 bash -n "$ROOT/scripts/uninstall.sh"
 bash -n "$ROOT/scripts/validate.sh"
@@ -113,6 +115,20 @@ for theme_id in ids:
     index = (theme_root / "index.theme").read_text(encoding="utf-8")
     if f"GtkTheme={theme_id}" not in index:
         raise SystemExit(f"{theme_id}: index.theme does not identify its GTK theme")
+
+composer = (root / "scripts" / "compose_zorin_base.py").read_text(encoding="utf-8")
+for expected in (
+    'TARGET_PACKAGE_VERSION = "4.2.2"',
+    '"GoreeCloud-Zorin-Light": "ZorinBlue-Light"',
+    '"GoreeCloud-Zorin-Dark": "ZorinBlue-Dark"',
+    '"GoreeCloud-Zorin-DeepDark": "ZorinBlue-Dark"',
+    "b29cfbaa713955b14517798e2c15a67184136d9913944c1d0cf22fce0d1b3e0c",
+    "90ffa76c872443d1549f09c814be8c22d68169a0dfb19e0508339e3613add77d",
+    "3d94563d7c680be4ac0632b95bb0c205954377488c774a653d8655dbc2ca0823",
+    "e36202095055bda8de6f225227a91911623775aa0896c24b8568c0d52982f8d7",
+):
+    if expected not in composer:
+        raise SystemExit(f"Target Zorin 17.3 base-composition evidence is missing: {expected}")
 
 secret_patterns = [
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
