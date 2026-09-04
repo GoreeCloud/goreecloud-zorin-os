@@ -15,6 +15,7 @@ TEMPLATES = {
     "index.theme": ROOT / "src" / "index.theme.in",
     "gtk-2.0/gtkrc": ROOT / "src" / "gtk-2.0" / "gtkrc.in",
     "gtk-3.0/gtk.css": ROOT / "src" / "gtk-3.0" / "gtk.css.in",
+    "gtk-4.0/gtk.css": ROOT / "src" / "gtk-4.0" / "gtk.css.in",
     "gnome-shell/gnome-shell.css": ROOT / "src" / "gnome-shell" / "gnome-shell.css.in",
 }
 PLACEHOLDER = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
@@ -90,6 +91,11 @@ def main() -> int:
                 render(template, tokens, TEMPLATES[relative]),
                 encoding="utf-8",
             )
+
+        # Zorin OS 17+ requires this explicit marker before patched libadwaita
+        # will load a third-party theme into native libadwaita applications.
+        marker = theme_root / "gtk-4.0" / ".libadwaita"
+        marker.write_text("", encoding="utf-8")
 
         generated.append(theme_root)
 
