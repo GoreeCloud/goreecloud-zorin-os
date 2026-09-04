@@ -181,9 +181,9 @@ placessidebar row:hover {
 }
 
 /* GNOME Settings 43 uses GtkListBox with the navigation-sidebar class.
- * ZorinBlue-Dark's generic selected-row styling also has focused/activatable
- * variants, so cover those exact target states rather than allowing a pale
- * Zorin-blue fill to win when the row owns keyboard focus. */
+ * ZorinBlue-Dark paints selected rows with an image-backed pale-blue fill.
+ * Match that target mechanism directly with the GoreeCloud selection token;
+ * merely clearing background-image is insufficient on this patched stack. */
 window.background list.navigation-sidebar > row:selected,
 window.background list.navigation-sidebar > row:selected:hover,
 window.background list.navigation-sidebar > row:selected:focus,
@@ -200,8 +200,8 @@ list.navigation-sidebar > row.activatable:selected:focus,
 .navigation-sidebar row:selected:focus,
 placessidebar .navigation-sidebar > row:selected,
 placessidebar row:selected {
-  background-image: none;
   background-color: {{SELECTION}};
+  background-image: image({{SELECTION}});
   color: {{TEXT}};
   box-shadow: inset 0 0 0 1px alpha(@accent_color, 0.35);
 }
@@ -227,14 +227,23 @@ preferencesgroup > box > box {
   border-radius: 16px;
 }
 
+/* ZorinBlue-Dark also paints checked switches with an image(#bde6fb) layer.
+ * Replace that layer explicitly with the GoreeCloud accent rather than relying
+ * on background-color alone. */
 switch:checked,
 switch:checked:hover,
 switch:checked:focus {
-  background-image: none;
   background-color: @accent_bg_color;
+  background-image: image(@accent_bg_color);
   border-color: @accent_color;
   color: @accent_fg_color;
   box-shadow: none;
+}
+
+switch:checked > slider,
+switch:checked:hover > slider,
+switch:checked:focus > slider {
+  background-color: @accent_fg_color;
 }
 
 progressbar > trough > progress,
