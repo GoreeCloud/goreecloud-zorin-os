@@ -19,6 +19,7 @@ bash -n "$ROOT/scripts/uninstall.sh"
 bash -n "$ROOT/scripts/validate.sh"
 bash -n "$ROOT/scripts/diagnose.sh"
 bash -n "$ROOT/scripts/trace_gtk4_runtime.sh"
+bash -n "$ROOT/scripts/diagnose_settings_css.sh"
 
 for tool in \
   "$ROOT/scripts/build.py" \
@@ -26,7 +27,8 @@ for tool in \
   "$ROOT/scripts/uninstall.sh" \
   "$ROOT/scripts/validate.sh" \
   "$ROOT/scripts/diagnose.sh" \
-  "$ROOT/scripts/trace_gtk4_runtime.sh"; do
+  "$ROOT/scripts/trace_gtk4_runtime.sh" \
+  "$ROOT/scripts/diagnose_settings_css.sh"; do
   if [[ ! -x "$tool" ]]; then
     echo "Expected executable tool is not executable: $tool" >&2
     exit 65
