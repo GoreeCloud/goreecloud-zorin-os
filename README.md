@@ -56,7 +56,7 @@ GTK smoke loading where the required dependencies are available:
 ./scripts/validate.sh --gtk
 ```
 
-CI runs ShellCheck and generated-theme validation. Green CI verifies repository source/tooling only; it does not establish target-device visual or accessibility acceptance.
+CI runs ShellCheck and generated-theme validation. Green CI verifies repository source/tooling only; it does not establish target-device visual or accessibility acceptance. Exact candidate SHAs and corresponding CI runs are maintained in PR #1 and the GoreeCloud task record rather than embedded in this README.
 
 ## Compatibility scope
 
@@ -71,7 +71,5 @@ Flatpak and Snap applications may retain bundled or sandboxed appearance behavio
 Development / Draft. Do not treat installation success, theme discovery, exact-base hash verification, local composition, green CI, or individual screenshots as Stable release evidence.
 
 Current Dark target progress includes verified GoreeCloud canvas/surface rendering in Files, verified `#174F52` GoreeCloud selection styling in the Files sidebar, improved Shell Quick Settings/date-menu/application-menu states, and coherent overview/search rendering. Settings selected-navigation and checked-switch image-backed states remain under target-device acceptance after the latest GTK 4 correction.
-
-Current exact source candidate: `85683c51d8cc734b6898195674caa341cec5e356`. `Validate theme source` run #57 (`33916547292`) passed at that exact head. The candidate is source-validated but has not yet been installed/rendered on the target laptop.
 
 The current draft must remain open until the documented Zorin OS 17.3 real-device visual/accessibility checks, Light/Dark/DeepDark acceptance, representative native/libadwaita application coverage, rollback verification, review/merge, and release qualification are complete.
