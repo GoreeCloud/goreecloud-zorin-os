@@ -1,0 +1,8 @@
+# GoreeCloud Zorin OS GTK 2 compatibility shim.
+#
+# The primary GoreeCloud application styling target is GTK 3. Zorin's own
+# desktop themes still ship a gtk-2.0/gtkrc entry, and classic theme discovery
+# paths may require that conventional file to consider a theme selectable.
+# GTK 2 applications inherit the system Adwaita GTK 2 theme in this preview.
+
+include "/usr/share/themes/Adwaita/gtk-2.0/gtkrc"
