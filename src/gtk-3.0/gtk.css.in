@@ -309,6 +309,33 @@ row:selected:focus image {
   color: @gc_text;
 }
 
+/* Target-device diagnostics show the verified Zorin GTK 3 base also paints
+ * row.activatable:selected with both background-color and background image at
+ * higher selector specificity. GNOME Control Center's CcPanelList is built
+ * from GtkListBox rows, so mirror that exact activatable selected-state
+ * contract after the Zorin base instead of relying on the lower-specificity
+ * generic row:selected rule. */
+row.activatable:selected,
+row.activatable:selected:hover,
+row.activatable:selected:focus,
+row.activatable:selected:active {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+  box-shadow: none;
+}
+
+row.activatable:selected label,
+row.activatable:selected image,
+row.activatable:selected:hover label,
+row.activatable:selected:hover image,
+row.activatable:selected:focus label,
+row.activatable:selected:focus image,
+row.activatable:selected:active label,
+row.activatable:selected:active image {
+  color: @gc_text;
+}
+
 .sidebar,
 placessidebar list {
   background-color: @gc_surface;
