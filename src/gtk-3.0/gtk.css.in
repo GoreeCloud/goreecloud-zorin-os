@@ -192,9 +192,22 @@ switch {
   color: @gc_text;
 }
 
+/* Zorin OS 17.3 Settings is GNOME Control Center 41.7 linked directly to
+ * GTK 3 + libhandy, not GTK 4/libadwaita. The verified ZorinBlue-Dark GTK 3
+ * base paints checked switches with background: image(#bde6fb), which outranks
+ * the lower-specificity generic switch background-image reset above. Override
+ * the exact checked/backdrop/slider states after the composed Zorin base. */
 switch:checked {
   border-color: @gc_accent;
   background-color: @gc_accent;
+  background-image: image(@gc_accent);
+  color: @gc_on_accent;
+}
+
+switch:backdrop:checked {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  background-image: image(@gc_accent);
   color: @gc_on_accent;
 }
 
@@ -203,6 +216,12 @@ switch slider {
   min-width: 20px;
   border-radius: 999px;
   background-color: @gc_surface;
+}
+
+switch:checked slider,
+switch:backdrop:checked slider {
+  background-color: @gc_on_accent;
+  box-shadow: none;
 }
 
 check,
@@ -267,6 +286,27 @@ treeview.view:selected,
 iconview:selected {
   background-color: @gc_accent;
   color: @gc_on_accent;
+}
+
+/* The verified ZorinBlue-Dark GTK 3 base applies #bde6fb to generic
+ * row:selected. GNOME Control Center 41.7 uses that GTK 3 row state for its
+ * libhandy Settings sidebar, so map the generic row contract to the Glaze
+ * selection token rather than treating this as a GTK 4 navigation-sidebar. */
+row:selected,
+row:selected:hover,
+row:selected:focus {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+row:selected label,
+row:selected image,
+row:selected:hover label,
+row:selected:hover image,
+row:selected:focus label,
+row:selected:focus image {
+  color: @gc_text;
 }
 
 .sidebar,
