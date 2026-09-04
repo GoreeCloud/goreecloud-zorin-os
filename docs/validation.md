@@ -13,6 +13,7 @@ The repository validation tooling verifies:
 - GTK 3 legacy symbolic color mappings used by application-provided CSS such as Nautilus 42.6;
 - an exact Nautilus 42.6 `.nautilus-window .sidebar-row:selected` override in GTK 3;
 - GTK 4/libadwaita color-role mappings, exact `navigation-sidebar` selected/activatable states, checked-switch state coverage, and an empty marker at exactly `gtk-4.0/.libadwaita`;
+- GTK 4 generated selected-row and checked-switch image layers map to the current GoreeCloud variant's selection/accent tokens rather than retaining Zorin's pale-cyan image fills;
 - shell-script syntax, Python compilation, and expected executable bits for executable repository tools;
 - presence of the exact Zorin OS 17.3 target package/version and pinned GTK 3, GTK 4, and GNOME Shell base stylesheet size/SHA-256 evidence in the composition implementation;
 - source evidence that target installation copies the verified local Zorin GTK 3 base and removes the standalone GTK 3 Adwaita import before appending GoreeCloud overrides;
@@ -35,11 +36,13 @@ The Zorin OS 17.3 target laptop has provided the following direct evidence durin
 - the date/notification menu uses coherent dark cards and readable calendar/date text;
 - the Zorin application-menu selected tile is readable and its tooltip is readable; the empty search placeholder still needs a dedicated contrast check;
 - representative GNOME overview/search rendering is coherent dark with a visible teal focus treatment;
-- the exact GTK 3 base-composition candidate is now visually effective in **Files / Nautilus 42.6**: the main Home view renders at the intended Dark canvas `#101A20`, and the sidebar renders at the intended Dark surface `#18252B`. This resolves the prior neutral-charcoal surface defect for the captured Dark state;
-- the same Files screenshot exposes a narrower remaining state defect: the selected Home row renders pale cyan near `#BDE6FB` instead of the Dark Glaze selection token `#174F52`;
-- **Settings → Search** likewise no longer shows the earlier saturated Zorin-blue selected row, but the selected Search row and checked switches render pale cyan near `#BDE6FB` rather than the intended Dark selection/accent roles (`#174F52` selection and `#1C8A8D` accent). The main Settings canvas/sidebar remain coherent with the Dark GoreeCloud surface hierarchy;
-- the pale selected/checked states are therefore tracked as target-specific specificity/background-image state defects, not as failures of the exact-base composition architecture;
-- current Development source adds the exact Nautilus 42.6 selected-sidebar selector, expands Settings `navigation-sidebar` selected/activatable/focus coverage, and clears inherited GTK 4 checked-switch background images before applying the GoreeCloud accent. These latest changes are source-validated but still require target-device reinstall/retest;
+- the exact GTK 3 base-composition candidate is visually effective in **Files / Nautilus 42.6**: the main Home view renders at the intended Dark canvas `#101A20`, and the sidebar renders at the intended Dark surface `#18252B`;
+- the current Files selected-sidebar correction is also visually verified: the selected Home row now renders at the intended Dark Glaze selection `#174F52`, resolving the prior pale-cyan selected-row defect;
+- **Settings → Search** remains the current Dark application-state blocker: the selected Search row still renders pale cyan near `#BDE6FB`, and checked switches still present a dominant pale-cyan image-backed fill instead of the intended `#174F52` selection and `#1C8A8D` Mineral Teal accent;
+- the earlier saturated Zorin-blue Settings row is no longer present; the remaining Settings issue is narrower and image-layer-specific;
+- public Zorin theme source confirms the relevant family behavior is image-backed: `.navigation-sidebar row:selected` paints a `background-image: image(#bde6fb)` layer and `switch:checked` paints `background: image(#bde6fb)` on the Dark family;
+- current GoreeCloud GTK 4 source therefore maps those image-backed states directly to the variant selection/accent tokens and validates the generated mappings instead of relying only on `background-color` or clearing the image layer;
+- this newest Settings image-layer correction is source-validated but has not yet been installed/rendered on the target laptop;
 - Firefox demonstrates that browser-provided/bundled chrome and content styling may remain visually independent from the GTK theme and therefore must not be treated as GTK/libadwaita acceptance evidence.
 
 This is **partial Dark-mode acceptance evidence**, not complete visual or accessibility acceptance.
@@ -70,7 +73,7 @@ The exact locally installed Zorin base stylesheet evidence is:
 | `ZorinBlue-Dark/gtk-4.0/gtk-dark.css` | 195469 | `90ffa76c872443d1549f09c814be8c22d68169a0dfb19e0508339e3613add77d` |
 | `ZorinBlue-Dark/gnome-shell/gnome-shell.css` | 111171 | `e36202095055bda8de6f225227a91911623775aa0896c24b8568c0d52982f8d7` |
 
-This evidence confirms that the target GTK 3, GTK 4, and Shell implementations are substantial Zorin-specific bases rather than tiny semantic overlays. Current upstream Zorin theme source must not be substituted for the installed 17.3 package without verification.
+This evidence confirms that the target GTK 3, GTK 4, and Shell implementations are substantial Zorin-specific bases rather than tiny semantic overlays. Current upstream Zorin theme source must not be substituted for the installed 17.3 package without verification; public source is used only to understand selector/property mechanisms that are then validated against the target device.
 
 ## Development base-composition architecture
 
@@ -88,7 +91,7 @@ The Development installer uses an evidence-bound composition step instead of att
 10. The GoreeCloud repository does not redistribute Zorin base-theme bytes; composition copies them locally from the already-installed Zorin package.
 11. The installer performs all verification and temporary composition **before** moving or replacing an existing installed GoreeCloud theme. A package/hash mismatch therefore fails closed without disturbing the current installed theme.
 
-The exact-base architecture is target-verified for the captured Dark Files surfaces. The latest selected/checked-state tightening remains a **Development candidate** until target-device rendering is retested.
+The exact-base architecture is target-verified for the captured Dark Files surfaces and Files selected-sidebar state. The latest Settings image-backed state correction remains a **Development candidate** until target-device rendering is retested.
 
 ## Required target-device acceptance
 
@@ -97,8 +100,8 @@ Before this theme is treated as release-ready or Stable, validate it on the inte
 1. Pull the current Development branch and run `./scripts/install.sh` after each source candidate that changes application or Shell styling.
 2. Confirm the installer reports successful composition against verified `ZorinBlue-Light` / `ZorinBlue-Dark` GTK 3, GTK 4, and Shell bases before installation.
 3. Confirm `goreecloud-base.json` records `gtk3_css`, `gtk_css`, and `shell_css` evidence for the selected base, and confirm `gtk-3.0/goreecloud-overrides.css` exists in the composed theme.
-4. Close/relaunch Files (`nautilus -q` before reopening is sufficient) and verify that the already-correct `#101A20` main canvas and `#18252B` sidebar are preserved while the selected Home/Pictures sidebar row moves from pale `#BDE6FB` to the Dark Glaze selection treatment.
-5. Fully close/reopen Settings, then re-test **Settings → Search** and verify that the selected navigation row no longer uses pale `#BDE6FB` and that checked switches return to the Dark Mineral Teal accent instead of pale cyan.
+4. Preserve the already-verified Files Dark canvas/sidebar and `#174F52` selected-sidebar treatment when testing later candidates.
+5. Fully close/reopen Settings, then re-test **Settings → Search** and verify that the selected navigation row moves from pale `#BDE6FB` to the Dark selection role and that checked switches move from the pale-cyan image-backed fill to the Mineral Teal accent.
 6. Close and reopen **Zorin Appearance → Themes → Other** and confirm all three variants remain available under Applications and Shell.
 7. Test matching Light, Dark, and Deep Dark Application + Shell combinations.
 8. For GTK 4/libadwaita acceptance, confirm at least one additional native libadwaita application adopts expected GoreeCloud canvas, surface, sidebar, selected-row, headerbar, popover, button, field, and focus colors without clipping or broken controls.
