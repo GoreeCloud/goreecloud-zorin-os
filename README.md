@@ -14,7 +14,7 @@ The current variants are:
 
 Each variant provides:
 
-- a GTK 3 application theme that layers GoreeCloud styling over GTK's built-in Adwaita base;
+- a GTK 3 application stylesheet whose standalone generated form uses GTK's built-in Adwaita base and whose Development installation is composed over the exact verified local Zorin OS 17.3 GTK 3 base before GoreeCloud semantic overrides are appended;
 - a small GTK 2 compatibility shim that inherits system Adwaita so classic theme-discovery paths used by Zorin/GNOME can recognize the theme package;
 - a GTK 4/libadwaita stylesheet whose Development installation is composed over the exact verified local Zorin OS 17.3 base before GoreeCloud semantic overrides are appended;
 - Zorin's required empty `gtk-4.0/.libadwaita` opt-in marker so native libadwaita applications can participate in target-device validation;
@@ -27,7 +27,7 @@ Icons and cursor themes are intentionally not replaced in this implementation. T
 
 The current Development target is **Zorin OS 17.3** with `zorin-desktop-themes` **4.2.2**.
 
-Target-device diagnostics established that the installed Zorin 17.3 GTK 4 and GNOME Shell stylesheets are large platform-specific bases. Files and several Shell surfaces remained only partially correct when GoreeCloud used a small standalone override stylesheet. The installer therefore now composes the generated GoreeCloud overrides over the exact verified local `ZorinBlue-Light` or `ZorinBlue-Dark` base, including its supporting assets, before installation.
+Target-device diagnostics established that the installed Zorin 17.3 GTK 3, GTK 4, and GNOME Shell stylesheets are substantial platform-specific bases. Files and several Shell/application surfaces remained only partially correct when GoreeCloud used small standalone override stylesheets. The installer therefore composes the generated GoreeCloud overrides over the exact verified local `ZorinBlue-Light` or `ZorinBlue-Dark` base, including supporting assets, before installation.
 
 This composition is intentionally fail-closed in Development. Before any existing GoreeCloud theme folder is moved or replaced, the installer verifies the local `zorin-desktop-themes` package version and the exact byte size/SHA-256 evidence captured from the accepted Zorin OS 17.3 target. If that base has changed, installation stops and requests a fresh `./scripts/diagnose.sh` result instead of assuming compatibility.
 
@@ -60,9 +60,9 @@ Run:
 The installer:
 
 1. generates all three GoreeCloud variants into temporary storage;
-2. verifies `zorin-desktop-themes` 4.2.2 and the recorded ZorinBlue Light/Dark GTK 4 and Shell base hashes;
+2. verifies `zorin-desktop-themes` 4.2.2 and the recorded ZorinBlue Light/Dark GTK 3, GTK 4, and Shell base hashes;
 3. locally copies the matching Zorin base directories and assets into the temporary themes;
-4. appends the generated GoreeCloud Glaze UI semantic overrides;
+4. appends the generated GoreeCloud Glaze UI semantic overrides, removing the standalone GTK 3 Adwaita import before GTK 3 target-base composition;
 5. only after successful composition, backs up any existing GoreeCloud theme folders into a timestamped recovery directory and installs the new variants under `~/.local/share/themes/`.
 
 Then close and reopen **Zorin Appearance**, navigate to **Themes → Other**, and choose a GoreeCloud variant in the **Applications** and **Shell** drop-downs.
@@ -85,7 +85,7 @@ When target-device rendering differs from the generated palette or a Zorin-speci
 ./scripts/diagnose.sh
 ```
 
-It reports the repository revision, operating-system/session information, relevant package versions, active GTK/Shell theme settings, installed GoreeCloud theme files, and hashes/sizes of installed ZorinBlue Light/Dark GTK 4 and Shell base stylesheets when available. It does not modify settings or system files. This evidence keeps compatibility work tied to the actual Zorin OS 17.3 implementation rather than assuming that another Zorin release or current upstream theme source is identical.
+It reports the repository revision, operating-system/session information, relevant package versions, active GTK/Shell theme settings, installed GoreeCloud theme files, hashes/sizes of installed ZorinBlue Light/Dark GTK 3, GTK 4, and Shell base stylesheets, and bounded selector evidence used for compatibility work. It does not modify settings or system files. This evidence keeps compatibility work tied to the actual Zorin OS 17.3 implementation rather than assuming that another Zorin release or current upstream theme source is identical.
 
 GNOME Shell can retain a previously loaded stylesheet across a theme reinstall. When validating Shell-only visual changes, switch the Shell theme away and back or log out and back in before classifying unchanged rendering as a current-source failure.
 
