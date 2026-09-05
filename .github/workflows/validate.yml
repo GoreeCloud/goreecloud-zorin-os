@@ -34,6 +34,9 @@ jobs:
       - name: Validate wallpaper collection
         run: python3 ./scripts/validate_wallpapers.py
 
+      - name: Validate desktop icon and cursor assets
+        run: python3 ./scripts/validate_desktop_assets.py
+
       - name: Validate Glaze UI V1.2 preview contract
         run: python3 ./scripts/validate_v12_preview.py
 
