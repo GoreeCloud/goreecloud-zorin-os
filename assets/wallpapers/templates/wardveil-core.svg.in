@@ -1,17 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
   <title id="title">Wardveil Security Sentinel Fold Core {{mode_label}}</title>
-  <desc id="desc">Wardveil Security wallpaper centered on the canonical Sentinel Fold identity, preserving its approved veil geometry, guarded core, and cyan-blue-indigo-violet identity colors. Artwork is identity only, not a security-status indicator.</desc>
+  <desc id="desc">Quiet Wardveil Security environmental wallpaper preserving the canonical Sentinel Fold identity and its cyan-blue-indigo-violet DNA without representing security status.</desc>
   <defs>
-    <linearGradient id="wpWardBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.52" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
-    <radialGradient id="wpWardCyan" cx="0.42" cy="0.42" r="0.54"><stop stop-color="#22D3EE" stop-opacity="0.22"/><stop offset="1" stop-color="#22D3EE" stop-opacity="0"/></radialGradient>
-    <radialGradient id="wpWardViolet" cx="0.64" cy="0.58" r="0.52"><stop stop-color="#7C3AED" stop-opacity="0.18"/><stop offset="1" stop-color="#7C3AED" stop-opacity="0"/></radialGradient>
+    <linearGradient id="wardCoreBg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="{{deep}}"/>
+      <stop offset="0.55" stop-color="{{canvas}}"/>
+      <stop offset="1" stop-color="{{surface}}"/>
+    </linearGradient>
+    <radialGradient id="wardCoreCyan" cx="0.73" cy="0.42" r="0.50">
+      <stop stop-color="#22D3EE" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="wardCoreViolet" cx="0.80" cy="0.65" r="0.42">
+      <stop stop-color="#7C3AED" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#7C3AED" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wardCoreFold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#22D3EE" stop-opacity="0.10"/>
+      <stop offset="0.52" stop-color="#2563EB" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#4F46E5" stop-opacity="0.03"/>
+    </linearGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#wpWardBg)"/><rect width="3840" height="2160" fill="url(#wpWardCyan)"/><rect width="3840" height="2160" fill="url(#wpWardViolet)"/>
-  <path d="M160 250C840 360 1280 650 1560 1020C1280 1410 850 1660 260 1830C600 1430 720 1090 650 770C570 510 390 340 160 250Z" fill="#2563EB" opacity="0.10"/>
-  <path d="M3680 250C3000 360 2560 650 2280 1020C2560 1410 2990 1660 3580 1830C3240 1430 3120 1090 3190 770C3270 510 3450 340 3680 250Z" fill="#7C3AED" opacity="0.10"/>
-  <rect x="1260" y="330" width="1320" height="1320" rx="330" fill="{{surface}}" opacity="0.16" stroke="#60A5FA" stroke-opacity="0.24" stroke-width="4"/>
-  <svg x="1320" y="390" width="1200" height="1200" viewBox="{{identity_viewbox}}" aria-hidden="true">
+  <rect width="3840" height="2160" fill="url(#wardCoreBg)"/>
+  <rect width="3840" height="2160" fill="url(#wardCoreCyan)"/>
+  <rect width="3840" height="2160" fill="url(#wardCoreViolet)"/>
+
+  <path d="M2050 260C2510 390 2820 650 3020 1020C2790 1400 2490 1630 2090 1810C2300 1500 2390 1230 2360 990C2330 720 2220 480 2050 260Z" fill="url(#wardCoreFold)"/>
+  <path d="M3730 290C3310 420 3040 690 2860 1020C3060 1360 3330 1600 3720 1800C3530 1500 3460 1230 3490 990C3510 730 3600 500 3730 290Z" fill="#7C3AED" opacity="0.035"/>
+  <path d="M2280 560L2860 1030L2280 1510" fill="none" stroke="#BFDBFE" stroke-opacity="0.07" stroke-width="4"/>
+
+  <rect x="2530" y="610" width="820" height="820" rx="230" fill="{{surface}}" opacity="0.10" stroke="#67E8F9" stroke-opacity="0.13" stroke-width="3"/>
+  <svg x="2600" y="680" width="680" height="680" viewBox="{{identity_viewbox}}" aria-hidden="true">
 {{identity_inner}}
   </svg>
-  <path d="M0 1990C850 1840 1510 1930 1950 2010S3090 2080 3840 1900V2160H0Z" fill="{{selection}}" opacity="0.22"/>
 </svg>
