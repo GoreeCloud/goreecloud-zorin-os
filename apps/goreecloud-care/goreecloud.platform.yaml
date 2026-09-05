@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev8
+version: 0.1.0-dev9
 
 supported_platforms:
   - linux
@@ -45,6 +45,7 @@ platform_systems:
     version: "1.1.0"
     evidence:
       - tests/test_ui_contract.py
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
     notes: >-
       Current Stable consumer target is 1.1.0. Dev6 established normal-text
@@ -54,10 +55,14 @@ platform_systems:
       45b5f11a49f363ebcaf753c892245a31109bc9bb passed all three workflow
       families and representative-device source/package validation, and fresh
       GDK_DPI_SCALE=2 wide/narrow screenshots accept the combined 200%-text +
-      compact/minimum-width adaptive-layout slice: compact HeaderBar subtitle
-      omission, category-amount reflow, content wrapping, complete vertical
-      scrolling, and a vertical full-width bottom action stack are verified.
-      HighContrast, full keyboard-under-resilience, assistive-technology,
+      compact/minimum-width adaptive-layout slice. The first requested
+      GTK_THEME=HighContrast representative-device pass then produced mixed
+      negative evidence: keyboard focus and normal-width readability were
+      positive, but the application retained its light Development palette
+      instead of yielding to HighContrast. Dev9 source expands the effective
+      HighContrast contract to include the process-local GTK_THEME override as
+      well as Gtk.Settings theme state. Dev9 HighContrast rendering remains
+      target-unverified. Full keyboard-under-resilience, assistive-technology,
       broader appearance/resilience, and final application conformance
       acceptance remain incomplete.
   mesh:
@@ -146,7 +151,7 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, keyboard-focus, cancellation, privileged-success, and all present cleanup functions are representative-device verified through dev5; dev6 normal-text compact behavior is target-verified; dev8 closes the combined 200%-text compact adaptive-layout blocker after dev7's target failure. HighContrast, full keyboard-under-resilience, assistive-technology, broader appearance/resilience, and final current-Stable consumer acceptance remain open.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, keyboard-focus, cancellation, privileged-success, and all present cleanup functions are representative-device verified through dev5; dev6 normal-text compact behavior is target-verified; dev8 closes the combined 200%-text compact adaptive-layout blocker after dev7's target failure. The first HighContrast target pass proved keyboard focus remained visible but system HighContrast takeover failed; dev9 contains a source remediation for process-local GTK_THEME detection and requires target revalidation. Full keyboard-under-resilience, assistive-technology, broader appearance/resilience, and final current-Stable consumer acceptance remain open.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
