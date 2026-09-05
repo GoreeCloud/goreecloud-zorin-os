@@ -52,8 +52,28 @@ def is_compact_width(width: int, text_scale: float | None = None) -> bool:
     return effective_layout_width(width, text_scale) < COMPACT_WIDTH
 
 
-def is_high_contrast_theme(theme_name: str | None) -> bool:
-    """Recognize common GTK high-contrast theme names without toolkit imports."""
+def _is_high_contrast_name(theme_name: str | None) -> bool:
     normalized = (theme_name or "").lower()
     normalized = normalized.replace("-", "").replace("_", "").replace(" ", "")
     return "highcontrast" in normalized
+
+
+def is_high_contrast_theme(
+    theme_name: str | None,
+    gtk_theme_override: str | None = None,
+) -> bool:
+    """Return whether GTK HighContrast is active or explicitly requested.
+
+    ``Gtk.Settings:gtk-theme-name`` does not necessarily reflect a process-local
+    ``GTK_THEME`` override. GoreeCloud Care's representative-device accessibility
+    harness intentionally launches isolated HighContrast processes using that
+    override, so both sources are part of the effective theme contract.
+    """
+    if _is_high_contrast_name(theme_name):
+        return True
+    override = (
+        os.environ.get("GTK_THEME")
+        if gtk_theme_override is None
+        else gtk_theme_override
+    )
+    return _is_high_contrast_name(override)
