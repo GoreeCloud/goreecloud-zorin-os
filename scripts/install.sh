@@ -19,6 +19,7 @@ THEMES=(
 )
 ICON_THEME="GoreeCloud-Zorin"
 CURSOR_THEME="GoreeCloud-Zorin-Cursors"
+LIGHT_THEME="GoreeCloud-Zorin-Light"
 
 usage() {
   cat <<'EOF'
@@ -138,25 +139,57 @@ if command -v gtk-update-icon-cache >/dev/null 2>&1; then
   gtk-update-icon-cache -f "$ICON_DEST/$ICON_THEME" >/dev/null 2>&1 || true
 fi
 
+cycle_setting_if_same() {
+  local schema="$1"
+  local key="$2"
+  local target="$3"
+  local fallback="$4"
+  local current
+
+  current="$(gsettings get "$schema" "$key" 2>/dev/null | tr -d "'" || true)"
+  if [[ "$current" == "$target" ]]; then
+    gsettings set "$schema" "$key" "'$fallback'"
+  fi
+  gsettings set "$schema" "$key" "'$target'"
+}
+
 activate_light_experience() {
   if ! command -v gsettings >/dev/null 2>&1; then
     return 0
   fi
 
-  gsettings set org.gnome.desktop.interface gtk-theme "'GoreeCloud-Zorin-Light'"
-  gsettings set org.gnome.desktop.interface icon-theme "'$ICON_THEME'"
-  gsettings set org.gnome.desktop.interface cursor-theme "'$CURSOR_THEME'"
+  # Reinstalling a theme under the same name does not reliably make already
+  # running GTK/Shell consumers reload the changed CSS or icons. Cycle through
+  # a safe fallback only when the target is already selected, then restore the
+  # GoreeCloud values. This makes iterative target-device visual review show
+  # the newly installed bytes instead of a stale in-memory stylesheet.
+  cycle_setting_if_same org.gnome.desktop.interface gtk-theme "$LIGHT_THEME" "Adwaita"
+  cycle_setting_if_same org.gnome.desktop.interface icon-theme "$ICON_THEME" "Adwaita"
+  cycle_setting_if_same org.gnome.desktop.interface cursor-theme "$CURSOR_THEME" "Adwaita"
 
   if gsettings list-schemas | grep -Fxq 'org.gnome.shell.extensions.user-theme'; then
-    gsettings set org.gnome.shell.extensions.user-theme name "'GoreeCloud-Zorin-Light'"
+    current_shell_theme="$(gsettings get org.gnome.shell.extensions.user-theme name 2>/dev/null | tr -d "'" || true)"
+    if [[ "$current_shell_theme" == "$LIGHT_THEME" ]]; then
+      gsettings set org.gnome.shell.extensions.user-theme name "''"
+      # Give the Shell extension a chance to process the first settings change
+      # before restoring the same theme name; otherwise rapid dconf updates can
+      # leave the previous stylesheet resident for the rest of the session.
+      sleep 0.25
+    fi
+    gsettings set org.gnome.shell.extensions.user-theme name "'$LIGHT_THEME'"
   fi
 
   if gsettings list-keys org.gnome.desktop.interface 2>/dev/null | grep -Fxq 'color-scheme'; then
     gsettings set org.gnome.desktop.interface color-scheme "'default'"
   fi
 
+  active_gtk="$(gsettings get org.gnome.desktop.interface gtk-theme | tr -d "'" || true)"
   active_icons="$(gsettings get org.gnome.desktop.interface icon-theme | tr -d "'" || true)"
   active_cursor="$(gsettings get org.gnome.desktop.interface cursor-theme | tr -d "'" || true)"
+  if [[ "$active_gtk" != "$LIGHT_THEME" ]]; then
+    echo "Failed to activate GTK theme: expected $LIGHT_THEME, got $active_gtk" >&2
+    exit 1
+  fi
   if [[ "$active_icons" != "$ICON_THEME" ]]; then
     echo "Failed to activate icon theme: expected $ICON_THEME, got $active_icons" >&2
     exit 1
@@ -178,12 +211,13 @@ fi
 echo
 echo "Installed and activated GoreeCloud desktop assets:"
 echo "  Design:       Glaze UI V1.2 Development"
-echo "  Applications: GoreeCloud-Zorin-Light"
-echo "  Shell:        GoreeCloud-Zorin-Light"
+echo "  Applications: $LIGHT_THEME"
+echo "  Shell:        $LIGHT_THEME"
 echo "  Icons:        $ICON_THEME"
 echo "  Cursor:       $CURSOR_THEME"
 echo "  Wallpaper:    primary GoreeCloud light wallpaper"
 echo "  Gallery:      24 visible (8 Light / 8 Dark / 8 Deep Dark)"
+echo "  Live refresh: GTK, icons, cursor, and Shell settings were re-emitted when already selected"
 echo
 echo "Theme directory:"
 echo "  $THEME_DEST"
