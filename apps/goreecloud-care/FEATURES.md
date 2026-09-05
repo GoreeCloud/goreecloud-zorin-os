@@ -27,11 +27,11 @@
 - Dev6: normal-text compact/minimum-window adaptive composition, vertical reachability, full-width stacked bottom actions, category-amount reflow, and visible focus at the compact bottom control path.
 - Dev8: combined 200%-text/compact acceptance at exact runtime head `45b5f11a49f363ebcaf753c892245a31109bc9bb`; wide and narrow `GDK_DPI_SCALE=2` views preserve wrapping, scrolling, compact HeaderBar behavior, category-amount reflow, and the full-width vertical action stack.
 - First HighContrast pass on installed dev8: focus was visibly clear on Scan, a category checkbox, and Memory Refresh, but `GTK_THEME=HighContrast` failed to displace the light Development palette.
-- Fresh dev9 HighContrast pass: the system HighContrast presentation now visibly replaces the light Care palette, confirming the dev9 takeover fix. In the same state, pressing Tab produces no visibly perceivable focus response. Treat palette takeover as positive evidence but keyboard-under-HighContrast as failed/open; this does not prove whether logical focus traversal is absent or merely visually silent.
+- Dev9 HighContrast pass: the system HighContrast presentation visibly replaced the light Care palette, confirming the takeover fix, but pressing Tab produced no visibly perceivable focus response.
+- Dev10 representative focus checkpoint: exact runtime head `3524a4a82da87ea51dcde08992a402190b54c130` passed 30 local tests plus XML/source validation, built and installed `0.1.0~dev10`, and fresh `GTK_THEME=HighContrast` screenshots show visible focus on Scan, the Thumbnail cache checkbutton, and Reclaim file cache while system HighContrast remains authoritative. Treat the dev9 no-visible-focus defect as closed for these sampled controls.
 
 ## Planned before RC
-- Build/install dev10 and repeat target-device HighContrast keyboard validation at normal and constrained widths. Confirm a visible focus indicator across Scan, all three cleanup selectors, Reclaim file cache, Clean selected, Empty Trash, and Clean APT cache.
-- If dev10 shows a focus ring but activation proves Tab still does not move logical focus, implement a separate native traversal remediation; do not add custom key handling without that evidence.
+- Complete the remaining HighContrast keyboard path at normal and constrained widths: verify visible focus on the remaining cleanup selectors and bottom actions, complete forward traversal, and reverse `Shift+Tab` traversal.
 - Assistive-technology semantic acceptance.
 - Additional supported appearance/resilience decisions and evidence, including dark/system appearance where applicable.
 - Package uninstall/downgrade/rollback validation.

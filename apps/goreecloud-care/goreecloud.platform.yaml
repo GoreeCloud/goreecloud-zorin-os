@@ -48,23 +48,26 @@ platform_systems:
       - tests/test_focus_resilience.py
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
     notes: >-
       Current Stable consumer target is 1.1.0. Dev8 accepted the combined
       200%-text plus compact/minimum-width adaptive-layout slice on the
       representative Zorin OS laptop. The first HighContrast pass showed visible
       focus but failed system palette takeover. Dev9 corrected effective
-      HighContrast detection for process-local GTK_THEME overrides, and fresh
-      target evidence now shows the system HighContrast presentation replacing
-      Care's light Development palette. In that same dev9 state, pressing Tab
-      produces no visibly perceivable focus response. This blocks keyboard-under-
-      resilience acceptance and is not treated as proof that logical traversal
-      itself is absent. Dev10 adds a separate focus-only GTK provider beneath
-      Care's normal application CSS. It uses the active GTK theme foreground
-      color and defines no application palette surfaces, so normal Care focus
-      styling remains authoritative in ordinary mode while HighContrast keeps a
-      visible focus fallback after the normal palette provider is suppressed.
-      Dev10 remains target-unverified. Assistive-technology, broader appearance/
-      resilience, and final application conformance acceptance remain incomplete.
+      HighContrast detection for process-local GTK_THEME overrides, and target
+      evidence showed the system HighContrast presentation replacing Care's light
+      Development palette; that same pass exposed a no-visible-Tab-response defect.
+      Dev10 adds a separate focus-only GTK provider beneath Care's ordinary CSS.
+      Exact runtime head 3524a4a82da87ea51dcde08992a402190b54c130 passed
+      30 local tests plus XML/source validation on the representative laptop,
+      built and installed 0.1.0~dev10, and fresh GTK_THEME=HighContrast screenshots
+      verify visibly perceivable focus on Scan, the Thumbnail cache checkbutton,
+      and Reclaim file cache while system HighContrast remains authoritative.
+      Treat those representative focus checkpoints as target-verified. Full
+      keyboard-under-resilience remains open for the remaining controls, complete
+      forward/reverse traversal, constrained-width HighContrast, and assistive-
+      technology semantics. Broader appearance/resilience and final application
+      conformance acceptance remain incomplete.
   mesh:
     result: applicable-blocked
     version: null
@@ -146,6 +149,13 @@ evidence:
       result: failed
       observed_at: "2026-09-05T20:41:00Z"
       notes: Representative-device screenshot verifies system HighContrast palette takeover, but the user reports no visibly perceivable response to Tab; dev10 focus-resilience remediation requires target revalidation.
+    - id: care-dev10-highcontrast-focus-sampled-target
+      category: accessibility
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
+      revision: 3524a4a82da87ea51dcde08992a402190b54c130
+      result: passed
+      observed_at: "2026-09-05T23:38:00Z"
+      notes: Representative-device dev10 build/install succeeded and GTK_THEME=HighContrast screenshots verify visible focus on Scan, the Thumbnail cache checkbutton, and Reclaim file cache while system HighContrast remains authoritative; complete keyboard-path and assistive-technology acceptance remain open.
   release: []
 
 conformance:
@@ -158,7 +168,7 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and current cleanup functions are representative-device verified through dev5; dev6 normal-text compact behavior is target-verified; dev8 closes the combined 200%-text compact adaptive-layout blocker. Dev9 target evidence verifies HighContrast palette takeover but fails visible keyboard-focus behavior under that resilience mode. Dev10 contains a source remediation using a theme-derived focus-only provider and remains target-unverified. Full keyboard-under-resilience, assistive-technology, broader appearance/resilience, and final current-Stable consumer acceptance remain open.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and current cleanup functions are representative-device verified through dev5; dev6 normal-text compact behavior is target-verified; dev8 closes the combined 200%-text compact adaptive-layout blocker. Dev9 target evidence verifies HighContrast palette takeover but exposed a no-visible-focus defect. Dev10 target evidence closes that defect for representative Scan, Thumbnail cache, and Reclaim file cache focus checkpoints while preserving system HighContrast. Remaining controls, complete forward/reverse traversal, constrained-width HighContrast, assistive-technology semantics, broader appearance/resilience, and final current-Stable consumer acceptance remain open.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
