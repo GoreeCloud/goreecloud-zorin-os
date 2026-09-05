@@ -1,24 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
   <title id="title">Privacy Shield Filter {{mode_label}}</title>
-  <desc id="desc">Privacy Shield wallpaper centered on the approved canonical shield with a restrained filtering field derived from its layered privacy-band artwork. The artwork is not a privacy-status indicator.</desc>
+  <desc id="desc">Quiet Privacy Shield environmental wallpaper preserving the canonical shield beside a restrained layered filtering field. The artwork identifies Privacy Shield and does not represent privacy state.</desc>
   <defs>
-    <linearGradient id="wpPrivacyFilterBg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="{{canvas}}"/><stop offset="1" stop-color="{{deep}}"/></linearGradient>
-    <radialGradient id="wpPrivacyFilterGlow" cx="0.66" cy="0.45" r="0.50"><stop stop-color="#7BD9FF" stop-opacity="0.18"/><stop offset="1" stop-color="#7BD9FF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="privacyFilterBg" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="{{canvas}}"/>
+      <stop offset="1" stop-color="{{deep}}"/>
+    </linearGradient>
+    <radialGradient id="privacyFilterLight" cx="0.74" cy="0.44" r="0.50">
+      <stop stop-color="#7BD9FF" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#7BD9FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="privacyFilterBand" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#DDF7FF" stop-opacity="0.08"/>
+      <stop offset="0.72" stop-color="#BFD3FF" stop-opacity="0.035"/>
+      <stop offset="1" stop-color="#7A5CFA" stop-opacity="0"/>
+    </linearGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#wpPrivacyFilterBg)"/><rect width="3840" height="2160" fill="url(#wpPrivacyFilterGlow)"/>
-  <g opacity="0.26">
-    <rect x="220" y="390" width="1520" height="150" rx="75" fill="#DDF7FF"/>
-    <rect x="420" y="670" width="1320" height="150" rx="75" fill="#BFD3FF"/>
-    <rect x="250" y="950" width="1490" height="150" rx="75" fill="#D5EAFF"/>
-    <rect x="510" y="1230" width="1230" height="150" rx="75" fill="#AFC7FF"/>
-    <rect x="320" y="1510" width="1420" height="150" rx="75" fill="#C5D8FF"/>
+  <rect width="3840" height="2160" fill="url(#privacyFilterBg)"/>
+  <rect width="3840" height="2160" fill="url(#privacyFilterLight)"/>
+
+  <g>
+    <rect x="160" y="580" width="1510" height="92" rx="46" fill="url(#privacyFilterBand)"/>
+    <rect x="360" y="850" width="1310" height="92" rx="46" fill="url(#privacyFilterBand)" opacity="0.86"/>
+    <rect x="220" y="1120" width="1450" height="92" rx="46" fill="url(#privacyFilterBand)" opacity="0.72"/>
+    <rect x="470" y="1390" width="1200" height="92" rx="46" fill="url(#privacyFilterBand)" opacity="0.58"/>
   </g>
-  <g fill="{{surface}}" opacity="0.22">
-    <circle cx="650" cy="465" r="46"/><circle cx="1050" cy="745" r="46"/><circle cx="730" cy="1025" r="46"/><circle cx="1180" cy="1305" r="46"/><circle cx="820" cy="1585" r="46"/>
+  <g fill="{{surface}}" opacity="0.08">
+    <circle cx="560" cy="626" r="28"/>
+    <circle cx="900" cy="896" r="28"/>
+    <circle cx="650" cy="1166" r="28"/>
+    <circle cx="1030" cy="1436" r="28"/>
   </g>
-  <rect x="2180" y="350" width="1320" height="1320" rx="330" fill="{{surface}}" opacity="0.18" stroke="#5B8CFF" stroke-opacity="0.22" stroke-width="4"/>
-  <svg x="2260" y="430" width="1160" height="1160" viewBox="{{identity_viewbox}}" aria-hidden="true">
+
+  <rect x="2550" y="630" width="800" height="800" rx="225" fill="{{surface}}" opacity="0.10" stroke="#5B8CFF" stroke-opacity="0.12" stroke-width="3"/>
+  <svg x="2620" y="700" width="660" height="660" viewBox="{{identity_viewbox}}" aria-hidden="true">
 {{identity_inner}}
   </svg>
-  <path d="M0 2030H3840V2160H0Z" fill="{{elevated}}" opacity="0.58"/>
 </svg>
