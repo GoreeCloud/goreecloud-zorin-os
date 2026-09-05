@@ -7,11 +7,13 @@ import math
 import shutil
 import struct
 from pathlib import Path
+from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config" / "desktop-assets.json"
 DEFAULT_OUTPUT = ROOT / "build" / "cursors"
 IMAGE_TYPE = 0xFFFD0002
+BASE_GRID = 32.0
 
 
 def parse_args() -> argparse.Namespace:
@@ -20,10 +22,39 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def argb(value: str) -> int:
+def argb(value: str, alpha: int = 255) -> int:
     value = value.lstrip("#")
     r, g, b = (int(value[i:i + 2], 16) for i in (0, 2, 4))
-    return (255 << 24) | (r << 16) | (g << 8) | b
+    r = (r * alpha + 127) // 255
+    g = (g * alpha + 127) // 255
+    b = (b * alpha + 127) // 255
+    return ((alpha & 0xFF) << 24) | (r << 16) | (g << 8) | b
+
+
+def with_alpha(color: int, alpha: int) -> int:
+    _base_alpha, r, g, b = components(color)
+    r = (r * alpha + 127) // 255
+    g = (g * alpha + 127) // 255
+    b = (b * alpha + 127) // 255
+    return ((alpha & 0xFF) << 24) | (r << 16) | (g << 8) | b
+
+
+def components(color: int) -> tuple[int, int, int, int]:
+    return (
+        (color >> 24) & 0xFF,
+        (color >> 16) & 0xFF,
+        (color >> 8) & 0xFF,
+        color & 0xFF,
+    )
+
+
+def canvas(size: int) -> list[int]:
+    return [0] * (size * size)
+
+
+def put(pixels: list[int], size: int, x: int, y: int, color: int) -> None:
+    if 0 <= x < size and 0 <= y < size:
+        pixels[y * size + x] = color
 
 
 def point_in_polygon(x: float, y: float, points: list[tuple[float, float]]) -> bool:
@@ -40,38 +71,12 @@ def point_in_polygon(x: float, y: float, points: list[tuple[float, float]]) -> b
     return inside
 
 
-def canvas(size: int) -> list[int]:
-    return [0] * (size * size)
-
-
-def put(pixels: list[int], size: int, x: int, y: int, color: int) -> None:
-    if 0 <= x < size and 0 <= y < size:
-        pixels[y * size + x] = color
-
-
-def line(pixels: list[int], size: int, x0: int, y0: int, x1: int, y1: int, color: int, width: int = 1) -> None:
-    dx = abs(x1 - x0)
-    sx = 1 if x0 < x1 else -1
-    dy = -abs(y1 - y0)
-    sy = 1 if y0 < y1 else -1
-    err = dx + dy
-    while True:
-        radius = max(0, width // 2)
-        for yy in range(y0 - radius, y0 + radius + 1):
-            for xx in range(x0 - radius, x0 + radius + 1):
-                put(pixels, size, xx, yy, color)
-        if x0 == x1 and y0 == y1:
-            return
-        e2 = 2 * err
-        if e2 >= dy:
-            err += dy
-            x0 += sx
-        if e2 <= dx:
-            err += dx
-            y0 += sy
-
-
-def fill_polygon(pixels: list[int], size: int, points: list[tuple[float, float]], color: int) -> None:
+def fill_polygon(
+    pixels: list[int],
+    size: int,
+    points: list[tuple[float, float]],
+    color: int,
+) -> None:
     min_x = max(0, math.floor(min(x for x, _ in points)))
     max_x = min(size - 1, math.ceil(max(x for x, _ in points)))
     min_y = max(0, math.floor(min(y for _, y in points)))
@@ -82,120 +87,441 @@ def fill_polygon(pixels: list[int], size: int, points: list[tuple[float, float]]
                 put(pixels, size, x, y, color)
 
 
-def fill_rect(pixels: list[int], size: int, x0: int, y0: int, x1: int, y1: int, color: int) -> None:
-    for y in range(max(0, y0), min(size, y1)):
-        for x in range(max(0, x0), min(size, x1)):
-            put(pixels, size, x, y, color)
-
-
-def ring(pixels: list[int], size: int, cx: float, cy: float, outer: float, inner: float, color: int) -> None:
-    for y in range(size):
-        for x in range(size):
-            d = math.hypot((x + 0.5) - cx, (y + 0.5) - cy)
-            if inner <= d <= outer:
+def fill_disk(
+    pixels: list[int],
+    size: int,
+    cx: float,
+    cy: float,
+    radius: float,
+    color: int,
+) -> None:
+    min_x = max(0, math.floor(cx - radius))
+    max_x = min(size - 1, math.ceil(cx + radius))
+    min_y = max(0, math.floor(cy - radius))
+    max_y = min(size - 1, math.ceil(cy + radius))
+    r2 = radius * radius
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x + 1):
+            dx = (x + 0.5) - cx
+            dy = (y + 0.5) - cy
+            if dx * dx + dy * dy <= r2:
                 put(pixels, size, x, y, color)
 
 
-def scale_points(points: list[tuple[float, float]], scale: float) -> list[tuple[float, float]]:
+def stroke_segment(
+    pixels: list[int],
+    size: int,
+    x0: float,
+    y0: float,
+    x1: float,
+    y1: float,
+    color: int,
+    width: float,
+) -> None:
+    radius = width / 2.0
+    min_x = max(0, math.floor(min(x0, x1) - radius))
+    max_x = min(size - 1, math.ceil(max(x0, x1) + radius))
+    min_y = max(0, math.floor(min(y0, y1) - radius))
+    max_y = min(size - 1, math.ceil(max(y0, y1) + radius))
+    vx = x1 - x0
+    vy = y1 - y0
+    length2 = vx * vx + vy * vy
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x + 1):
+            px = x + 0.5
+            py = y + 0.5
+            if length2 == 0:
+                t = 0.0
+            else:
+                t = max(0.0, min(1.0, ((px - x0) * vx + (py - y0) * vy) / length2))
+            qx = x0 + t * vx
+            qy = y0 + t * vy
+            if math.hypot(px - qx, py - qy) <= radius:
+                put(pixels, size, x, y, color)
+
+
+def ring(
+    pixels: list[int],
+    size: int,
+    cx: float,
+    cy: float,
+    outer: float,
+    inner: float,
+    color: int,
+) -> None:
+    outer2 = outer * outer
+    inner2 = inner * inner
+    min_x = max(0, math.floor(cx - outer))
+    max_x = min(size - 1, math.ceil(cx + outer))
+    min_y = max(0, math.floor(cy - outer))
+    max_y = min(size - 1, math.ceil(cy + outer))
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x + 1):
+            dx = (x + 0.5) - cx
+            dy = (y + 0.5) - cy
+            d2 = dx * dx + dy * dy
+            if inner2 <= d2 <= outer2:
+                put(pixels, size, x, y, color)
+
+
+def scale_points(
+    points: list[tuple[float, float]],
+    scale: float,
+) -> list[tuple[float, float]]:
     return [(x * scale, y * scale) for x, y in points]
 
 
-def arrow_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
-    s = size / 32.0
+def downsample(pixels: list[int], source_size: int, factor: int) -> list[int]:
+    if factor == 1:
+        return pixels
+    target_size = source_size // factor
+    output = canvas(target_size)
+    sample_count = factor * factor
+    for ty in range(target_size):
+        for tx in range(target_size):
+            alpha_sum = 0
+            red_sum = 0
+            green_sum = 0
+            blue_sum = 0
+            for sy in range(ty * factor, (ty + 1) * factor):
+                row = sy * source_size
+                for sx in range(tx * factor, (tx + 1) * factor):
+                    a, r, g, b = components(pixels[row + sx])
+                    alpha_sum += a
+                    red_sum += r
+                    green_sum += g
+                    blue_sum += b
+            alpha = round(alpha_sum / sample_count)
+            if alpha_sum == 0:
+                output[ty * target_size + tx] = 0
+                continue
+            red = round(red_sum / sample_count)
+            green = round(green_sum / sample_count)
+            blue = round(blue_sum / sample_count)
+            output[ty * target_size + tx] = (
+                ((alpha & 0xFF) << 24)
+                | ((red & 0xFF) << 16)
+                | ((green & 0xFF) << 8)
+                | (blue & 0xFF)
+            )
+    return output
+
+
+Renderer = Callable[[int, dict[str, int], int], tuple[list[int], tuple[int, int]]]
+
+
+def render_supersampled(
+    size: int,
+    renderer: Renderer,
+    colors: dict[str, int],
+    phase: int,
+    factor: int,
+) -> tuple[list[int], tuple[int, int]]:
+    source_size = size * factor
+    pixels, hot = renderer(source_size, colors, phase)
+    return downsample(pixels, source_size, factor), (
+        round(hot[0] / factor),
+        round(hot[1] / factor),
+    )
+
+
+def arrow_image(
+    size: int,
+    colors: dict[str, int],
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
     p = canvas(size)
-    shadow = scale_points([(3,2),(3,27),(9,21),(15,31),(20,28),(14,18),(25,18)], s)
-    outer = scale_points([(2,1),(2,26),(8,20),(14,30),(19,27),(13,17),(24,17)], s)
-    inner = scale_points([(4,5),(4,22),(8,18),(14,27),(16,26),(10,16),(20,16)], s)
-    fill_polygon(p, size, [(x+s, y+s) for x,y in shadow], colors["graphite"])
-    fill_polygon(p, size, outer, colors["blue"])
+    outer = scale_points(
+        [(3.0, 2.0), (3.0, 26.4), (9.2, 20.5), (15.3, 30.0),
+         (19.8, 27.2), (13.8, 17.8), (24.8, 17.8)],
+        s,
+    )
+    inner = scale_points(
+        [(5.4, 6.2), (5.4, 21.0), (9.6, 17.1), (15.6, 26.8),
+         (16.6, 26.1), (10.4, 16.1), (20.6, 16.1)],
+        s,
+    )
+    fill_polygon(p, size, outer, colors["graphite"])
     fill_polygon(p, size, inner, colors["frost"])
-    return p, (max(0, round(2*s)), max(0, round(1*s)))
+    return p, (round(3.2 * s), round(2.2 * s))
 
 
-def hand_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
-    s = size / 32.0
+def hand_image(
+    size: int,
+    colors: dict[str, int],
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
     p = canvas(size)
-    outer = scale_points([(11,3),(15,3),(15,13),(17,10),(20,11),(20,13),(22,11),(25,13),(25,16),(27,15),(29,18),(27,27),(22,31),(13,29),(8,22),(9,18),(12,20)], s)
-    inner = scale_points([(12.5,5),(14,5),(14,17),(17,13),(19,13),(19,17),(22,14),(24,15),(24,19),(27,17.5),(27.5,19),(26,26),(21,29),(14,27),(10,22),(10.5,20),(14,23),(14,5)], s)
-    fill_polygon(p, size, outer, colors["blue"])
+    outer = scale_points(
+        [(11.1, 3.0), (15.2, 3.0), (15.2, 13.2), (17.2, 10.5),
+         (20.2, 10.7), (20.7, 13.0), (22.3, 11.6), (25.0, 12.6),
+         (25.4, 15.3), (27.2, 15.1), (29.3, 17.8), (27.7, 26.9),
+         (22.3, 30.2), (13.2, 28.7), (8.2, 22.0), (8.8, 18.0),
+         (11.7, 19.8)],
+        s,
+    )
+    inner = scale_points(
+        [(12.8, 5.0), (14.0, 5.0), (14.0, 17.2), (17.3, 13.0),
+         (19.0, 13.1), (19.1, 17.1), (22.1, 14.0), (23.8, 14.7),
+         (23.9, 18.5), (26.7, 17.3), (27.3, 18.6), (25.9, 25.5),
+         (21.5, 28.1), (14.3, 26.8), (10.3, 21.7), (10.6, 20.2),
+         (13.9, 22.8), (13.9, 5.0)],
+        s,
+    )
+    fill_polygon(p, size, outer, colors["graphite"])
     fill_polygon(p, size, inner, colors["frost"])
-    return p, (round(13*s), round(5*s))
+    return p, (round(13.6 * s), round(5.0 * s))
 
 
-def text_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
-    s = size / 32.0
+def text_image(
+    size: int,
+    colors: dict[str, int],
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
     p = canvas(size)
-    cx = round(16*s)
-    top, bottom = round(4*s), round(28*s)
-    w = max(1, round(2*s))
-    line(p,size,cx,top,cx,bottom,colors["blue"],w+2)
-    line(p,size,round(10*s),top,round(22*s),top,colors["blue"],w+2)
-    line(p,size,round(10*s),bottom,round(22*s),bottom,colors["blue"],w+2)
-    line(p,size,cx,top+max(1,w),cx,bottom-max(1,w),colors["frost"],w)
-    return p, (cx, round(16*s))
+    cx = 16.0 * s
+    top = 4.0 * s
+    bottom = 28.0 * s
+    left = 10.0 * s
+    right = 22.0 * s
+    outer = max(2.0 * s, 2.0)
+    inner = max(0.9 * s, 1.0)
+    for x0, y0, x1, y1 in (
+        (cx, top, cx, bottom),
+        (left, top, right, top),
+        (left, bottom, right, bottom),
+    ):
+        stroke_segment(p, size, x0, y0, x1, y1, colors["graphite"], outer)
+        stroke_segment(p, size, x0, y0, x1, y1, colors["frost"], inner)
+    return p, (round(cx), round(16.0 * s))
 
 
-def cross_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
-    s=size/32.0; p=canvas(size); c=round(16*s)
-    line(p,size,c,round(3*s),c,round(29*s),colors["blue"],max(2,round(3*s)))
-    line(p,size,round(3*s),c,round(29*s),c,colors["blue"],max(2,round(3*s)))
-    line(p,size,c,round(6*s),c,round(26*s),colors["frost"],max(1,round(s)))
-    line(p,size,round(6*s),c,round(26*s),c,colors["frost"],max(1,round(s)))
-    return p,(c,c)
+def cross_image(
+    size: int,
+    colors: dict[str, int],
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
+    p = canvas(size)
+    c = 16.0 * s
+    outer = max(2.2 * s, 2.0)
+    inner = max(0.9 * s, 1.0)
+    for x0, y0, x1, y1 in (
+        (c, 4.5 * s, c, 27.5 * s),
+        (4.5 * s, c, 27.5 * s, c),
+    ):
+        stroke_segment(p, size, x0, y0, x1, y1, colors["graphite"], outer)
+        stroke_segment(p, size, x0, y0, x1, y1, colors["frost"], inner)
+    return p, (round(c), round(c))
 
 
-def move_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
-    s=size/32.0; p=canvas(size); c=round(16*s); blue=colors["blue"]; frost=colors["frost"]
-    line(p,size,c,round(5*s),c,round(27*s),blue,max(2,round(3*s)))
-    line(p,size,round(5*s),c,round(27*s),c,blue,max(2,round(3*s)))
-    for pts in [
-        [(16,2),(12,8),(20,8)],[(16,30),(12,24),(20,24)],[(2,16),(8,12),(8,20)],[(30,16),(24,12),(24,20)]
-    ]:
-        fill_polygon(p,size,scale_points(pts,s),blue)
-    put(p,size,c,c,frost)
-    return p,(c,c)
+def move_image(
+    size: int,
+    colors: dict[str, int],
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
+    p = canvas(size)
+    c = 16.0 * s
+    outer = max(2.4 * s, 2.0)
+    inner = max(1.0 * s, 1.0)
+    for x0, y0, x1, y1 in (
+        (c, 6.0 * s, c, 26.0 * s),
+        (6.0 * s, c, 26.0 * s, c),
+    ):
+        stroke_segment(p, size, x0, y0, x1, y1, colors["graphite"], outer)
+        stroke_segment(p, size, x0, y0, x1, y1, colors["frost"], inner)
+    outer_heads = [
+        [(16, 2.5), (11.7, 8.8), (20.3, 8.8)],
+        [(16, 29.5), (11.7, 23.2), (20.3, 23.2)],
+        [(2.5, 16), (8.8, 11.7), (8.8, 20.3)],
+        [(29.5, 16), (23.2, 11.7), (23.2, 20.3)],
+    ]
+    inner_heads = [
+        [(16, 4.5), (13.7, 7.8), (18.3, 7.8)],
+        [(16, 27.5), (13.7, 24.2), (18.3, 24.2)],
+        [(4.5, 16), (7.8, 13.7), (7.8, 18.3)],
+        [(27.5, 16), (24.2, 13.7), (24.2, 18.3)],
+    ]
+    for pts in outer_heads:
+        fill_polygon(p, size, scale_points(pts, s), colors["graphite"])
+    for pts in inner_heads:
+        fill_polygon(p, size, scale_points(pts, s), colors["frost"])
+    return p, (round(c), round(c))
 
 
-def wait_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
-    s=size/32.0; p=canvas(size); c=16*s
-    ring(p,size,c,c,12*s,8*s,colors["blue"])
-    line(p,size,round(c),round(c),round(c),round(5*s),colors["frost"],max(1,round(2*s)))
-    return p,(round(c),round(c))
+def spinner(
+    pixels: list[int],
+    size: int,
+    colors: dict[str, int],
+    cx: float,
+    cy: float,
+    radius: float,
+    dot_radius: float,
+    phase: int,
+) -> None:
+    alpha_steps = (255, 210, 165, 125, 95, 70, 48, 32)
+    for index in range(8):
+        angle = (index / 8.0) * math.tau - math.pi / 2.0
+        x = cx + math.cos(angle) * radius
+        y = cy + math.sin(angle) * radius
+        alpha = alpha_steps[(index - phase) % 8]
+        fill_disk(
+            pixels,
+            size,
+            x,
+            y,
+            dot_radius,
+            with_alpha(colors["blue"], alpha),
+        )
 
 
-def forbidden_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
-    s=size/32.0; p=canvas(size); c=16*s
-    ring(p,size,c,c,12*s,9*s,colors["blocked"])
-    line(p,size,round(8*s),round(8*s),round(24*s),round(24*s),colors["blocked"],max(2,round(4*s)))
-    return p,(round(c),round(c))
+def wait_image(
+    size: int,
+    colors: dict[str, int],
+    phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
+    p = canvas(size)
+    c = 16.0 * s
+    spinner(p, size, colors, c, c, 9.0 * s, max(1.5 * s, 1.3), phase)
+    return p, (round(c), round(c))
 
 
-def resize_image(size: int, colors: dict[str, int], kind: str) -> tuple[list[int], tuple[int, int]]:
-    s=size/32.0; p=canvas(size); blue=colors["blue"]; c=round(16*s)
-    if kind == "h":
-        line(p,size,round(6*s),c,round(26*s),c,blue,max(2,round(3*s)))
-        fill_polygon(p,size,scale_points([(3,16),(10,11),(10,21)],s),blue)
-        fill_polygon(p,size,scale_points([(29,16),(22,11),(22,21)],s),blue)
-    elif kind == "v":
-        line(p,size,c,round(6*s),c,round(26*s),blue,max(2,round(3*s)))
-        fill_polygon(p,size,scale_points([(16,3),(11,10),(21,10)],s),blue)
-        fill_polygon(p,size,scale_points([(16,29),(11,22),(21,22)],s),blue)
-    elif kind == "d1":
-        line(p,size,round(7*s),round(7*s),round(25*s),round(25*s),blue,max(2,round(3*s)))
-        fill_polygon(p,size,scale_points([(4,4),(13,6),(6,13)],s),blue)
-        fill_polygon(p,size,scale_points([(28,28),(19,26),(26,19)],s),blue)
-    else:
-        line(p,size,round(25*s),round(7*s),round(7*s),round(25*s),blue,max(2,round(3*s)))
-        fill_polygon(p,size,scale_points([(28,4),(19,6),(26,13)],s),blue)
-        fill_polygon(p,size,scale_points([(4,28),(13,26),(6,19)],s),blue)
-    return p,(c,c)
-
-
-def progress_image(size: int, colors: dict[str, int]) -> tuple[list[int], tuple[int, int]]:
+def progress_image(
+    size: int,
+    colors: dict[str, int],
+    phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
     p, hot = arrow_image(size, colors)
-    s=size/32.0
-    ring(p,size,23*s,23*s,6*s,4*s,colors["blue"])
-    return p,hot
+    s = size / BASE_GRID
+    spinner(
+        p,
+        size,
+        colors,
+        23.2 * s,
+        23.0 * s,
+        4.0 * s,
+        max(1.0 * s, 1.0),
+        phase,
+    )
+    return p, hot
+
+
+def forbidden_image(
+    size: int,
+    colors: dict[str, int],
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
+    p = canvas(size)
+    c = 16.0 * s
+    ring(p, size, c, c, 12.3 * s, 8.4 * s, colors["graphite"])
+    ring(p, size, c, c, 10.9 * s, 8.9 * s, colors["blocked"])
+    stroke_segment(
+        p, size,
+        8.1 * s, 8.1 * s,
+        23.9 * s, 23.9 * s,
+        colors["graphite"],
+        max(4.4 * s, 3.0),
+    )
+    stroke_segment(
+        p, size,
+        8.5 * s, 8.5 * s,
+        23.5 * s, 23.5 * s,
+        colors["blocked"],
+        max(2.2 * s, 1.5),
+    )
+    return p, (round(c), round(c))
+
+
+def resize_image(
+    size: int,
+    colors: dict[str, int],
+    kind: str,
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    s = size / BASE_GRID
+    p = canvas(size)
+    c = 16.0 * s
+    graphite = colors["graphite"]
+    frost = colors["frost"]
+    outer_w = max(2.4 * s, 2.0)
+    inner_w = max(1.0 * s, 1.0)
+
+    if kind == "h":
+        start, end = (6.0, 16.0), (26.0, 16.0)
+        outer_heads = [[(2.7, 16), (9.2, 11.6), (9.2, 20.4)],
+                       [(29.3, 16), (22.8, 11.6), (22.8, 20.4)]]
+        inner_heads = [[(4.7, 16), (8.2, 13.6), (8.2, 18.4)],
+                       [(27.3, 16), (23.8, 13.6), (23.8, 18.4)]]
+    elif kind == "v":
+        start, end = (16.0, 6.0), (16.0, 26.0)
+        outer_heads = [[(16, 2.7), (11.6, 9.2), (20.4, 9.2)],
+                       [(16, 29.3), (11.6, 22.8), (20.4, 22.8)]]
+        inner_heads = [[(16, 4.7), (13.6, 8.2), (18.4, 8.2)],
+                       [(16, 27.3), (13.6, 23.8), (18.4, 23.8)]]
+    elif kind == "d1":
+        start, end = (7.0, 7.0), (25.0, 25.0)
+        outer_heads = [[(3.4, 3.4), (12.5, 5.6), (5.6, 12.5)],
+                       [(28.6, 28.6), (19.5, 26.4), (26.4, 19.5)]]
+        inner_heads = [[(5.2, 5.2), (10.2, 6.4), (6.4, 10.2)],
+                       [(26.8, 26.8), (21.8, 25.6), (25.6, 21.8)]]
+    else:
+        start, end = (25.0, 7.0), (7.0, 25.0)
+        outer_heads = [[(28.6, 3.4), (19.5, 5.6), (26.4, 12.5)],
+                       [(3.4, 28.6), (12.5, 26.4), (5.6, 19.5)]]
+        inner_heads = [[(26.8, 5.2), (21.8, 6.4), (25.6, 10.2)],
+                       [(5.2, 26.8), (10.2, 25.6), (6.4, 21.8)]]
+
+    stroke_segment(
+        p, size,
+        start[0] * s, start[1] * s,
+        end[0] * s, end[1] * s,
+        graphite, outer_w,
+    )
+    stroke_segment(
+        p, size,
+        start[0] * s, start[1] * s,
+        end[0] * s, end[1] * s,
+        frost, inner_w,
+    )
+    for pts in outer_heads:
+        fill_polygon(p, size, scale_points(pts, s), graphite)
+    for pts in inner_heads:
+        fill_polygon(p, size, scale_points(pts, s), frost)
+    return p, (round(c), round(c))
+
+
+def copy_image(
+    size: int,
+    colors: dict[str, int],
+    _phase: int = 0,
+) -> tuple[list[int], tuple[int, int]]:
+    p, hot = arrow_image(size, colors)
+    s = size / BASE_GRID
+    cx = 23.5 * s
+    cy = 23.5 * s
+    fill_disk(p, size, cx, cy, 5.0 * s, colors["frost"])
+    ring(p, size, cx, cy, 5.0 * s, 3.8 * s, colors["graphite"])
+    stroke_segment(
+        p, size,
+        cx - 2.4 * s, cy,
+        cx + 2.4 * s, cy,
+        colors["blue"],
+        max(1.4 * s, 1.0),
+    )
+    stroke_segment(
+        p, size,
+        cx, cy - 2.4 * s,
+        cx, cy + 2.4 * s,
+        colors["blue"],
+        max(1.4 * s, 1.0),
+    )
+    return p, hot
 
 
 def write_xcursor(path: Path, frames: list[dict[str, object]]) -> None:
@@ -208,6 +534,7 @@ def write_xcursor(path: Path, frames: list[dict[str, object]]) -> None:
         pixels = frame["pixels"]
         width = height = nominal
         xhot, yhot = frame["hot"]
+        delay = int(frame.get("delay", 0))
         tocs.append(struct.pack("<III", IMAGE_TYPE, nominal, position))
         chunk = struct.pack(
             "<IIIIIIIII",
@@ -219,18 +546,40 @@ def write_xcursor(path: Path, frames: list[dict[str, object]]) -> None:
             height,
             int(xhot),
             int(yhot),
-            0,
+            delay,
         ) + b"".join(struct.pack("<I", int(pixel)) for pixel in pixels)
         chunks.append(chunk)
         position += len(chunk)
     path.write_bytes(header + b"".join(tocs) + b"".join(chunks))
 
 
-def build_cursor(path: Path, sizes: list[int], renderer, colors: dict[str, int]) -> None:
-    frames = []
+def build_cursor(
+    path: Path,
+    sizes: list[int],
+    renderer: Renderer,
+    colors: dict[str, int],
+    supersample: int,
+    phases: int = 1,
+    delay: int = 0,
+) -> None:
+    frames: list[dict[str, object]] = []
     for size in sizes:
-        pixels, hot = renderer(size, colors)
-        frames.append({"size": size, "pixels": pixels, "hot": hot})
+        for phase in range(phases):
+            pixels, hot = render_supersampled(
+                size,
+                renderer,
+                colors,
+                phase,
+                supersample,
+            )
+            frames.append(
+                {
+                    "size": size,
+                    "pixels": pixels,
+                    "hot": hot,
+                    "delay": delay if phases > 1 else 0,
+                }
+            )
     write_xcursor(path, frames)
 
 
@@ -255,12 +604,15 @@ def main() -> int:
     colors = {
         "frost": argb(palette["frost"]),
         "blue": argb(palette["primary_blue"]),
-        "deep_blue": argb(palette["deep_blue"]),
         "graphite": argb(palette["graphite"]),
         "blocked": argb(palette["blocked"]),
     }
     sizes = [int(size) for size in cfg["sizes"]]
-    renderers = {
+    supersample = int(cfg.get("supersample", 4))
+    animation_frames = int(cfg.get("animation_frames", 8))
+    animation_delay = int(cfg.get("animation_delay_ms", 55))
+
+    renderers: dict[str, Renderer] = {
         "arrow": arrow_image,
         "hand": hand_image,
         "text": text_image,
@@ -269,10 +621,11 @@ def main() -> int:
         "wait": wait_image,
         "progress": progress_image,
         "blocked": forbidden_image,
-        "hresize": lambda size, c: resize_image(size, c, "h"),
-        "vresize": lambda size, c: resize_image(size, c, "v"),
-        "d1resize": lambda size, c: resize_image(size, c, "d1"),
-        "d2resize": lambda size, c: resize_image(size, c, "d2"),
+        "hresize": lambda size, c, phase=0: resize_image(size, c, "h", phase),
+        "vresize": lambda size, c, phase=0: resize_image(size, c, "v", phase),
+        "d1resize": lambda size, c, phase=0: resize_image(size, c, "d1", phase),
+        "d2resize": lambda size, c, phase=0: resize_image(size, c, "d2", phase),
+        "copy": copy_image,
     }
     aliases = {
         "arrow": ["left_ptr", "default", "arrow", "top_left_arrow"],
@@ -283,23 +636,41 @@ def main() -> int:
         "wait": ["watch", "wait"],
         "progress": ["left_ptr_watch", "progress"],
         "blocked": ["not-allowed", "forbidden", "no-drop"],
-        "hresize": ["sb_h_double_arrow", "size_hor", "ew-resize", "e-resize", "w-resize", "left_side", "right_side"],
-        "vresize": ["sb_v_double_arrow", "size_ver", "ns-resize", "n-resize", "s-resize", "top_side", "bottom_side"],
-        "d1resize": ["size_bdiag", "nwse-resize", "nw-resize", "se-resize", "top_left_corner", "bottom_right_corner"],
-        "d2resize": ["size_fdiag", "nesw-resize", "ne-resize", "sw-resize", "top_right_corner", "bottom_left_corner"],
+        "hresize": [
+            "sb_h_double_arrow", "size_hor", "ew-resize", "e-resize",
+            "w-resize", "left_side", "right_side",
+        ],
+        "vresize": [
+            "sb_v_double_arrow", "size_ver", "ns-resize", "n-resize",
+            "s-resize", "top_side", "bottom_side",
+        ],
+        "d1resize": [
+            "size_bdiag", "nwse-resize", "nw-resize", "se-resize",
+            "top_left_corner", "bottom_right_corner",
+        ],
+        "d2resize": [
+            "size_fdiag", "nesw-resize", "ne-resize", "sw-resize",
+            "top_right_corner", "bottom_left_corner",
+        ],
+        "copy": ["dnd-copy", "copy"],
     }
 
     for family, renderer in renderers.items():
         canonical = cursors / f".goreecloud-{family}"
-        build_cursor(canonical, sizes, renderer, colors)
+        animated = family in {"wait", "progress"}
+        build_cursor(
+            canonical,
+            sizes,
+            renderer,
+            colors,
+            supersample,
+            phases=animation_frames if animated else 1,
+            delay=animation_delay if animated else 0,
+        )
         payload = canonical.read_bytes()
         for name in aliases[family]:
             (cursors / name).write_bytes(payload)
         canonical.unlink()
-
-    # DnD copy uses the pointer hand rather than falling back to an unrelated theme.
-    (cursors / "dnd-copy").write_bytes((cursors / "hand2").read_bytes())
-    (cursors / "copy").write_bytes((cursors / "hand2").read_bytes())
 
     print(f"Built GoreeCloud cursor theme: {theme}")
     return 0
