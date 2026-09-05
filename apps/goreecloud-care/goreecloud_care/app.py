@@ -288,6 +288,15 @@ class CareWindow(Gtk.ApplicationWindow):
                 GLib.idle_add(done, None, exc)
         threading.Thread(target=worker, daemon=True).start()
 
+    def _apply_scans(self, scans) -> int:
+        self.scans = scans
+        total = 0
+        for key, scan in scans.items():
+            total += scan.bytes
+            self.rows[key][1].set_text(f"{human_bytes(scan.bytes)} • {scan.count} items")
+        self.refresh_system_status()
+        return total
+
     def on_scan(self, _button) -> None:
         self.set_status("Scanning without deleting files…", "info", "Scanning")
         self.run_thread(self.engine.scan_all, self._scan_done)
@@ -296,17 +305,32 @@ class CareWindow(Gtk.ApplicationWindow):
         if error:
             self.set_status(f"Scan failed: {error}", "error", "Scan failed")
             return False
-        self.scans = scans
-        total = 0
-        for key, scan in scans.items():
-            total += scan.bytes
-            self.rows[key][1].set_text(f"{human_bytes(scan.bytes)} • {scan.count} items")
-        self.refresh_system_status()
+        total = self._apply_scans(scans)
         self.set_status(
             f"Up to {human_bytes(total)} is visible across all maintenance categories.",
             "info",
             "Scan complete",
         )
+        return False
+
+    def _refresh_after_action(self, text: str, state: str, title: str) -> None:
+        """Refresh category/system values without overwriting the action result."""
+        self.run_thread(
+            self.engine.scan_all,
+            lambda scans, error: self._refresh_after_action_done(scans, error, text, state, title),
+        )
+
+    def _refresh_after_action_done(self, scans, error, text: str, state: str, title: str) -> bool:
+        if error:
+            self.refresh_system_status()
+            self.set_status(
+                f"{text} Follow-up scan failed: {error}",
+                "attention",
+                f"{title}; refresh incomplete",
+            )
+            return False
+        self._apply_scans(scans)
+        self.set_status(text, state, title)
         return False
 
     def _confirm(
@@ -390,11 +414,9 @@ class CareWindow(Gtk.ApplicationWindow):
         msg = f"Approximately {human_bytes(reclaimed)} removed."
         if failures:
             msg += f" {failures} item(s) could not be removed; no success is claimed for those items."
-            self.set_status(msg, "attention", "Cleanup finished with exceptions")
+            self._refresh_after_action(msg, "attention", "Cleanup finished with exceptions")
         else:
-            self.set_status(msg, "success", "Cleanup complete")
-        self.refresh_system_status()
-        self.on_scan(None)
+            self._refresh_after_action(msg, "success", "Cleanup complete")
         return False
 
     def on_empty_trash(self, _button) -> None:
@@ -417,10 +439,9 @@ class CareWindow(Gtk.ApplicationWindow):
         msg = f"Approximately {human_bytes(result.reclaimed_bytes)} removed from Trash."
         if result.errors:
             msg += f" {len(result.errors)} item(s) were not removed."
-            self.set_status(msg, "attention", "Trash cleanup finished with exceptions")
+            self._refresh_after_action(msg, "attention", "Trash cleanup finished with exceptions")
         else:
-            self.set_status(msg, "success", "Trash emptied")
-        self.on_scan(None)
+            self._refresh_after_action(msg, "success", "Trash emptied")
         return False
 
     def _run_privileged(self, action: str):
@@ -499,9 +520,10 @@ class CareWindow(Gtk.ApplicationWindow):
             )
             return False
 
-        self.set_status(outcome.message, "success", f"{action_label} complete")
-        self.refresh_system_status()
-        self.on_scan(None)
+        completion_title = f"{action_label} complete"
+        self.set_status(outcome.message, "success", completion_title)
+        self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)
+        self._refresh_after_action(outcome.message, "success", completion_title)
         return False
 
 
