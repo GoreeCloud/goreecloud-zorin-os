@@ -14,10 +14,10 @@ from .core import CareEngine, CategoryScan, human_bytes, read_disk_stats, read_m
 from .privilege import interpret_pkexec_result
 from .ui_contract import (
     COMPACT_BORDER,
-    COMPACT_WIDTH,
     MIN_WINDOW_HEIGHT,
     MIN_WINDOW_WIDTH,
     REGULAR_BORDER,
+    is_compact_width,
     is_high_contrast_theme,
 )
 
@@ -133,11 +133,12 @@ class CareWindow(Gtk.ApplicationWindow):
         if self.settings is not None:
             self.settings.connect("notify::gtk-theme-name", self._on_theme_name_changed)
 
-        header = Gtk.HeaderBar()
-        header.set_show_close_button(True)
-        header.props.title = "GoreeCloud Care"
-        header.props.subtitle = "Development • local maintenance"
-        self.set_titlebar(header)
+        self.header_subtitle = "Development • local maintenance"
+        self.header = Gtk.HeaderBar()
+        self.header.set_show_close_button(True)
+        self.header.props.title = "GoreeCloud Care"
+        self.header.props.subtitle = self.header_subtitle
+        self.set_titlebar(self.header)
 
         scan_btn = Gtk.Button(label="Scan")
         scan_btn.set_can_focus(True)
@@ -146,7 +147,7 @@ class CareWindow(Gtk.ApplicationWindow):
             "Preview maintenance categories. Scanning does not delete files."
         )
         scan_btn.connect("clicked", self.on_scan)
-        header.pack_end(scan_btn)
+        self.header.pack_end(scan_btn)
 
         self.root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
         self.root.set_border_width(REGULAR_BORDER)
@@ -314,11 +315,12 @@ class CareWindow(Gtk.ApplicationWindow):
         self._apply_layout(allocation.width)
 
     def _apply_layout(self, width: int) -> None:
-        compact = width < COMPACT_WIDTH
+        compact = is_compact_width(width)
         if compact == self._compact_layout:
             return
         self._compact_layout = compact
         self.root.set_border_width(COMPACT_BORDER if compact else REGULAR_BORDER)
+        self.header.set_subtitle(None if compact else self.header_subtitle)
         self.controls.set_orientation(
             Gtk.Orientation.VERTICAL if compact else Gtk.Orientation.HORIZONTAL
         )
