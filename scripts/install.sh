@@ -27,8 +27,9 @@ Usage:
 
 The install activates the light-first GoreeCloud desktop experience:
 Applications theme, Shell theme, GoreeCloud icons, GoreeCloud cursors, and the
-primary light wallpaper. --replace-stock additionally removes the audited
-Zorin OS 17.3 stock wallpaper packages after recovery-backed checks pass.
+primary light wallpaper. --replace-stock additionally moves the exact audited
+Zorin OS 17.3 stock wallpaper files/catalogs out of GNOME discovery paths with
+package-safe dpkg diversions. Zorin desktop/artwork packages remain installed.
 EOF
 }
 
@@ -198,11 +199,12 @@ if pgrep -f 'zorin-appearance' >/dev/null 2>&1; then
 fi
 
 if [[ "$REPLACE_STOCK" -eq 1 ]]; then
-  echo "The audited Zorin stock wallpaper packages were removed."
+  echo "The audited Zorin stock wallpaper files/catalogs were diverted out of GNOME discovery paths."
+  echo "Zorin desktop/artwork packages remain installed."
   echo "Recovery remains available through:"
   echo "  ./scripts/wallpaper.sh replace-stock restore"
 else
   echo "The complete GoreeCloud wallpaper collection is installed user-locally."
-  echo "To remove the audited Zorin stock wallpaper set later:"
+  echo "To replace the audited Zorin stock wallpaper gallery later:"
   echo "  ./scripts/wallpaper.sh replace-stock apply"
 fi
