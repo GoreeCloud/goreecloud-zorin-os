@@ -10,12 +10,24 @@ class PrivilegedOutcome:
     message: str
 
 
+_CANCELLED_STDERR_MARKERS = (
+    "request dismissed",
+    "authentication cancelled",
+    "authentication canceled",
+    "authorization cancelled",
+    "authorization canceled",
+    "cancelled by user",
+    "canceled by user",
+)
+
+
 def interpret_pkexec_result(returncode: int, stderr: str, action_label: str) -> PrivilegedOutcome:
     """Translate pkexec/helper completion into explicit user-facing state.
 
-    pkexec reserves exit code 126 for a dismissed authentication dialog and 127
-    for authorization/error cases where authorization was not obtained. Other
-    non-zero values are treated as helper/action failures and never as success.
+    pkexec commonly uses exit code 126 when authorization is dismissed, but
+    PolicyKit agents/distributions can also surface dismissal through stderr.
+    Treat an observed dismissal message as cancellation regardless of the exact
+    non-zero code so cancellation is never misreported as an opaque failure.
     """
     if returncode == 0:
         return PrivilegedOutcome(
@@ -24,7 +36,11 @@ def interpret_pkexec_result(returncode: int, stderr: str, action_label: str) -> 
             message=f"{action_label} completed successfully.",
         )
 
-    if returncode == 126:
+    detail = (stderr or "").strip()
+    detail_lower = detail.lower()
+    dismissed = returncode == 126 or any(marker in detail_lower for marker in _CANCELLED_STDERR_MARKERS)
+
+    if dismissed:
         return PrivilegedOutcome(
             completed=False,
             cancelled=True,
@@ -34,7 +50,6 @@ def interpret_pkexec_result(returncode: int, stderr: str, action_label: str) -> 
             ),
         )
 
-    detail = (stderr or "").strip()
     if returncode == 127:
         message = (
             f"{action_label} did not run because administrator authorization was not obtained "
