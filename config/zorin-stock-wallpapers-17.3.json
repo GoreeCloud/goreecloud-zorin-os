@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "Development",
   "evidence_date": "2026-09-04",
   "target": {
@@ -10,6 +10,32 @@
     "user_background_dir": "~/.local/share/backgrounds/GoreeCloud-Zorin",
     "user_catalog": "~/.local/share/gnome-background-properties/goreecloud-zorin.xml",
     "expected_wallpaper_count": 24
+  },
+  "strategy": {
+    "mode": "dpkg-divert",
+    "package_purge": "prohibited",
+    "reason": "Target apt simulation showed that purging the wallpaper packages also removes zorin-os-artwork and zorin-os-desktop and installs Ubuntu wallpaper packages. Keep the Zorin packages installed and divert only the audited wallpaper/catalog paths out of GNOME discovery locations.",
+    "diversion_root": "/var/lib/goreecloud-zorin/stock-wallpaper-diversions",
+    "protected_packages": [
+      {
+        "name": "zorin-os-artwork",
+        "version": "1.6.9"
+      },
+      {
+        "name": "zorin-os-desktop",
+        "version": "1.6.9"
+      }
+    ],
+    "observed_unsafe_purge": {
+      "additional_removals": [
+        "zorin-os-artwork",
+        "zorin-os-desktop"
+      ],
+      "additional_installs": [
+        "ubuntu-wallpapers",
+        "ubuntu-wallpapers-jammy"
+      ]
+    }
   },
   "recovery_root": "/var/lib/goreecloud-zorin/wallpaper-recovery",
   "packages": [
@@ -158,5 +184,5 @@
       "owner": "zorin-os-wallpapers"
     }
   ],
-  "notes": "Exact stock-wallpaper set captured from the verified Zorin OS 17.3 target audit. The removal workflow must fail closed if package versions, ownership, paths, or apt purge simulation differ."
+  "notes": "Exact stock-wallpaper set captured from the verified Zorin OS 17.3 target audit. Direct package purge is prohibited because target simulation removes Zorin desktop/artwork metapackages. Replacement uses local dpkg diversions to move only the audited wallpaper/catalog files out of GNOME discovery paths while keeping all Zorin packages installed and recoverable."
 }
