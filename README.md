@@ -12,7 +12,7 @@ The repository currently provides:
 - `GoreeCloud-Zorin-Dark` — secondary compatibility theme;
 - `GoreeCloud-Zorin-DeepDark` — secondary compatibility theme;
 - `GoreeCloud-Zorin` — light-first icon theme;
-- `GoreeCloud-Zorin-Cursors` — Frost White + GoreeCloud Blue Xcursor theme;
+- `GoreeCloud-Zorin-Cursors` — neutral Frost White + Graphite Xcursor theme with restrained GoreeCloud Blue activity/action accents;
 - 24 identity-derived wallpaper source derivatives, with only 8 Light wallpapers exposed in Settings;
 - recovery-backed replacement of the audited Zorin OS 17.3 stock wallpaper set without removing Zorin desktop packages.
 
@@ -109,7 +109,9 @@ The generated Xcursor theme is named:
 GoreeCloud-Zorin-Cursors
 ```
 
-It is generated with Python standard-library code and does not require `xcursorgen` at install time. The theme contains 24px, 32px, and 48px Xcursor image frames and custom Frost White / GoreeCloud Blue treatments for pointer, hand, text, crosshair, move, wait/progress, blocked, and resize cursor families, with common Xcursor aliases included.
+The cursor is intentionally quieter than the rest of the desktop branding. Primary pointer, link hand, text, crosshair, move, and resize families use a familiar Frost White fill with a Graphite outline so they remain legible on both light and dark content. GoreeCloud Blue is reserved for activity/action accents such as progress spinners and the copy badge instead of outlining every cursor.
+
+The generator uses only the Python standard library and does not require `xcursorgen` at install time. It renders a 24px, 32px, 48px, 64px, and 96px Xcursor size ladder with 4x supersampling and premultiplied-alpha downsampling. Wait and progress cursors use eight animation frames at a 55ms frame delay. Common Xcursor aliases and a dedicated copy cursor are included, while unoverridden cursor names inherit from Adwaita.
 
 ## Wallpaper collection
 
@@ -171,6 +173,8 @@ python3 ./scripts/validate_system_wallpapers.py
 ```
 
 The light-catalog gate verifies that all 24 compatibility entries remain valid while only the exact 8 Light wallpaper IDs are visible in the GNOME catalog.
+
+Cursor validation verifies the complete configured size ladder, animated-frame/delay contract, non-empty Xcursor payloads, and the neutral Frost/Graphite primary-pointer contract so the default pointer cannot regress to a blue-heavy treatment unnoticed.
 
 CI runs ShellCheck plus wallpaper source/rendering, light-first catalog visibility, icon/cursor, V1.2 preview, stock-wallpaper safety, and generated GTK theme validation.
 
