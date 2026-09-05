@@ -70,9 +70,12 @@ headerbar,
   padding: 4px 6px;
 }
 
+/* Keep inactive windows frosted instead of dropping back to a flat gray
+ * Zorin base surface. Text still softens to preserve focus hierarchy. */
 headerbar:backdrop,
 .titlebar:backdrop {
-  background-color: @gc_canvas;
+  background-image: none;
+  background-color: @gc_surface;
   color: @gc_muted;
 }
 
@@ -109,6 +112,13 @@ button:checked:hover {
   border-color: @gc_accent_hover;
   background-color: @gc_accent_hover;
   color: @gc_on_accent;
+}
+
+button:backdrop {
+  border-color: @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_muted;
 }
 
 button.destructive-action {
@@ -174,6 +184,14 @@ spinbutton:focus,
 combobox button:focus {
   border-color: @gc_accent;
   box-shadow: inset 0 0 0 1px @gc_accent;
+}
+
+entry:backdrop,
+spinbutton:backdrop,
+combobox button:backdrop {
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_muted;
 }
 
 entry selection,
@@ -255,7 +273,7 @@ popover,
   border-radius: 16px;
   background-color: @gc_surface;
   color: @gc_text;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
 }
 
 menuitem,
@@ -281,6 +299,14 @@ textview text {
   color: @gc_text;
 }
 
+.view:backdrop,
+treeview.view:backdrop,
+iconview:backdrop,
+textview text:backdrop {
+  background-color: @gc_canvas;
+  color: @gc_muted;
+}
+
 .view:selected,
 treeview.view:selected,
 iconview:selected {
@@ -288,13 +314,12 @@ iconview:selected {
   color: @gc_on_accent;
 }
 
-/* The verified ZorinBlue-Dark GTK 3 base applies #bde6fb to generic
- * row:selected. GNOME Control Center 41.7 uses that GTK 3 row state for its
- * libhandy Settings sidebar, so map the generic row contract to the Glaze
- * selection token rather than treating this as a GTK 4 navigation-sidebar. */
+/* Selected rows stay softly blue even when their window is inactive. This
+ * prevents the gray selected-state fallback visible in overlapping windows. */
 row:selected,
 row:selected:hover,
-row:selected:focus {
+row:selected:focus,
+row:selected:backdrop {
   background-image: none;
   background-color: @gc_selection;
   color: @gc_text;
@@ -305,7 +330,9 @@ row:selected image,
 row:selected:hover label,
 row:selected:hover image,
 row:selected:focus label,
-row:selected:focus image {
+row:selected:focus image,
+row:selected:backdrop label,
+row:selected:backdrop image {
   color: @gc_text;
 }
 
@@ -318,7 +345,8 @@ row:selected:focus image {
 row.activatable:selected,
 row.activatable:selected:hover,
 row.activatable:selected:focus,
-row.activatable:selected:active {
+row.activatable:selected:active,
+row.activatable:selected:backdrop {
   background-image: none;
   background-color: @gc_selection;
   color: @gc_text;
@@ -332,7 +360,9 @@ row.activatable:selected:hover image,
 row.activatable:selected:focus label,
 row.activatable:selected:focus image,
 row.activatable:selected:active label,
-row.activatable:selected:active image {
+row.activatable:selected:active image,
+row.activatable:selected:backdrop label,
+row.activatable:selected:backdrop image {
   color: @gc_text;
 }
 
@@ -344,7 +374,10 @@ placessidebar list {
 }
 
 .sidebar row:selected,
-placessidebar row:selected {
+.sidebar row:selected:backdrop,
+placessidebar row:selected,
+placessidebar row:selected:backdrop {
+  background-image: none;
   background-color: @gc_selection;
   color: @gc_text;
 }
@@ -352,14 +385,15 @@ placessidebar row:selected {
 /* Nautilus 42.6 ships a more specific .nautilus-window .sidebar-row:selected
  * rule than the generic places-sidebar contract. Pin that exact target state
  * to the Glaze selection token so the verified Zorin GTK 3 base cannot leave
- * the active location on a pale Zorin-blue selection. */
+ * the active location on a pale Zorin-blue or inactive-gray selection. */
 .nautilus-window .sidebar-row:selected,
 .nautilus-window .sidebar-row:selected:hover,
-.nautilus-window .sidebar-row:selected:focus {
+.nautilus-window .sidebar-row:selected:focus,
+.nautilus-window .sidebar-row:selected:backdrop {
   background-image: none;
   background-color: @gc_selection;
   color: @gc_text;
-  box-shadow: inset 0 0 0 1px alpha(@gc_accent, 0.35);
+  box-shadow: inset 0 0 0 1px alpha(@gc_accent, 0.28);
 }
 
 .nautilus-window .sidebar-row:selected label,
@@ -367,7 +401,9 @@ placessidebar row:selected {
 .nautilus-window .sidebar-row:selected:hover label,
 .nautilus-window .sidebar-row:selected:hover image,
 .nautilus-window .sidebar-row:selected:focus label,
-.nautilus-window .sidebar-row:selected:focus image {
+.nautilus-window .sidebar-row:selected:focus image,
+.nautilus-window .sidebar-row:selected:backdrop label,
+.nautilus-window .sidebar-row:selected:backdrop image {
   color: @gc_text;
 }
 
