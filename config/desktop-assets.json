@@ -27,10 +27,10 @@
   },
   "cursor_theme": {
     "id": "GoreeCloud-Zorin-Cursors",
-    "runtime_id": "GoreeCloud-Zorin-Cursors-r3",
+    "runtime_id": "GoreeCloud-Zorin-Cursors-r2",
     "name": "GoreeCloud Zorin Cursors",
-    "comment": "Frost White and Graphite cursors with GoreeCloud Blue activity accents and a normalized desktop footprint",
-    "design_revision": 3,
+    "comment": "Frost White and Graphite cursors with GoreeCloud Blue activity accents",
+    "design_revision": 2,
     "visual_direction": "neutral-familiar",
     "accent_policy": "activity-and-action-only",
     "inherits": [
