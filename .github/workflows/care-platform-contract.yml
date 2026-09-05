@@ -1,0 +1,28 @@
+name: GoreeCloud Care Platform Contract
+
+on:
+  pull_request:
+    paths:
+      - 'apps/goreecloud-care/goreecloud.platform.yaml'
+      - 'apps/goreecloud-care/PRIVACY.md'
+      - 'apps/goreecloud-care/SECURITY.md'
+      - 'apps/goreecloud-care/RECOVERY.md'
+      - '.github/workflows/care-platform-contract.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/goreecloud-care/goreecloud.platform.yaml'
+      - 'apps/goreecloud-care/PRIVACY.md'
+      - 'apps/goreecloud-care/SECURITY.md'
+      - 'apps/goreecloud-care/RECOVERY.md'
+      - '.github/workflows/care-platform-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  platform-contract:
+    uses: GoreeCloud/GoreeCloud/.github/workflows/reusable-platform-manifest.yml@4a0ebf20ffb669e3d5680ab6c8d34583f1712966
+    with:
+      manifest-path: apps/goreecloud-care/goreecloud.platform.yaml

@@ -1,0 +1,38 @@
+name: GoreeCloud Care Development
+
+on:
+  pull_request:
+    paths:
+      - 'apps/goreecloud-care/**'
+      - '.github/workflows/care-ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/goreecloud-care/**'
+      - '.github/workflows/care-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/goreecloud-care
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate Care source
+        run: sh ./scripts/validate.sh
+
+      - name: Build Development Debian package
+        run: sh ./scripts/build-deb.sh dist
+
+      - name: Inspect Development Debian package
+        run: |
+          dpkg-deb -I dist/goreecloud-care_0.1.0~dev1_all.deb
+          dpkg-deb -c dist/goreecloud-care_0.1.0~dev1_all.deb

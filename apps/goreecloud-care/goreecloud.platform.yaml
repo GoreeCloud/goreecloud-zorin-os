@@ -1,0 +1,125 @@
+schema_version: "0.2"
+
+component:
+  type: application
+  id: goreecloud-care
+  product_name: GoreeCloud Care
+  repository: GoreeCloud/goreecloud-zorin-os
+
+lifecycle: development
+version: 0.1.0-dev1
+
+supported_platforms:
+  - linux
+
+api:
+  versions: []
+  endpoints: []
+
+platform_systems:
+  manager:
+    result: applicable-blocked
+    version: null
+    evidence: []
+    notes: Operational visibility requirements have not yet been integrated or accepted.
+  privacy_shield:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - PRIVACY.md
+    notes: Local-only privacy design is documented; formal Privacy Shield acceptance is not claimed.
+  wardveil_security:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - SECURITY.md
+    notes: Least-privilege source controls are present; formal Wardveil Security acceptance is not claimed.
+  everkeep:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - RECOVERY.md
+    notes: Recovery behavior is documented; Everkeep recovery acceptance has not been completed.
+  glaze_ui:
+    result: applicable-blocked
+    version: "1.1.0"
+    evidence: []
+    notes: Current Stable consumer target is 1.1.0, but final application acceptance is blocked by the known current Stable import-closure issue and no corrected immutable Stable release is yet adopted.
+  mesh:
+    result: applicable-blocked
+    version: null
+    evidence: []
+    notes: Mesh registration/runtime acceptance has not been implemented.
+    capabilities: []
+    dependencies: []
+    published_events: []
+    consumed_events: []
+  identity:
+    result: not-applicable-justified
+    version: null
+    evidence: []
+    notes: This local-only Development utility has no account/authentication surface; re-evaluate if remote or multi-user capabilities are introduced.
+
+health:
+  health_endpoint: null
+  readiness_endpoint: null
+
+continuity:
+  backup:
+    required: false
+    requirements:
+      - The Development utility currently persists no durable user application data requiring backup.
+  restore:
+    required: true
+    requirements:
+      - Document irreversible Trash deletion and validate package rollback before Release Candidate consideration.
+  export:
+    required: false
+    requirements:
+      - No durable user application data is currently stored for export.
+  portability:
+    required: true
+    requirements:
+      - Keep maintenance policy and package state documented and avoid proprietary durable data formats.
+
+external_dependencies:
+  - name: python3
+    purpose: Native application runtime.
+    required: true
+    version_constraint: ">=3.10"
+  - name: PyGObject GTK 3
+    purpose: Native Zorin OS desktop interface.
+    required: true
+    version_constraint: null
+  - name: PolicyKit
+    purpose: Explicit authorization for APT cache cleanup and Linux file-cache reclaim.
+    required: true
+    version_constraint: null
+
+compatibility:
+  platform_contract: "0.2"
+  glaze_ui_required: "1.1.0"
+  requires:
+    - goreecloud-platform-contract==0.2
+    - glaze-ui==1.1.0
+  provides:
+    - goreecloud-care-local-maintenance
+
+evidence:
+  acceptance_tests: []
+  release: []
+
+conformance:
+  status: nonconformant
+  validated_at: null
+  evidence: []
+  blockers:
+    - GoreeCloud Care is a component manifest under apps/goreecloud-care; repository-wide monorepo inventory/conformance integration remains incomplete.
+    - GoreeCloud Manager integration and acceptance remain incomplete.
+    - Privacy Shield formal acceptance remains incomplete.
+    - Wardveil Security formal acceptance remains incomplete.
+    - Everkeep recovery/rollback acceptance remains incomplete.
+    - Final Glaze UI current-Stable source/rendered/accessibility acceptance remains blocked/incomplete.
+    - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
+    - Representative Zorin OS 17.3 install, PolicyKit, rendered, accessibility, package, upgrade, and rollback acceptance remain incomplete.
+    - Release Candidate and release evidence are intentionally absent for this Development build.

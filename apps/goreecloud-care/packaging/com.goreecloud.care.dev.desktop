@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=GoreeCloud Care (Development)
+Comment=Preview and clean local cache, temporary files, Trash, and package cache
+Exec=goreecloud-care
+Icon=preferences-system-symbolic
+Terminal=false
+Categories=System;Utility;
+Keywords=cleaner;cache;temporary;trash;memory;maintenance;
+StartupNotify=true
+StartupWMClass=com.goreecloud.care.dev
