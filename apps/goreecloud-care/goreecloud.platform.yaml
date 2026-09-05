@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev4
+version: 0.1.0-dev5
 
 supported_platforms:
   - linux
@@ -44,7 +44,7 @@ platform_systems:
     result: applicable-blocked
     version: "1.1.0"
     evidence: []
-    notes: Current Stable consumer target is 1.1.0. Dev4 maps light appearance and semantic status roles from that Stable line, but final native rendered/accessibility acceptance and application conformance remain incomplete.
+    notes: Current Stable consumer target is 1.1.0. Dev5 retains the representative-device-verified light appearance, visible keyboard focus, and semantic status roles from the Stable line, while final native rendered/accessibility acceptance and application conformance remain incomplete.
   mesh:
     result: applicable-blocked
     version: null
@@ -120,7 +120,8 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native rendered/accessibility acceptance remains incomplete, including dev4 light-default and status-salience validation.
+    - Final Glaze UI current-Stable native rendered/accessibility acceptance remains incomplete; representative Zorin OS dev4 light-default, status-salience, and keyboard-focus rendering are verified but broader appearance/window-size/accessibility coverage remains open.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
-    - Representative Zorin OS 17.3 keyboard-focus visibility and first-stage cancellation feedback are evidenced, but PolicyKit authentication-prompt cancellation, privileged-success behavior, cleanup operations, broader accessibility/appearance, upgrade, and rollback acceptance remain incomplete.
+    - Representative Zorin OS PolicyKit cancellation paths are verified. Dev5 now preserves completion state across the post-action refresh scan and presents an explicit completion notice, but privileged-success execution still requires target-device revalidation before it can be claimed complete.
+    - Actual cleanup operations, broader accessibility/appearance, package rollback, and remaining platform-system acceptance remain incomplete.
     - Release Candidate and release evidence are intentionally absent for this Development build.
