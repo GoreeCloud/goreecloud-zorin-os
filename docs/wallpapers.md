@@ -145,11 +145,38 @@ Applying a wallpaper records a GNOME settings snapshot first. Restore the latest
 
 ## Stock Zorin wallpaper replacement
 
-The desired end state remains a GoreeCloud-only wallpaper gallery. The audited recovery-backed stock-removal tooling exists, but **privileged stock wallpaper removal is paused while the redesigned identity-derived collection is awaiting target visual acceptance**.
+The desired end state is a GoreeCloud-only wallpaper gallery. Target testing showed that purging the four stock wallpaper packages is not safe: apt also proposes removing `zorin-os-artwork` and `zorin-os-desktop`, then installing Ubuntu wallpaper packages. The implementation therefore keeps every Zorin package installed.
 
-Do not run the privileged `apply` or `finalize` stock-removal subcommands until the redesigned 24-wallpaper set is installed, reviewed, and accepted on the target laptop.
+Replacement now uses **local `dpkg-divert` entries** for the exact audited Zorin wallpaper images and GNOME background catalog files. Applying the replacement moves only those package-owned files from their normal `/usr/share/backgrounds` and `/usr/share/gnome-background-properties` locations into:
 
-The read-only audit/plan paths remain available for inspection without changing packages.
+```text
+/var/lib/goreecloud-zorin/stock-wallpaper-diversions
+```
+
+That makes the stock set disappear from GNOME/Zorin wallpaper discovery while preserving package ownership and desktop metapackages. Future package operations respect the diversions rather than restoring the stock files into the visible gallery.
+
+Inspect the plan without changing the system:
+
+```bash
+./scripts/wallpaper.sh replace-stock plan
+```
+
+Apply it after the GoreeCloud collection is installed:
+
+```bash
+./scripts/wallpaper.sh replace-stock apply
+```
+
+Check status or restore the stock files:
+
+```bash
+./scripts/wallpaper.sh replace-stock status
+./scripts/wallpaper.sh replace-stock restore
+```
+
+`finalize` removes the temporary recovery archive but deliberately leaves the package-safe diversions active. It does not purge Zorin packages.
+
+The workflow verifies the exact Zorin OS 17.3 package versions and ownership evidence before making changes. It also records the unsafe apt purge simulation as diagnostic evidence, but there is no code path that executes that purge.
 
 ## Validation
 
@@ -167,10 +194,12 @@ The read-only audit/plan paths remain available for inspection without changing 
 - no script elements or remote/file/data href resources;
 - generated GNOME background catalog count and filenames.
 
+`python3 ./scripts/validate_system_wallpapers.py` verifies that the stock replacement contract remains pinned to the exact audited Zorin package/file set, requires the `dpkg-divert` strategy, protects `zorin-os-artwork` and `zorin-os-desktop`, and rejects executable package-purge code.
+
 Source validation proves reproducibility and identity-source integrity. It does not prove visual quality on the target display.
 
 ## Remaining target acceptance
 
 Install the redesigned collection on the Zorin OS 17.3 laptop, reopen Settings → Background, review the 24 thumbnails and representative full-desktop renders, and verify that Unified Clean, Facet, Sentinel Fold, and Privacy Shield are visibly faithful to their canonical artwork in Light/Dark/Deep Dark contexts.
 
-For V1.2, review the same representative set against the Frost/Graphite preview and include bright, dark, saturated, and detailed wallpaper stress cases, increased contrast, reduced transparency where applicable, and 200% text before promoting the preview. Only after the redesigned collection is accepted should stock wallpaper removal resume.
+For V1.2, review the same representative set against the Frost/Graphite preview and include bright, dark, saturated, and detailed wallpaper stress cases, increased contrast, reduced transparency where applicable, and 200% text before promoting the preview.
