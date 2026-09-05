@@ -16,11 +16,13 @@ Choose **Clean APT cache…** and confirm. PolicyKit asks for administrator auth
 Choose **Reclaim file cache…** only when you deliberately want Linux to release page/dentry/inode caches. Linux normally manages these caches automatically. Available memory may rise temporarily, but this is not a lasting performance boost and later file/app loads may be slower while caches rebuild.
 
 ## Keyboard and accessibility
-Use **Tab** and **Shift+Tab** to move through interactive controls. The current Development build provides a visible focus treatment, accessible names/descriptions for maintenance actions and cleanup selectors, and a status region whose accessible name is updated as maintenance state changes.
+Use **Tab** and **Shift+Tab** to move through interactive controls. GoreeCloud Care requires keyboard focus to be visibly perceivable as it moves; an interface where focus changes cannot be seen is not considered accepted keyboard behavior.
+
+The ordinary Care presentation uses its established application focus styling. When a system HighContrast presentation suppresses Care's normal palette provider, dev10 installs a separate focus-only fallback beneath the ordinary Care CSS. The fallback uses the active GTK theme foreground color and does not define Care backgrounds, surfaces, or palette colors, so HighContrast remains authoritative while keyboard focus retains a visible outline.
 
 GoreeCloud Care is designed to remain vertically scrollable when text is enlarged or the window becomes shorter. In compact windows, category amounts move below their category description and the bottom action buttons stack vertically so the primary workflow does not depend on horizontal scrolling. For the Development 200%-text acceptance path, the compact decision accounts for the GTK `GDK_DPI_SCALE` text scale rather than relying only on the raw allocated width. The compact HeaderBar may omit the Development subtitle when space is constrained; the GoreeCloud Care title and **Scan** action remain available.
 
-The application opens in a light appearance by default. In dev9, effective HighContrast detection honors both the desktop GTK theme state and an explicit process-local `GTK_THEME` override. When either selects a GTK HighContrast theme, the Development color mapping is suppressed so the system high-contrast presentation can take priority. This source behavior still requires representative-device rendered acceptance before HighContrast support is considered verified.
+The application opens in a light appearance by default. Effective HighContrast detection honors both the desktop GTK theme state and an explicit process-local `GTK_THEME` override. Current dev10 HighContrast focus behavior still requires representative-device validation before it is considered accepted.
 
 ## If an action fails
 GoreeCloud Care reports failure instead of treating it as success. Re-scan to see current state. No automatic retry performs a destructive action without another user invocation.
