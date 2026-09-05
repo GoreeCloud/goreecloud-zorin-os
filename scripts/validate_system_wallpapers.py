@@ -15,6 +15,10 @@ EXPECTED_PACKAGES = {
     "zorin-os-pro-wallpapers": "17",
     "zorin-os-pro-wallpapers-17": "17",
 }
+EXPECTED_PROTECTED = {
+    "zorin-os-artwork": "1.6.9",
+    "zorin-os-desktop": "1.6.9",
+}
 EXPECTED_CATALOGS = {
     "/usr/share/gnome-background-properties/zorin-default-wallpapers.xml": "zorin-os-wallpapers",
     "/usr/share/gnome-background-properties/zorin-os-17-wallpapers.xml": "zorin-os-wallpapers-17",
@@ -22,6 +26,7 @@ EXPECTED_CATALOGS = {
 }
 EXPECTED_WALLPAPER_COUNT = 28
 EXPECTED_REPLACEMENT_COUNT = 24
+EXPECTED_DIVERSION_ROOT = "/var/lib/goreecloud-zorin/stock-wallpaper-diversions"
 
 
 def fail(message: str) -> None:
@@ -30,14 +35,30 @@ def fail(message: str) -> None:
 
 def main() -> int:
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if data.get("schema_version") != 1:
-        fail("Stock wallpaper manifest schema_version must be 1")
+    if data.get("schema_version") != 2:
+        fail("Stock wallpaper manifest schema_version must be 2")
     if data.get("status") != "Development":
         fail("Stock wallpaper migration must remain Development until target acceptance")
     if data.get("target") != {"id": "zorin", "version": "17.3"}:
         fail("Stock wallpaper manifest must remain pinned to the verified Zorin OS 17.3 target")
     if data.get("recovery_root") != "/var/lib/goreecloud-zorin/wallpaper-recovery":
         fail("Unexpected stock wallpaper recovery root")
+
+    strategy = data.get("strategy", {})
+    if strategy.get("mode") != "dpkg-divert":
+        fail("Stock wallpaper replacement must use dpkg-divert")
+    if strategy.get("package_purge") != "prohibited":
+        fail("Direct package purge must remain prohibited")
+    if strategy.get("diversion_root") != EXPECTED_DIVERSION_ROOT:
+        fail("Unexpected stock wallpaper diversion root")
+    protected = {item["name"]: item["version"] for item in strategy.get("protected_packages", [])}
+    if protected != EXPECTED_PROTECTED:
+        fail(f"Protected Zorin package set changed: {protected}")
+    unsafe = strategy.get("observed_unsafe_purge", {})
+    if set(unsafe.get("additional_removals", [])) != set(EXPECTED_PROTECTED):
+        fail("Unsafe purge evidence must retain the observed Zorin metapackage removals")
+    if set(unsafe.get("additional_installs", [])) != {"ubuntu-wallpapers", "ubuntu-wallpapers-jammy"}:
+        fail("Unsafe purge evidence must retain the observed Ubuntu wallpaper fallback installs")
 
     packages = {item["name"]: item["version"] for item in data.get("packages", [])}
     if packages != EXPECTED_PACKAGES:
@@ -79,21 +100,41 @@ def main() -> int:
         "def apply(",
         "def restore(",
         "def finalize(",
-        "def simulate_purge(",
+        "def simulate_purge_diagnostic(",
         "def verify_replacement_ready(",
-        '"--simulate", "purge"',
-        '"purge", "--yes"',
-        '"download", *self.package_specs()',
+        "def verify_stock_paths_diverted(",
+        "def add_diversion(",
+        "def remove_diversion(",
+        '"dpkg-divert"',
+        '"--local"',
+        '"--add"',
+        '"--remove"',
+        '"--rename"',
+        '"--divert"',
         '"stock-files.tar"',
         "apt-purge-simulation.txt",
         "stock-files.sha256.tsv",
+        "verify_packages_exact()",
     ):
         if token not in text:
             fail(f"System wallpaper workflow is missing required safety mechanism: {token}")
-    if "shutil.rmtree" in text or "rm -rf" in text:
-        fail("System wallpaper workflow must not use broad recursive deletion")
+
+    forbidden = (
+        '["apt-get", "purge", "--yes"',
+        '["apt-get", "--yes", "purge"',
+        '"download", *self.package_specs()',
+        "dpkg --remove --force-depends",
+        "shutil.rmtree",
+        "rm -rf",
+    )
+    for token in forbidden:
+        if token in text:
+            fail(f"System wallpaper workflow contains prohibited package/destructive operation: {token}")
+
+    if '["apt-get", "--simulate", "purge"' not in text:
+        fail("Read-only apt purge diagnostic must remain for target evidence")
     if "os.walk(resolved, topdown=False)" not in text:
-        fail("Finalize must use bounded transaction-tree deletion")
+        fail("Recovery cleanup must use bounded transaction-tree deletion")
     if not SCRIPT.stat().st_mode & 0o111:
         fail("scripts/system_wallpapers.py must be executable")
     if not WRAPPER.stat().st_mode & 0o111:
@@ -104,8 +145,9 @@ def main() -> int:
 
     print(
         "System wallpaper replacement source validation passed: "
-        f"{len(packages)} packages, {len(catalogs)} catalogs, "
-        f"{len(wallpapers)} stock images, {EXPECTED_REPLACEMENT_COUNT} replacement wallpapers"
+        f"{len(packages)} installed wallpaper packages preserved, "
+        f"{len(protected)} protected Zorin packages, {len(catalogs)} diverted catalogs, "
+        f"{len(wallpapers)} diverted stock images, {EXPECTED_REPLACEMENT_COUNT} replacement wallpapers"
     )
     return 0
 
