@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_PALETTES = ROOT / "config" / "palettes.json"
 
 TOKEN_KEYS = (
     "canvas", "surface", "elevated", "deep", "text", "muted", "border",
@@ -28,7 +29,23 @@ def parse_args():
         description="Render the GoreeCloud Zorin wallpaper catalog from repository source."
     )
     p.add_argument("--output", required=True, type=Path)
+    p.add_argument(
+        "--palette-config",
+        type=Path,
+        default=DEFAULT_PALETTES,
+        help=(
+            "palette contract used for environmental base tokens; defaults to "
+            "config/palettes.json. Use config/palettes-v1.2.json for the V1.2 preview."
+        ),
+    )
     return p.parse_args()
+
+
+def resolve_input(path: Path) -> Path:
+    path = path.expanduser()
+    if path.is_absolute():
+        return path.resolve()
+    return (ROOT / path).resolve()
 
 
 def mode_label(mode: str) -> str:
@@ -82,7 +99,8 @@ def identity_values(item: dict, identities: dict) -> dict[str, str]:
 def main() -> int:
     args = parse_args()
     manifest = json.loads((ROOT / "config/wallpapers.json").read_text(encoding="utf-8"))
-    palettes = json.loads((ROOT / "config/palettes.json").read_text(encoding="utf-8"))
+    palette_path = resolve_input(args.palette_config)
+    palettes = json.loads(palette_path.read_text(encoding="utf-8"))
     identities = json.loads((ROOT / "config/wallpaper-identities.json").read_text(encoding="utf-8"))
     palette_by_id = {v["id"]: v for v in palettes["variants"]}
     args.output.mkdir(parents=True, exist_ok=True)
@@ -102,7 +120,15 @@ def main() -> int:
         src = ROOT / item["source"]
         if not src.is_file():
             raise SystemExit(f"Missing wallpaper template: {item['source']}")
-        palette = palette_by_id[item["theme_id"]]
+        palette = palette_by_id.get(item["theme_id"])
+        if palette is None:
+            raise SystemExit(
+                f"{item['id']}: palette contract {palette_path} has no {item['theme_id']} variant"
+            )
+        if palette.get("mode") != item["mode"]:
+            raise SystemExit(
+                f"{item['id']}: palette mode {palette.get('mode')} does not match {item['mode']}"
+            )
         text = src.read_text(encoding="utf-8")
         values = {key: palette[key] for key in TOKEN_KEYS}
         for template_key, palette_key in TOKEN_MAP.items():
@@ -118,7 +144,17 @@ def main() -> int:
         out.write_text(text, encoding="utf-8")
         generated += 1
 
-    print(f"Rendered wallpaper catalog: {copied} direct + {generated} generated = {copied + generated}")
+    design = palettes.get("design_system", {})
+    version = design.get("version", "unknown")
+    lifecycle = design.get("lifecycle")
+    label = f"Glaze UI {version}"
+    if lifecycle:
+        label += f" ({lifecycle})"
+    print(
+        f"Rendered wallpaper catalog from {label}: "
+        f"{copied} direct + {generated} generated = {copied + generated}"
+    )
+    print(f"Palette contract: {palette_path}")
     return 0
 
 
