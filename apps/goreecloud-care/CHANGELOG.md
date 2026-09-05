@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-dev5 — 2026-09-05
+- Fixed post-action status replacement that could hide successful privileged-action feedback behind the automatic refresh scan.
+- Added an explicit completion notice after successful PolicyKit-authorized APT cache cleanup and Memory Refresh.
+- Added a post-action refresh path that updates scan values without overwriting the final success/attention result.
+- Applied the same status-preservation behavior to normal selected cleanup and Trash cleanup so their final result remains visible after values refresh.
+- If a maintenance action completes but the follow-up scan fails, GoreeCloud Care now preserves the completed-action fact while reporting the refresh failure as an attention state instead of falsely claiming a fully refreshed result.
+
 ## 0.1.0-dev4 — 2026-09-05
 - Changed GoreeCloud Care to open in a light appearance by default without modifying the user's desktop-wide Zorin OS appearance setting.
 - Reworked the persistent maintenance-status surface into a higher-salience semantic indicator with a symbol, bold state title, stronger border/surface treatment, and explicit text so changed state is not communicated by color alone.
