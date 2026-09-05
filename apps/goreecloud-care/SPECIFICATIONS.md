@@ -17,6 +17,14 @@ Primary user: a person maintaining their own GoreeCloud/Zorin OS workstation.
 - Cleanup candidates are individual leaf nodes; broad recursive deletion of cache/temp directories is not used.
 - Errors are surfaced and failed items are not counted as successful deletion.
 
+## Interface and appearance
+- GoreeCloud Care opens in a light appearance by default on the target Zorin OS laptop.
+- The application-local light preference must not change the desktop-wide Zorin OS appearance setting.
+- Status feedback must communicate changed state with text plus a recognizable symbol and an appropriate semantic surface/border treatment; color alone is not sufficient.
+- User-initiated cancellation is an attention/changed-state condition, not an error or destructive warning. It must be immediately noticeable without exaggerating it into a critical condition.
+- Keyboard focus must remain visibly perceivable on supported interactive controls.
+- Current Stable Glaze UI remains the governing design target; these Development mappings do not establish conformance until rendered, accessibility, and platform-native evidence is accepted.
+
 ## Data and privacy
 The app reads local filesystem metadata, `/proc/meminfo`, and disk usage. It sends nothing over the network and contains no telemetry.
 
