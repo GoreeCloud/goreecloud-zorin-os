@@ -13,7 +13,11 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config" / "desktop-assets.json"
 DEFAULT_OUTPUT = ROOT / "build" / "cursors"
 IMAGE_TYPE = 0xFFFD0002
-BASE_GRID = 32.0
+# Keep the nominal Xcursor frame ladder unchanged while using a slightly larger
+# optical design grid. Target-device acceptance found revision 2 accurate but
+# visibly larger than the surrounding Zorin cursor language; 36 vs 32 reduces
+# the rendered footprint by about 11% without changing hotspot semantics.
+BASE_GRID = 36.0
 
 
 def parse_args() -> argparse.Namespace:
