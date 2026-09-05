@@ -6,6 +6,7 @@ DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 THEME_DEST="$DATA_HOME/themes"
 ICON_DEST="$DATA_HOME/icons"
 LEGACY_ICON_DEST="$HOME/.icons"
+PALETTE_CONFIG="$ROOT/config/palettes-v1.2.json"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 THEME_RECOVERY_ROOT="$THEME_DEST/.goreecloud-zorin-recovery/$STAMP"
 ASSET_RECOVERY_ROOT="$ICON_DEST/.goreecloud-zorin-recovery/$STAMP"
@@ -25,11 +26,13 @@ Usage:
   ./scripts/install.sh
   ./scripts/install.sh --replace-stock
 
-The install activates the light-first GoreeCloud desktop experience:
-Applications theme, Shell theme, GoreeCloud icons, GoreeCloud cursors, and the
-primary light wallpaper. --replace-stock additionally moves the exact audited
-Zorin OS 17.3 stock wallpaper files/catalogs out of GNOME discovery paths with
-package-safe dpkg diversions. Zorin desktop/artwork packages remain installed.
+The install activates the light-first GoreeCloud desktop experience using the
+Glaze UI V1.2 Development palette: Applications theme, Shell theme, GoreeCloud
+icons, GoreeCloud cursors, and the primary light wallpaper.
+
+--replace-stock additionally moves the exact audited Zorin OS 17.3 stock
+wallpaper files/catalogs out of GNOME discovery paths with package-safe dpkg
+diversions. Zorin desktop/artwork packages remain installed.
 EOF
 }
 
@@ -53,16 +56,22 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python3 "$ROOT/scripts/build.py" --output "$TEMP_ROOT/themes"
+python3 "$ROOT/scripts/build.py" \
+  --palette-config "$PALETTE_CONFIG" \
+  --output "$TEMP_ROOT/themes"
 python3 "$ROOT/scripts/build_icons.py" --output "$TEMP_ROOT/icons"
 python3 "$ROOT/scripts/build_cursors.py" --output "$TEMP_ROOT/cursors"
 python3 "$ROOT/scripts/validate_desktop_assets.py" >/dev/null
+python3 "$ROOT/scripts/validate_v12_preview.py" >/dev/null
 
 # Zorin OS 17.3's GTK 3, GTK 4, and Shell themes contain extensive
 # platform-specific selectors and assets. Compose the generated GoreeCloud
 # semantic overrides on top of the exact verified local Zorin 17.3 base before
-# touching an existing installed GoreeCloud theme.
-python3 "$ROOT/scripts/compose_zorin_base.py" "$TEMP_ROOT/themes"
+# touching an existing installed GoreeCloud theme. Use the same V1.2 palette
+# contract so native selected/checked states cannot fall back to V1.1 teal.
+python3 "$ROOT/scripts/compose_zorin_base.py" \
+  "$TEMP_ROOT/themes" \
+  --palette-config "$PALETTE_CONFIG"
 
 mkdir -p -- "$THEME_DEST" "$ICON_DEST"
 
@@ -156,7 +165,7 @@ activate_light_experience() {
 }
 
 activate_light_experience
-"$ROOT/scripts/wallpaper.sh" apply default
+GOREECLOUD_PALETTE_CONFIG="$PALETTE_CONFIG" "$ROOT/scripts/wallpaper.sh" apply default
 
 if [[ "$REPLACE_STOCK" -eq 1 ]]; then
   "$ROOT/scripts/system_wallpapers.sh" plan
@@ -165,6 +174,7 @@ fi
 
 echo
 echo "Installed and activated GoreeCloud desktop assets:"
+echo "  Design:       Glaze UI V1.2 Development"
 echo "  Applications: GoreeCloud-Zorin-Light"
 echo "  Shell:        GoreeCloud-Zorin-Light"
 echo "  Icons:        $ICON_THEME"
@@ -204,7 +214,7 @@ if [[ "$REPLACE_STOCK" -eq 1 ]]; then
   echo "Recovery remains available through:"
   echo "  ./scripts/wallpaper.sh replace-stock restore"
 else
-  echo "The complete GoreeCloud wallpaper collection is installed user-locally."
+  echo "The GoreeCloud light wallpaper catalog is installed user-locally."
   echo "To replace the audited Zorin stock wallpaper gallery later:"
   echo "  ./scripts/wallpaper.sh replace-stock apply"
 fi
