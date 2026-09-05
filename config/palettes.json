@@ -33,7 +33,8 @@
       "shell_border": "rgba(15, 107, 111, 0.22)",
       "shell_hover": "rgba(15, 107, 111, 0.14)",
       "shell_active": "rgba(15, 107, 111, 0.24)",
-      "shell_shadow": "rgba(8, 16, 22, 0.18)"
+      "shell_shadow": "rgba(8, 16, 22, 0.18)",
+      "edge_light": "rgba(255, 255, 255, 0.72)"
     },
     {
       "id": "GoreeCloud-Zorin-Dark",
@@ -61,7 +62,8 @@
       "shell_border": "rgba(143, 214, 210, 0.20)",
       "shell_hover": "rgba(28, 138, 141, 0.18)",
       "shell_active": "rgba(28, 138, 141, 0.30)",
-      "shell_shadow": "rgba(0, 0, 0, 0.36)"
+      "shell_shadow": "rgba(0, 0, 0, 0.36)",
+      "edge_light": "rgba(255, 255, 255, 0.10)"
     },
     {
       "id": "GoreeCloud-Zorin-DeepDark",
@@ -89,7 +91,8 @@
       "shell_border": "rgba(143, 214, 210, 0.18)",
       "shell_hover": "rgba(28, 138, 141, 0.20)",
       "shell_active": "rgba(28, 138, 141, 0.34)",
-      "shell_shadow": "rgba(0, 0, 0, 0.48)"
+      "shell_shadow": "rgba(0, 0, 0, 0.48)",
+      "edge_light": "rgba(255, 255, 255, 0.08)"
     }
   ]
 }
