@@ -3,7 +3,6 @@ from __future__ import annotations
 import subprocess
 import sys
 import threading
-from pathlib import Path
 
 import gi
 
@@ -16,23 +15,86 @@ from .privilege import interpret_pkexec_result
 APP_ID = "com.goreecloud.care.dev"
 HELPER = "/usr/lib/goreecloud-care/goreecloud-care-helper"
 
+# Development GTK mapping of current Glaze UI V1.1 light roles. This is not a
+# conformance claim; representative rendered/accessibility acceptance remains open.
 CSS = b"""
-window { background: #101a20; color: #f3f7f8; }
-headerbar { background: #18252b; color: #f3f7f8; }
-.card { background: #18252b; border-radius: 14px; padding: 14px; }
-.status-banner { background: #132c35; border-radius: 12px; padding: 10px 12px; }
+window {
+  background: #f5f7fa;
+  color: #151a23;
+}
+headerbar {
+  background: #ffffff;
+  color: #151a23;
+  border-bottom: 1px solid rgba(25, 35, 50, 0.14);
+}
+headerbar button { color: #151a23; }
+.card {
+  background: #ffffff;
+  border: 1px solid rgba(25, 35, 50, 0.11);
+  border-radius: 14px;
+  padding: 14px;
+}
+.status-banner {
+  background: #eef4ff;
+  border: 1px solid rgba(52, 120, 246, 0.36);
+  border-left-width: 4px;
+  border-radius: 12px;
+  padding: 11px 13px;
+}
+.status-banner.status-attention {
+  background: #e9f6f6;
+  border-color: #1c8a8d;
+  box-shadow: 0 6px 18px rgba(15, 107, 111, 0.14);
+}
+.status-banner.status-success {
+  background: #edf8f1;
+  border-color: #2f9e63;
+}
+.status-banner.status-error {
+  background: #fff0ef;
+  border-color: #c63b32;
+  box-shadow: 0 6px 18px rgba(198, 59, 50, 0.12);
+}
+.status-title {
+  color: #151a23;
+  font-weight: 700;
+}
+.status-icon { color: #3478f6; }
+.status-attention .status-icon,
+.status-attention .status-title { color: #0f6b6f; }
+.status-success .status-icon,
+.status-success .status-title { color: #2f7f53; }
+.status-error .status-icon,
+.status-error .status-title { color: #a92f28; }
 .title { font-weight: 700; font-size: 18px; }
-.muted { color: #9fb2bc; }
-.warning { color: #f1c75b; }
-button.suggested-action { background: #1c8a8d; color: #ffffff; }
+.muted { color: #5d6675; }
+.warning { color: #b56a00; }
+button.suggested-action {
+  background: #1c8a8d;
+  color: #ffffff;
+}
 button:focus, checkbutton:focus {
-  outline-color: #7fe6ff;
+  outline-color: #0f6b6f;
   outline-style: solid;
   outline-width: 3px;
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px rgba(127, 230, 255, 0.35);
+  box-shadow: 0 0 0 2px rgba(28, 138, 141, 0.24);
 }
 """
+
+STATUS_STYLES = ("status-info", "status-attention", "status-success", "status-error")
+STATUS_ICONS = {
+    "info": "dialog-information-symbolic",
+    "attention": "process-stop-symbolic",
+    "success": "emblem-ok-symbolic",
+    "error": "dialog-error-symbolic",
+}
+STATUS_TITLES = {
+    "info": "Status",
+    "attention": "Action needs attention",
+    "success": "Completed",
+    "error": "Action failed",
+}
 
 
 class CareWindow(Gtk.ApplicationWindow):
@@ -43,6 +105,13 @@ class CareWindow(Gtk.ApplicationWindow):
         self.engine = CareEngine()
         self.scans: dict[str, CategoryScan] = {}
         self.rows: dict[str, tuple[Gtk.CheckButton | None, Gtk.Label]] = {}
+
+        # GoreeCloud Care intentionally opens in a light appearance by default.
+        # This preference is local to the application process and does not alter
+        # the user's Zorin OS desktop appearance.
+        settings = Gtk.Settings.get_default()
+        if settings is not None:
+            settings.set_property("gtk-application-prefer-dark-theme", False)
 
         provider = Gtk.CssProvider()
         provider.load_from_data(CSS)
@@ -83,14 +152,29 @@ class CareWindow(Gtk.ApplicationWindow):
         self.system_label.get_style_context().add_class("muted")
         root.pack_start(self.system_label, False, False, 0)
 
-        status_frame = Gtk.Frame()
-        status_frame.set_shadow_type(Gtk.ShadowType.NONE)
-        status_frame.get_style_context().add_class("status-banner")
+        self.status_frame = Gtk.Frame()
+        self.status_frame.set_shadow_type(Gtk.ShadowType.NONE)
+        self.status_frame.get_style_context().add_class("status-banner")
+        self.status_frame.get_style_context().add_class("status-info")
+        self.status_frame.get_accessible().set_name("GoreeCloud Care maintenance status")
+
+        status_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=11)
+        self.status_frame.add(status_box)
+        self.status_icon = Gtk.Image.new_from_icon_name(STATUS_ICONS["info"], Gtk.IconSize.BUTTON)
+        self.status_icon.get_style_context().add_class("status-icon")
+        status_box.pack_start(self.status_icon, False, False, 0)
+
+        status_text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        self.status_title = Gtk.Label(xalign=0)
+        self.status_title.get_style_context().add_class("status-title")
+        self.status_title.set_text("Ready")
+        status_text.pack_start(self.status_title, False, False, 0)
         self.status = Gtk.Label(xalign=0)
         self.status.set_line_wrap(True)
-        self.status.set_text("Ready. Scan to preview reclaimable space.")
-        status_frame.add(self.status)
-        root.pack_start(status_frame, False, False, 0)
+        self.status.set_text("Scan to preview reclaimable space.")
+        status_text.pack_start(self.status, False, False, 0)
+        status_box.pack_start(status_text, True, True, 0)
+        root.pack_start(self.status_frame, False, False, 0)
 
         for key, title, desc, selectable in (
             ("cache", "Application cache", "Cache files older than 7 days in ~/.cache, excluding thumbnails.", True),
@@ -184,7 +268,15 @@ class CareWindow(Gtk.ApplicationWindow):
             f"File cache: about {human_bytes(mem.cached)}"
         )
 
-    def set_status(self, text: str) -> None:
+    def set_status(self, text: str, state: str = "info", title: str | None = None) -> None:
+        if state not in STATUS_ICONS:
+            state = "info"
+        context = self.status_frame.get_style_context()
+        for class_name in STATUS_STYLES:
+            context.remove_class(class_name)
+        context.add_class(f"status-{state}")
+        self.status_icon.set_from_icon_name(STATUS_ICONS[state], Gtk.IconSize.BUTTON)
+        self.status_title.set_text(title or STATUS_TITLES[state])
         self.status.set_text(text)
 
     def run_thread(self, fn, done) -> None:
@@ -197,12 +289,12 @@ class CareWindow(Gtk.ApplicationWindow):
         threading.Thread(target=worker, daemon=True).start()
 
     def on_scan(self, _button) -> None:
-        self.set_status("Scanning without deleting files…")
+        self.set_status("Scanning without deleting files…", "info", "Scanning")
         self.run_thread(self.engine.scan_all, self._scan_done)
 
     def _scan_done(self, scans, error) -> bool:
         if error:
-            self.set_status(f"Scan failed: {error}")
+            self.set_status(f"Scan failed: {error}", "error", "Scan failed")
             return False
         self.scans = scans
         total = 0
@@ -210,7 +302,11 @@ class CareWindow(Gtk.ApplicationWindow):
             total += scan.bytes
             self.rows[key][1].set_text(f"{human_bytes(scan.bytes)} • {scan.count} items")
         self.refresh_system_status()
-        self.set_status(f"Scan complete. Up to {human_bytes(total)} is visible across all maintenance categories.")
+        self.set_status(
+            f"Up to {human_bytes(total)} is visible across all maintenance categories.",
+            "info",
+            "Scan complete",
+        )
         return False
 
     def _confirm(
@@ -239,7 +335,7 @@ class CareWindow(Gtk.ApplicationWindow):
         dialog.destroy()
         accepted = response == response_id
         if not accepted and cancel_status:
-            self.set_status(cancel_status)
+            self.set_status(cancel_status, "attention", "Action cancelled")
         return accepted
 
     def _show_notice(self, primary: str, secondary: str, message_type=Gtk.MessageType.INFO) -> None:
@@ -261,10 +357,14 @@ class CareWindow(Gtk.ApplicationWindow):
             if selector is not None and selector.get_active():
                 selected.append(key)
         if not selected:
-            self.set_status("Select at least one cache or temporary-file category.")
+            self.set_status(
+                "Select at least one cache or temporary-file category.",
+                "attention",
+                "Selection needed",
+            )
             return
         if any(key not in self.scans for key in selected):
-            self.set_status("Scan first so cleanup has a current preview.")
+            self.set_status("Scan first so cleanup has a current preview.", "attention", "Scan required")
             return
         total = sum(self.scans[key].bytes for key in selected)
         names = ", ".join(self.scans[key].label for key in selected)
@@ -274,23 +374,25 @@ class CareWindow(Gtk.ApplicationWindow):
             cancel_status="Selected cleanup cancelled. No cache or temporary files were changed.",
         ):
             return
-        self.set_status("Cleaning selected user-owned cache and temporary files…")
+        self.set_status("Cleaning selected user-owned cache and temporary files…", "info", "Cleaning")
 
         def action():
-            results = [self.engine.cleanup(self.scans[key]) for key in selected]
-            return results
+            return [self.engine.cleanup(self.scans[key]) for key in selected]
+
         self.run_thread(action, self._cleanup_done)
 
     def _cleanup_done(self, results, error) -> bool:
         if error:
-            self.set_status(f"Cleanup failed: {error}")
+            self.set_status(f"Cleanup failed: {error}", "error", "Cleanup failed")
             return False
         reclaimed = sum(r.reclaimed_bytes for r in results)
         failures = sum(len(r.errors) for r in results)
-        msg = f"Cleanup finished: approximately {human_bytes(reclaimed)} removed."
+        msg = f"Approximately {human_bytes(reclaimed)} removed."
         if failures:
             msg += f" {failures} item(s) could not be removed; no success is claimed for those items."
-        self.set_status(msg)
+            self.set_status(msg, "attention", "Cleanup finished with exceptions")
+        else:
+            self.set_status(msg, "success", "Cleanup complete")
         self.refresh_system_status()
         self.on_scan(None)
         return False
@@ -305,17 +407,19 @@ class CareWindow(Gtk.ApplicationWindow):
             cancel_status="Trash emptying cancelled. No Trash contents were removed.",
         ):
             return
-        self.set_status("Permanently emptying Trash…")
+        self.set_status("Permanently emptying Trash…", "info", "Emptying Trash")
         self.run_thread(self.engine.empty_trash, self._trash_done)
 
     def _trash_done(self, result, error) -> bool:
         if error:
-            self.set_status(f"Trash cleanup failed: {error}")
+            self.set_status(f"Trash cleanup failed: {error}", "error", "Trash cleanup failed")
             return False
-        msg = f"Trash cleanup finished: approximately {human_bytes(result.reclaimed_bytes)} removed."
+        msg = f"Approximately {human_bytes(result.reclaimed_bytes)} removed from Trash."
         if result.errors:
             msg += f" {len(result.errors)} item(s) were not removed."
-        self.set_status(msg)
+            self.set_status(msg, "attention", "Trash cleanup finished with exceptions")
+        else:
+            self.set_status(msg, "success", "Trash emptied")
         self.on_scan(None)
         return False
 
@@ -339,7 +443,11 @@ class CareWindow(Gtk.ApplicationWindow):
             cancel_status="APT cache cleanup cancelled before administrator authorization. No privileged changes were made.",
         ):
             return
-        self.set_status("Requesting administrator authorization for APT cache cleanup…")
+        self.set_status(
+            "Requesting administrator authorization for APT cache cleanup…",
+            "info",
+            "Authorization required",
+        )
         self.run_thread(
             lambda: self._run_privileged("apt-clean"),
             lambda result, error: self._privileged_done("APT cache cleanup", result, error),
@@ -354,7 +462,11 @@ class CareWindow(Gtk.ApplicationWindow):
             cancel_status="Memory-cache reclaim cancelled before administrator authorization. No privileged changes were made.",
         ):
             return
-        self.set_status("Requesting administrator authorization for memory-cache reclaim…")
+        self.set_status(
+            "Requesting administrator authorization for memory-cache reclaim…",
+            "info",
+            "Authorization required",
+        )
         self.run_thread(
             lambda: self._run_privileged("reclaim-memory"),
             lambda result, error: self._privileged_done("Memory-cache reclaim", result, error),
@@ -363,14 +475,14 @@ class CareWindow(Gtk.ApplicationWindow):
     def _privileged_done(self, action_label: str, result, error) -> bool:
         if error:
             message = f"{action_label} failed before completion: {error}. No successful privileged change is claimed."
-            self.set_status(message)
+            self.set_status(message, "error", "Privileged maintenance failed")
             self._show_notice("Privileged maintenance failed", message, Gtk.MessageType.ERROR)
             return False
 
         outcome = interpret_pkexec_result(result.returncode, result.stderr, action_label)
-        self.set_status(outcome.message)
 
         if outcome.cancelled:
+            self.set_status(outcome.message, "attention", "Authorization cancelled")
             self._show_notice(
                 "Administrator authorization cancelled",
                 outcome.message,
@@ -379,6 +491,7 @@ class CareWindow(Gtk.ApplicationWindow):
             return False
 
         if not outcome.completed:
+            self.set_status(outcome.message, "error", "Privileged maintenance did not complete")
             self._show_notice(
                 "Privileged maintenance did not complete",
                 outcome.message,
@@ -386,7 +499,9 @@ class CareWindow(Gtk.ApplicationWindow):
             )
             return False
 
+        self.set_status(outcome.message, "success", f"{action_label} complete")
         self.refresh_system_status()
+        self.on_scan(None)
         return False
 
 
