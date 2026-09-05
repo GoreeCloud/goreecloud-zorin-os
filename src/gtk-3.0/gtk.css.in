@@ -314,11 +314,16 @@ iconview:selected {
   color: @gc_on_accent;
 }
 
-/* Selected rows stay softly blue even when their window is inactive. This
- * prevents the gray selected-state fallback visible in overlapping windows. */
 row:selected,
 row:selected:hover,
-row:selected:focus,
+row:selected:focus {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+/* Selected rows stay softly blue even when their window is inactive. This
+ * prevents the gray selected-state fallback visible in overlapping windows. */
 row:selected:backdrop {
   background-image: none;
   background-color: @gc_selection;
