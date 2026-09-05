@@ -22,6 +22,11 @@ grep -F 'gtk-application-prefer-dark-theme' goreecloud_care/app.py >/dev/null
 grep -F 'settings.set_property("gtk-application-prefer-dark-theme", False)' goreecloud_care/app.py >/dev/null
 grep -F '.status-banner.status-attention' goreecloud_care/app.py >/dev/null
 grep -F '"Action cancelled"' goreecloud_care/app.py >/dev/null
+# Post-action completion must survive the automatic values refresh.
+grep -F 'def _refresh_after_action(' goreecloud_care/app.py >/dev/null
+grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
+grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
+grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
 # Mandatory GoreeCloud component documentation.
 for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md goreecloud.platform.yaml; do
   test -s "$f"
