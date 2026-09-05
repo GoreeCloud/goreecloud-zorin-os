@@ -127,7 +127,13 @@ compatibility:
 
 evidence:
   acceptance_tests:
-    - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
+    - id: care-dev8-large-text-compact-target
+      category: accessibility
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
+      revision: 45b5f11a49f363ebcaf753c892245a31109bc9bb
+      result: passed
+      observed_at: "2026-09-05T16:19:00Z"
+      notes: Representative Zorin OS laptop accepted the combined GDK_DPI_SCALE=2 large-text and compact/minimum-width adaptive-layout slice; broader accessibility acceptance remains open.
   release: []
 
 conformance:
