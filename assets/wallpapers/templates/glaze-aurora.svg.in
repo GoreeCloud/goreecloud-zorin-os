@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Glaze UI Facet Aurora {{mode_label}}</title>
+  <desc id="desc">Quiet Glaze UI environmental wallpaper preserving the canonical Facet identity while using broad frosted planes, cold edge light, restrained atmospheric color, and large calm regions.</desc>
+  <defs>
+    <linearGradient id="glazeAuroraBg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="{{deep}}"/>
+      <stop offset="0.56" stop-color="{{canvas}}"/>
+      <stop offset="1" stop-color="{{surface}}"/>
+    </linearGradient>
+    <radialGradient id="glazeAuroraBlue" cx="0.70" cy="0.42" r="0.54">
+      <stop stop-color="#38BDF8" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glazeAuroraIndigo" cx="0.78" cy="0.66" r="0.46">
+      <stop stop-color="#6366F1" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glazeAuroraEdge" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F8FAFC" stop-opacity="0.30"/>
+      <stop offset="0.48" stop-color="#60A5FA" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#2DD4BF" stop-opacity="0.04"/>
+    </linearGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#glazeAuroraBg)"/>
+  <rect width="3840" height="2160" fill="url(#glazeAuroraBlue)"/>
+  <rect width="3840" height="2160" fill="url(#glazeAuroraIndigo)"/>
+
+  <path d="M-260 300L1180 80L1660 620L640 1060L-220 880Z" fill="{{surface}}" opacity="0.10" stroke="url(#glazeAuroraEdge)" stroke-width="4"/>
+  <path d="M4000 560L3040 280L2390 920L3180 1420L4030 1220Z" fill="{{elevated}}" opacity="0.10" stroke="url(#glazeAuroraEdge)" stroke-width="4"/>
+  <path d="M-120 1870C810 1710 1450 1760 2090 1840C2770 1930 3290 1850 3970 1660" fill="none" stroke="#60A5FA" stroke-opacity="0.08" stroke-width="8" stroke-linecap="round"/>
+
+  <rect x="2520" y="650" width="820" height="820" rx="240" fill="{{surface}}" opacity="0.10" stroke="{{border}}" stroke-opacity="0.18" stroke-width="3"/>
+  <svg x="2590" y="720" width="680" height="680" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+</svg>

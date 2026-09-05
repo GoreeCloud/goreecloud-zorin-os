@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "authority": {
+    "repository": "GoreeCloud/goreecloud-branding-assets",
+    "commit": "f5afcac107971d9e01c5910ac1a1c6e4ca0c6543",
+    "policy": "Canonical artwork is synchronized byte-for-byte for offline wallpaper composition; geometry and identity colors are not redrawn or substituted."
+  },
+  "assets": {
+    "goreecloud-transparent": {
+      "identity": "GoreeCloud",
+      "canonical_path": "official/goreecloud-mark-transparent.svg",
+      "git_blob": "f6093cdd79105290c359462e983e81870c6ca42d",
+      "local_path": "assets/wallpapers/identity/goreecloud-mark-transparent.svg",
+      "sha256": "fdfc3da2fbbd43b9ab00343b81caa88b97144539e87acd55e7a9a560b0acd43a",
+      "viewBox": "0 0 512 512"
+    },
+    "goreecloud-reversed": {
+      "identity": "GoreeCloud",
+      "canonical_path": "official/goreecloud-mark-reversed.svg",
+      "git_blob": "aeede7a0929c2715300c3c59e710b921b7de640e",
+      "local_path": "assets/wallpapers/identity/goreecloud-mark-reversed.svg",
+      "sha256": "f0fd1e5a39fb13ca4b9c09c168f33034c9bf9485d2b23752e910cad2567d6fb0",
+      "viewBox": "0 0 512 512"
+    },
+    "glaze-ui": {
+      "identity": "Glaze UI",
+      "canonical_path": "systems/glaze-ui/glaze-ui-mark.svg",
+      "git_blob": "7756ca8f04a588286e05e37e9a141dbea7f1965d",
+      "local_path": "assets/wallpapers/identity/glaze-ui-mark.svg",
+      "sha256": "3c9566bf21c5bed4121547c3d5c79c34e4f3e60105179b7f2342c4b60ae91a61",
+      "viewBox": "0 0 64 64"
+    },
+    "wardveil-security": {
+      "identity": "Wardveil Security",
+      "canonical_path": "systems/wardveil-security/wardveil-security-icon.svg",
+      "git_blob": "fb3d643cca5477c3f8d4e03ce10a3458fd12f407",
+      "local_path": "assets/wallpapers/identity/wardveil-security-icon.svg",
+      "sha256": "18e37630036b4e16d75c7bfc8d1c9425d48e6f0978dcb1865ac0d451aa557b0e",
+      "viewBox": "0 0 256 256"
+    },
+    "privacy-shield": {
+      "identity": "Privacy Shield",
+      "canonical_path": "systems/privacy-shield/privacy-shield-icon.svg",
+      "git_blob": "62b10029d4104d0235afe634c21f55d0a826a63d",
+      "local_path": "assets/wallpapers/identity/privacy-shield-icon.svg",
+      "sha256": "459d2e7b0427bb17b25c6440a6388461d8ade3b52033601cdb02970ea99db29d",
+      "viewBox": "0 0 256 256"
+    }
+  },
+  "category_asset": {
+    "GoreeCloud": {
+      "light": "goreecloud-transparent",
+      "dark": "goreecloud-reversed",
+      "deep-dark": "goreecloud-reversed"
+    },
+    "Glaze UI": {
+      "light": "glaze-ui",
+      "dark": "glaze-ui",
+      "deep-dark": "glaze-ui"
+    },
+    "Wardveil Security": {
+      "light": "wardveil-security",
+      "dark": "wardveil-security",
+      "deep-dark": "wardveil-security"
+    },
+    "Privacy Shield": {
+      "light": "privacy-shield",
+      "dark": "privacy-shield",
+      "deep-dark": "privacy-shield"
+    }
+  }
+}

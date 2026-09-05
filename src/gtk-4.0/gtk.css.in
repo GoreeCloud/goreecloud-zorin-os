@@ -1,0 +1,297 @@
+/*
+ * GoreeCloud Zorin OS GTK 4 / libadwaita compatibility theme
+ * Generated from shared source. Do not edit generated copies.
+ * Mode: {{MODE}}
+ *
+ * Zorin OS 17+ can load this stylesheet into native libadwaita apps when the
+ * sibling .libadwaita opt-in marker is present. Keep the overrides focused on
+ * stable GTK/libadwaita color roles and common widget states so the upstream
+ * application stylesheet remains the compatibility foundation.
+ */
+
+@define-color accent_color {{ACCENT}};
+@define-color accent_bg_color {{ACCENT}};
+@define-color accent_fg_color {{ON_ACCENT}};
+@define-color destructive_color {{DESTRUCTIVE}};
+@define-color destructive_bg_color {{DESTRUCTIVE}};
+@define-color destructive_fg_color #FFFFFF;
+
+@define-color window_bg_color {{CANVAS}};
+@define-color window_fg_color {{TEXT}};
+@define-color window_backdrop_color {{CANVAS}};
+@define-color window_backdrop_fg_color {{MUTED}};
+
+@define-color view_bg_color {{CANVAS}};
+@define-color view_fg_color {{TEXT}};
+@define-color view_backdrop_color {{CANVAS}};
+@define-color view_backdrop_fg_color {{MUTED}};
+
+@define-color headerbar_bg_color {{SURFACE}};
+@define-color headerbar_fg_color {{TEXT}};
+@define-color headerbar_border_color {{BORDER}};
+@define-color headerbar_backdrop_color {{SURFACE}};
+@define-color headerbar_backdrop_fg_color {{MUTED}};
+@define-color headerbar_backdrop_border_color {{BORDER}};
+@define-color headerbar_shade_color rgba(14, 20, 25, 0.14);
+@define-color headerbar_darker_shade_color rgba(14, 20, 25, 0.22);
+
+@define-color sidebar_bg_color {{SURFACE}};
+@define-color sidebar_fg_color {{TEXT}};
+@define-color sidebar_backdrop_color {{SURFACE}};
+@define-color sidebar_backdrop_fg_color {{MUTED}};
+@define-color sidebar_border_color {{BORDER}};
+@define-color sidebar_backdrop_border_color {{BORDER}};
+@define-color sidebar_shade_color rgba(14, 20, 25, 0.12);
+
+@define-color secondary_sidebar_bg_color {{ELEVATED}};
+@define-color secondary_sidebar_fg_color {{TEXT}};
+@define-color secondary_sidebar_backdrop_color {{ELEVATED}};
+@define-color secondary_sidebar_backdrop_fg_color {{MUTED}};
+@define-color secondary_sidebar_border_color {{BORDER}};
+@define-color secondary_sidebar_backdrop_border_color {{BORDER}};
+@define-color secondary_sidebar_shade_color rgba(14, 20, 25, 0.12);
+
+@define-color card_bg_color {{SURFACE}};
+@define-color card_fg_color {{TEXT}};
+@define-color card_backdrop_color {{SURFACE}};
+@define-color card_backdrop_fg_color {{MUTED}};
+@define-color card_shade_color {{BORDER}};
+
+@define-color dialog_bg_color {{SURFACE}};
+@define-color dialog_fg_color {{TEXT}};
+@define-color popover_bg_color {{SURFACE}};
+@define-color popover_fg_color {{TEXT}};
+@define-color popover_shade_color rgba(14, 20, 25, 0.16);
+@define-color thumbnail_bg_color {{ELEVATED}};
+@define-color thumbnail_fg_color {{TEXT}};
+@define-color shade_color rgba(14, 20, 25, 0.16);
+@define-color scrollbar_outline_color {{CANVAS}};
+
+/* Nautilus 43's application stylesheet references these legacy border roles. */
+@define-color borders {{BORDER}};
+@define-color unfocused_borders {{BORDER}};
+
+.background,
+window.background {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+headerbar {
+  background-image: none;
+  background-color: @headerbar_bg_color;
+  color: @headerbar_fg_color;
+  border-color: @headerbar_border_color;
+}
+
+headerbar:backdrop {
+  background-image: none;
+  background-color: @headerbar_backdrop_color;
+  color: @headerbar_backdrop_fg_color;
+}
+
+button {
+  border-radius: 16px;
+}
+
+button:hover {
+  border-color: {{ACCENT_SOFT}};
+}
+
+button.suggested-action,
+button:checked {
+  background-image: none;
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+}
+
+button.destructive-action {
+  background-image: none;
+  background-color: @destructive_bg_color;
+  color: @destructive_fg_color;
+}
+
+entry,
+searchentry,
+spinbutton {
+  border-radius: 16px;
+}
+
+entry:focus-within,
+searchentry:focus-within,
+spinbutton:focus-within {
+  outline-color: @accent_color;
+}
+
+popover > contents,
+menu {
+  border-radius: 18px;
+  border-color: {{BORDER}};
+  background-color: @popover_bg_color;
+  color: @popover_fg_color;
+}
+
+.view,
+textview > text,
+gridview,
+listview,
+columnview,
+flowbox {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+.view:selected,
+textview > text selection:focus-within,
+selection:focus-within {
+  background-color: {{SELECTION}};
+  color: {{TEXT}};
+}
+
+/* Files / Nautilus 43 switched to GTK 4. Its view containers do not all carry
+ * libadwaita's generic .view class, so map the known upstream view classes
+ * directly instead of leaving them on Zorin's neutral defaults. */
+.nautilus-window,
+.nautilus-window .nautilus-grid-view,
+.nautilus-window .nautilus-list-view,
+.nautilus-grid-view,
+.nautilus-list-view,
+.nautilus-grid-view gridview,
+.nautilus-list-view columnview,
+.nautilus-list-view columnview > listview {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+.nautilus-grid-view gridview > child:selected,
+.nautilus-list-view columnview > listview > row:selected {
+  background-image: none;
+  background-color: {{SELECTION}};
+  color: @view_fg_color;
+}
+
+.navigation-sidebar,
+.sidebar,
+placessidebar,
+placessidebar.sidebar,
+gridview.navigation-sidebar,
+listview.navigation-sidebar,
+.nautilus-window placessidebar.sidebar {
+  background-color: @sidebar_bg_color;
+  color: @sidebar_fg_color;
+}
+
+.navigation-sidebar row,
+placessidebar row {
+  border-radius: 10px;
+}
+
+.navigation-sidebar row:hover,
+placessidebar row:hover {
+  background-color: alpha(@accent_bg_color, 0.08);
+}
+
+/* GNOME Settings and Files selected navigation rows stay on the soft Glaze
+ * selection surface even when their window becomes inactive. */
+window.background list.navigation-sidebar > row:selected,
+window.background list.navigation-sidebar > row:selected:hover,
+window.background list.navigation-sidebar > row:selected:focus,
+window.background list.navigation-sidebar > row:selected:backdrop,
+window.background list.navigation-sidebar > row.activatable:selected,
+window.background list.navigation-sidebar > row.activatable:selected:hover,
+window.background list.navigation-sidebar > row.activatable:selected:focus,
+window.background list.navigation-sidebar > row.activatable:selected:backdrop,
+list.navigation-sidebar > row:selected,
+list.navigation-sidebar > row:selected:hover,
+list.navigation-sidebar > row:selected:focus,
+list.navigation-sidebar > row:selected:backdrop,
+list.navigation-sidebar > row.activatable:selected,
+list.navigation-sidebar > row.activatable:selected:hover,
+list.navigation-sidebar > row.activatable:selected:focus,
+list.navigation-sidebar > row.activatable:selected:backdrop,
+.navigation-sidebar row:selected,
+.navigation-sidebar row:selected:focus,
+.navigation-sidebar row:selected:backdrop,
+placessidebar .navigation-sidebar > row:selected,
+placessidebar row:selected,
+placessidebar row:selected:backdrop {
+  background-color: {{SELECTION}};
+  background-image: image({{SELECTION}});
+  color: {{TEXT}};
+  box-shadow: inset 0 0 0 1px alpha(@accent_color, 0.24);
+}
+
+window.background list.navigation-sidebar > row:selected label,
+window.background list.navigation-sidebar > row:selected image,
+window.background list.navigation-sidebar > row:selected:focus label,
+window.background list.navigation-sidebar > row:selected:focus image,
+window.background list.navigation-sidebar > row:selected:backdrop label,
+window.background list.navigation-sidebar > row:selected:backdrop image,
+window.background list.navigation-sidebar > row.activatable:selected label,
+window.background list.navigation-sidebar > row.activatable:selected image,
+window.background list.navigation-sidebar > row.activatable:selected:backdrop label,
+window.background list.navigation-sidebar > row.activatable:selected:backdrop image,
+list.navigation-sidebar > row:selected label,
+list.navigation-sidebar > row:selected image,
+list.navigation-sidebar > row:selected:focus label,
+list.navigation-sidebar > row:selected:focus image,
+list.navigation-sidebar > row:selected:backdrop label,
+list.navigation-sidebar > row:selected:backdrop image,
+list.navigation-sidebar > row.activatable:selected label,
+list.navigation-sidebar > row.activatable:selected image,
+list.navigation-sidebar > row.activatable:selected:backdrop label,
+list.navigation-sidebar > row.activatable:selected:backdrop image {
+  color: {{TEXT}};
+}
+
+.card,
+.boxed-list,
+preferencesgroup > box > box {
+  border-radius: 16px;
+  background-color: @card_bg_color;
+  color: @card_fg_color;
+  box-shadow: inset 0 0 0 1px alpha(@accent_color, 0.08);
+}
+
+/* Zorin's target GTK 4 base also paints checked switches with an image layer.
+ * Replace it explicitly with the selected Glaze accent. */
+switch:checked,
+switch:checked:hover,
+switch:checked:focus {
+  background-color: @accent_bg_color;
+  background-image: image(@accent_bg_color);
+  border-color: @accent_color;
+  color: @accent_fg_color;
+  box-shadow: none;
+}
+
+switch:checked > slider,
+switch:checked:hover > slider,
+switch:checked:focus > slider {
+  background-color: @accent_fg_color;
+}
+
+progressbar > trough > progress,
+scale > trough > highlight {
+  background-color: @accent_bg_color;
+}
+
+scrollbar slider {
+  border-radius: 999px;
+  background-color: {{BORDER}};
+}
+
+scrollbar slider:hover {
+  background-color: {{MUTED}};
+}
+
+tooltip {
+  border-radius: 8px;
+  border-color: {{BORDER}};
+  background-color: {{DEEP}};
+  color: {{TEXT}};
+}
+
+*:disabled {
+  color: {{MUTED}};
+}

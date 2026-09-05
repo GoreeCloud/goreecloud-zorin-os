@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name={{DISPLAY_NAME}}
+Comment=GoreeCloud theme for Zorin OS mapped to {{GLAZE_NAME}} {{GLAZE_VERSION}} ({{MODE}})
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme={{THEME_ID}}

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">GoreeCloud Unified Clean Horizon {{mode_label}}</title>
+  <desc id="desc">Quiet GoreeCloud environmental wallpaper preserving the approved Unified Clean mark and its canonical blue identity, with restrained cold-light depth and large calm workspace regions.</desc>
+  <defs>
+    <linearGradient id="gcHorizonBg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="{{deep}}"/>
+      <stop offset="0.48" stop-color="{{canvas}}"/>
+      <stop offset="1" stop-color="{{surface}}"/>
+    </linearGradient>
+    <radialGradient id="gcHorizonPrimary" cx="0.76" cy="0.48" r="0.48">
+      <stop stop-color="#3B82F6" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gcHorizonIce" cx="0.64" cy="0.42" r="0.56">
+      <stop stop-color="#8FC4E8" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#8FC4E8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gcHorizonEdge" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#3B82F6" stop-opacity="0"/>
+      <stop offset="0.56" stop-color="#3B82F6" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#174EA6" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#gcHorizonBg)"/>
+  <rect width="3840" height="2160" fill="url(#gcHorizonPrimary)"/>
+  <rect width="3840" height="2160" fill="url(#gcHorizonIce)"/>
+
+  <path d="M-160 1770C720 1620 1420 1660 2030 1760C2630 1860 3230 1850 4020 1630V2160H-160Z" fill="{{surface}}" opacity="0.16"/>
+  <path d="M-120 1820C790 1670 1490 1710 2070 1800C2730 1900 3320 1810 4010 1620" fill="none" stroke="url(#gcHorizonEdge)" stroke-width="10" stroke-linecap="round"/>
+
+  <g fill="none" stroke="#3B82F6" stroke-opacity="0.08">
+    <circle cx="2900" cy="1060" r="560" stroke-width="4"/>
+    <circle cx="2900" cy="1060" r="760" stroke-width="3"/>
+  </g>
+  <path d="M2900 1060H3650C3710 1060 3750 1020 3750 960V780" fill="none" stroke="#174EA6" stroke-opacity="0.14" stroke-width="12" stroke-linecap="round"/>
+
+  <rect x="2450" y="610" width="900" height="900" rx="260" fill="{{surface}}" opacity="0.10" stroke="{{border}}" stroke-opacity="0.20" stroke-width="3"/>
+  <svg x="2510" y="670" width="780" height="780" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+</svg>

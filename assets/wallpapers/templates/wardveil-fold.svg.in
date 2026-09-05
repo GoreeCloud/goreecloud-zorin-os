@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Wardveil Security Sentinel Fold Veil {{mode_label}}</title>
+  <desc id="desc">Quiet Wardveil Security environmental wallpaper preserving the canonical Sentinel Fold identity beside restrained protective veil planes. The artwork identifies Wardveil and does not indicate security state.</desc>
+  <defs>
+    <linearGradient id="wardVeilBg" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="{{canvas}}"/>
+      <stop offset="0.55" stop-color="{{deep}}"/>
+      <stop offset="1" stop-color="{{surface}}"/>
+    </linearGradient>
+    <linearGradient id="wardVeilLeft" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#22D3EE" stop-opacity="0.11"/>
+      <stop offset="0.55" stop-color="#2563EB" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#4F46E5" stop-opacity="0.025"/>
+    </linearGradient>
+    <linearGradient id="wardVeilRight" x1="1" y1="0" x2="0" y2="1">
+      <stop stop-color="#60A5FA" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#7C3AED" stop-opacity="0.035"/>
+    </linearGradient>
+    <radialGradient id="wardVeilLight" cx="0.75" cy="0.45" r="0.48">
+      <stop stop-color="#67E8F9" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#67E8F9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#wardVeilBg)"/>
+  <rect width="3840" height="2160" fill="url(#wardVeilLight)"/>
+
+  <path d="M-120 430C650 520 1130 760 1530 1080C1180 1420 700 1660-120 1780Z" fill="url(#wardVeilLeft)"/>
+  <path d="M40 720C560 790 900 910 1180 1080C920 1280 570 1430 40 1510Z" fill="#E0F7FF" opacity="0.035"/>
+  <path d="M3990 390C3380 490 3010 720 2680 1060C2980 1390 3370 1620 3990 1780Z" fill="url(#wardVeilRight)"/>
+
+  <g fill="none" stroke="#BFDBFE" stroke-opacity="0.065" stroke-width="4">
+    <path d="M560 610L1310 1070L560 1560"/>
+    <path d="M850 560L1640 1070L850 1620"/>
+  </g>
+
+  <rect x="2550" y="620" width="800" height="800" rx="225" fill="{{surface}}" opacity="0.10" stroke="#67E8F9" stroke-opacity="0.13" stroke-width="3"/>
+  <svg x="2620" y="690" width="660" height="660" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+</svg>

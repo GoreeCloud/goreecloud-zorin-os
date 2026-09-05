@@ -1,0 +1,50 @@
+name: Validate theme source
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install validation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            gir1.2-adw-1 \
+            gir1.2-gtk-3.0 \
+            gir1.2-gtk-4.0 \
+            python3-gi \
+            shellcheck \
+            xvfb
+
+      - name: ShellCheck
+        run: shellcheck scripts/*.sh
+
+      - name: Validate wallpaper collection
+        run: python3 ./scripts/validate_wallpapers.py
+
+      - name: Validate light-first multi-mode wallpaper gallery
+        run: python3 ./scripts/validate_light_catalog.py
+
+      - name: Validate desktop icon and cursor assets
+        run: python3 ./scripts/validate_desktop_assets.py
+
+      - name: Validate Glaze UI V1.2 preview contract
+        run: python3 ./scripts/validate_v12_preview.py
+
+      - name: Validate stock wallpaper replacement source
+        run: python3 ./scripts/validate_system_wallpapers.py
+
+      - name: Validate generated themes
+        run: ./scripts/validate.sh --gtk

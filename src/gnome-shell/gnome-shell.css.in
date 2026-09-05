@@ -1,0 +1,415 @@
+/*
+ * GoreeCloud Zorin OS GNOME Shell overlay
+ * Generated from shared source. Do not edit generated copies.
+ * Mode: {{MODE}}
+ *
+ * This stylesheet intentionally overrides selected shell surfaces while
+ * retaining the shell's default theme as the compatibility foundation.
+ */
+
+stage {
+  color: {{TEXT}};
+}
+
+#panel {
+  background-color: {{SHELL_PANEL}};
+  color: {{TEXT}};
+  box-shadow: inset 0 -1px 0 {{SHELL_BORDER}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+#panel .panel-button {
+  color: {{TEXT}};
+  border-radius: 16px;
+}
+
+#panel .panel-button:hover,
+#panel .panel-button:focus {
+  background-color: {{SHELL_HOVER}};
+}
+
+#panel .panel-button:active,
+#panel .panel-button:checked {
+  background-color: {{SHELL_ACTIVE}};
+}
+
+.popup-menu-boxpointer {
+  -arrow-background-color: {{SHELL_SURFACE}};
+  -arrow-border-color: {{SHELL_BORDER}};
+  -arrow-border-width: 1px;
+  -arrow-base: 24px;
+  -arrow-rise: 12px;
+}
+
+.popup-menu-content {
+  padding: 8px;
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 18px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+  box-shadow: 0 10px 32px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.popup-menu-item {
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: {{TEXT}};
+}
+
+.popup-menu-item:focus {
+  background-color: {{SHELL_HOVER}};
+}
+
+.popup-menu-item:active,
+.popup-menu-item:checked {
+  background-color: {{SHELL_ACTIVE}};
+}
+
+.popup-separator-menu-item .popup-separator-menu-item-separator {
+  background-color: {{SHELL_BORDER}};
+}
+
+#dash .dash-background {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 24px;
+  background-color: {{SHELL_SURFACE}};
+  box-shadow: 0 10px 32px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.app-well-app .overview-icon,
+.show-apps .overview-icon {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background-image: none;
+}
+
+.app-well-app:hover .overview-icon,
+.app-well-app:focus .overview-icon,
+.show-apps:hover .overview-icon,
+.show-apps:focus .overview-icon {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
+  background-color: {{SHELL_HOVER}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.app-well-app:active .overview-icon,
+.app-well-app:checked .overview-icon,
+.show-apps:active .overview-icon,
+.show-apps:checked .overview-icon {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
+  background-color: {{SHELL_ACTIVE}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.search-entry {
+  padding: 8px 12px;
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+  selection-background-color: {{ACCENT}};
+  selected-color: {{ON_ACCENT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.search-entry:focus {
+  border-color: {{ACCENT}};
+  box-shadow: inset 0 0 0 1px {{ACCENT}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.modal-dialog {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 24px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+  box-shadow: 0 12px 38px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.message-list-section,
+.notification-banner {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+}
+
+/* GNOME Shell's date/notification menu contains nested buttons and messages
+ * with their own default surfaces. Map those concrete Shell classes so the
+ * GoreeCloud material hierarchy stays consistent in every appearance mode. */
+#calendarArea,
+.datemenu-today-button,
+.calendar,
+.message-list,
+.message-list-section {
+  color: {{TEXT}};
+}
+
+/* Empty notification space should feel airy, not like a second giant card.
+ * Real notification sections retain their own surfaces above, while the list
+ * itself stays transparent and narrower beside the calendar. */
+#calendarArea {
+  padding: 8px;
+  spacing: 8px;
+}
+
+.message-list {
+  width: 18em;
+  padding: 6px;
+  border: 0;
+  border-radius: 18px;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.message-list-sections {
+  spacing: 8px;
+}
+
+.message-list-placeholder {
+  color: {{MUTED}};
+  spacing: 8px;
+}
+
+.message-list-placeholder StIcon {
+  color: {{ACCENT_SOFT}};
+  icon-size: 28px;
+}
+
+.datemenu-calendar-column {
+  spacing: 8px;
+}
+
+.datemenu-calendar-column:ltr {
+  padding-left: 8px;
+  border-left: 1px solid {{SHELL_BORDER}};
+}
+
+.datemenu-calendar-column:rtl {
+  padding-right: 8px;
+  border-right: 1px solid {{SHELL_BORDER}};
+}
+
+.datemenu-today-button {
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background-color: {{SHELL_ELEVATED}};
+  color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.datemenu-today-button:hover,
+.datemenu-today-button:focus {
+  border-color: {{ACCENT_SOFT}};
+  background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.datemenu-today-button .day-label,
+.datemenu-today-button .date-label,
+.calendar-month-label,
+.calendar-day-heading,
+.calendar-week-number {
+  color: {{TEXT}};
+}
+
+.calendar {
+  padding: 6px 8px;
+  border-radius: 16px;
+}
+
+.calendar-day-base {
+  color: {{TEXT}};
+  border-radius: 999px;
+}
+
+.calendar-day-base:hover,
+.calendar-day-base:focus {
+  background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.calendar-day-base:selected {
+  background-image: none;
+  background-color: {{ACCENT}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{ACCENT}};
+  background-gradient-end: {{ACCENT}};
+  color: {{ON_ACCENT}};
+  box-shadow: inset 0 0 0 1px {{ACCENT_HOVER}};
+}
+
+.events-button,
+.world-clocks-button,
+.weather-button,
+.message {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-color: {{SHELL_ELEVATED}};
+  color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.events-button:hover,
+.events-button:focus,
+.world-clocks-button:hover,
+.world-clocks-button:focus,
+.weather-button:hover,
+.weather-button:focus,
+.message:hover,
+.message:focus {
+  border-color: {{ACCENT_SOFT}};
+  background-color: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.events-button:active,
+.world-clocks-button:active,
+.weather-button:active,
+.message:active {
+  background-color: {{SHELL_ACTIVE}};
+  color: {{TEXT}};
+}
+
+.world-clocks-header,
+.weather-header,
+.message-list-section-title,
+.events-section-title,
+.events-title,
+.events-button .event-time,
+.world-clocks-button .world-clocks-city,
+.world-clocks-button .world-clocks-time,
+.world-clocks-button .world-clocks-timezone {
+  color: {{MUTED}};
+}
+
+.message-title,
+.message-content,
+.message-body,
+.notification-banner .notification-title,
+.notification-banner .notification-body {
+  color: {{TEXT}};
+}
+
+.quick-settings {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 24px;
+  background-color: {{SHELL_SURFACE}};
+  color: {{TEXT}};
+  box-shadow: 0 12px 38px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+/* Zorin's Shell base uses St background-gradient properties for quick tiles.
+ * background-image:none alone does not clear them. Pin equal gradient endpoints
+ * so every base/hover/checked state renders as the intended flat frost color. */
+.quick-toggle,
+.quick-menu-toggle .quick-toggle,
+.quick-settings .quick-toggle,
+.quick-settings .quick-menu-toggle .quick-toggle,
+.quick-settings .quick-toggle-menu-button {
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 16px;
+  background-image: none;
+  background-color: {{SHELL_ELEVATED}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_ELEVATED}};
+  background-gradient-end: {{SHELL_ELEVATED}};
+  color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.quick-menu-toggle,
+.quick-settings .quick-menu-toggle {
+  background-image: none;
+  background-color: transparent;
+  background-gradient-direction: horizontal;
+  background-gradient-start: transparent;
+  background-gradient-end: transparent;
+}
+
+.quick-toggle:hover,
+.quick-menu-toggle .quick-toggle:hover,
+.quick-settings .quick-toggle:hover,
+.quick-settings .quick-menu-toggle .quick-toggle:hover,
+.quick-settings .quick-toggle-menu-button:hover {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
+  background-color: {{SHELL_HOVER}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_HOVER}};
+  background-gradient-end: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+/* Checked toggles use an icy selected surface with a strong blue foreground
+ * instead of the stock Zorin cyan gradient. Equal St gradient endpoints are
+ * intentional: they override Zorin's inherited cyan start/end values. */
+.quick-toggle:checked,
+.quick-menu-toggle .quick-toggle:checked,
+.quick-settings .quick-toggle:checked,
+.quick-settings .quick-menu-toggle .quick-toggle:checked,
+.quick-settings .quick-toggle-menu-button:checked {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
+  background-color: {{SELECTION}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SELECTION}};
+  background-gradient-end: {{SELECTION}};
+  color: {{ACCENT}};
+  box-shadow: inset 0 0 0 1px {{SHELL_ACTIVE}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.quick-toggle:checked:hover,
+.quick-menu-toggle .quick-toggle:checked:hover,
+.quick-settings .quick-toggle:checked:hover,
+.quick-settings .quick-menu-toggle .quick-toggle:checked:hover,
+.quick-settings .quick-toggle-menu-button:checked:hover {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
+  background-color: {{SHELL_ACTIVE}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_ACTIVE}};
+  background-gradient-end: {{SHELL_ACTIVE}};
+  color: {{ACCENT}};
+}
+
+.quick-settings .icon-button {
+  border: 1px solid {{SHELL_BORDER}};
+  background-image: none;
+  background-color: {{SHELL_ELEVATED}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_ELEVATED}};
+  background-gradient-end: {{SHELL_ELEVATED}};
+  color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.quick-settings .icon-button:hover,
+.quick-settings .icon-button:focus {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
+  background-color: {{SHELL_HOVER}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_HOVER}};
+  background-gradient-end: {{SHELL_HOVER}};
+  color: {{TEXT}};
+}
+
+.quick-settings .icon-button:active,
+.quick-settings .icon-button:checked {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
+  background-color: {{SELECTION}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SELECTION}};
+  background-gradient-end: {{SELECTION}};
+  color: {{ACCENT}};
+}
+
+.slider {
+  -barlevel-active-background-color: {{ACCENT}};
+  -barlevel-background-color: {{BORDER}};
+  -barlevel-border-color: transparent;
+  -barlevel-overdrive-color: {{ACCENT_HOVER}};
+}

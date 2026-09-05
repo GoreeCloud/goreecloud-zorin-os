@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Glaze UI Facet Lattice {{mode_label}}</title>
+  <desc id="desc">Quiet Glaze UI wallpaper preserving the canonical Facet identity within an ordered field of low-frequency frosted planes and restrained cold-light edges.</desc>
+  <defs>
+    <linearGradient id="glazeLatticeBg" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="{{canvas}}"/>
+      <stop offset="1" stop-color="{{deep}}"/>
+    </linearGradient>
+    <linearGradient id="glazeLatticeEdge" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#2DD4BF" stop-opacity="0.04"/>
+      <stop offset="0.48" stop-color="#38BDF8" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0.05"/>
+    </linearGradient>
+    <radialGradient id="glazeLatticeLight" cx="0.76" cy="0.48" r="0.46">
+      <stop stop-color="#60A5FA" stop-opacity="0.11"/>
+      <stop offset="1" stop-color="#60A5FA" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#glazeLatticeBg)"/>
+  <rect width="3840" height="2160" fill="url(#glazeLatticeLight)"/>
+
+  <g fill="{{surface}}" fill-opacity="0.08" stroke="url(#glazeLatticeEdge)" stroke-width="4">
+    <rect x="2140" y="270" width="920" height="920" rx="230"/>
+    <rect x="2540" y="760" width="900" height="900" rx="225"/>
+    <rect x="1840" y="1060" width="720" height="720" rx="180"/>
+  </g>
+  <g fill="none" stroke="#F8FAFC" stroke-opacity="0.06" stroke-width="3">
+    <path d="M2050 430H3500"/>
+    <path d="M1930 760H3620"/>
+    <path d="M1860 1110H3500"/>
+    <path d="M2140 250V1820"/>
+    <path d="M2500 180V1870"/>
+    <path d="M2860 250V1760"/>
+  </g>
+
+  <rect x="2520" y="600" width="820" height="820" rx="230" fill="{{surface}}" opacity="0.11" stroke="{{border}}" stroke-opacity="0.18" stroke-width="3"/>
+  <svg x="2590" y="670" width="680" height="680" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+
+  <path d="M-120 1870C770 1760 1450 1780 2110 1880" fill="none" stroke="#38BDF8" stroke-opacity="0.06" stroke-width="8" stroke-linecap="round"/>
+</svg>

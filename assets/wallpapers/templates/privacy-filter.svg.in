@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Privacy Shield Filter {{mode_label}}</title>
+  <desc id="desc">Quiet Privacy Shield environmental wallpaper preserving the canonical shield beside a restrained layered filtering field. The artwork identifies Privacy Shield and does not represent privacy state.</desc>
+  <defs>
+    <linearGradient id="privacyFilterBg" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="{{canvas}}"/>
+      <stop offset="1" stop-color="{{deep}}"/>
+    </linearGradient>
+    <radialGradient id="privacyFilterLight" cx="0.74" cy="0.44" r="0.50">
+      <stop stop-color="#7BD9FF" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#7BD9FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="privacyFilterBand" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#DDF7FF" stop-opacity="0.08"/>
+      <stop offset="0.72" stop-color="#BFD3FF" stop-opacity="0.035"/>
+      <stop offset="1" stop-color="#7A5CFA" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#privacyFilterBg)"/>
+  <rect width="3840" height="2160" fill="url(#privacyFilterLight)"/>
+
+  <g>
+    <rect x="160" y="580" width="1510" height="92" rx="46" fill="url(#privacyFilterBand)"/>
+    <rect x="360" y="850" width="1310" height="92" rx="46" fill="url(#privacyFilterBand)" opacity="0.86"/>
+    <rect x="220" y="1120" width="1450" height="92" rx="46" fill="url(#privacyFilterBand)" opacity="0.72"/>
+    <rect x="470" y="1390" width="1200" height="92" rx="46" fill="url(#privacyFilterBand)" opacity="0.58"/>
+  </g>
+  <g fill="{{surface}}" opacity="0.08">
+    <circle cx="560" cy="626" r="28"/>
+    <circle cx="900" cy="896" r="28"/>
+    <circle cx="650" cy="1166" r="28"/>
+    <circle cx="1030" cy="1436" r="28"/>
+  </g>
+
+  <rect x="2550" y="630" width="800" height="800" rx="225" fill="{{surface}}" opacity="0.10" stroke="#5B8CFF" stroke-opacity="0.12" stroke-width="3"/>
+  <svg x="2620" y="700" width="660" height="660" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+</svg>

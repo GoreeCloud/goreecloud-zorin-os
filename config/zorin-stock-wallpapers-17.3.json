@@ -1,0 +1,188 @@
+{
+  "schema_version": 2,
+  "status": "Development",
+  "evidence_date": "2026-09-04",
+  "target": {
+    "id": "zorin",
+    "version": "17.3"
+  },
+  "replacement": {
+    "user_background_dir": "~/.local/share/backgrounds/GoreeCloud-Zorin",
+    "user_catalog": "~/.local/share/gnome-background-properties/goreecloud-zorin.xml",
+    "expected_wallpaper_count": 24
+  },
+  "strategy": {
+    "mode": "dpkg-divert",
+    "package_purge": "prohibited",
+    "reason": "Target apt simulation showed that purging the wallpaper packages also removes zorin-os-artwork and zorin-os-desktop and installs Ubuntu wallpaper packages. Keep the Zorin packages installed and divert only the audited wallpaper/catalog paths out of GNOME discovery locations.",
+    "diversion_root": "/var/lib/goreecloud-zorin/stock-wallpaper-diversions",
+    "protected_packages": [
+      {
+        "name": "zorin-os-artwork",
+        "version": "1.6.9"
+      },
+      {
+        "name": "zorin-os-desktop",
+        "version": "1.6.9"
+      }
+    ],
+    "observed_unsafe_purge": {
+      "additional_removals": [
+        "zorin-os-artwork",
+        "zorin-os-desktop"
+      ],
+      "additional_installs": [
+        "ubuntu-wallpapers",
+        "ubuntu-wallpapers-jammy"
+      ]
+    }
+  },
+  "recovery_root": "/var/lib/goreecloud-zorin/wallpaper-recovery",
+  "packages": [
+    {
+      "name": "zorin-os-wallpapers",
+      "version": "17.1"
+    },
+    {
+      "name": "zorin-os-wallpapers-17",
+      "version": "17.1"
+    },
+    {
+      "name": "zorin-os-pro-wallpapers",
+      "version": "17"
+    },
+    {
+      "name": "zorin-os-pro-wallpapers-17",
+      "version": "17"
+    }
+  ],
+  "catalogs": [
+    {
+      "path": "/usr/share/gnome-background-properties/zorin-default-wallpapers.xml",
+      "owner": "zorin-os-wallpapers"
+    },
+    {
+      "path": "/usr/share/gnome-background-properties/zorin-os-17-wallpapers.xml",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/gnome-background-properties/zorin-os-17-pro-wallpapers.xml",
+      "owner": "zorin-os-pro-wallpapers-17"
+    }
+  ],
+  "wallpaper_files": [
+    {
+      "path": "/usr/share/backgrounds/Canyon-by-Ashim-DSilva.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Dark-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Desert-by-Guillermo.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Desert-Cube-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Dune-by-Mikk-Tonissoo.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Fabric-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Glass-Cubes-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Green-Hills-by-Massimiliano-Morosinotto.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Loop-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Metal-Cubes-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Monument-Valley-by-Explore-with-Joshua.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Oil-Bubble-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Orange-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Path-by-Jonathan-Formento.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Planet-Zorin.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Refraction-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Sea-by-Eberhard-Grossgasteiger.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Shore-by-Sergi-Ferrete.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Spheres-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Tessellation-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Tiles-by-Bernard-Hermant.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Tree-Bloom-by-Claudio-Testa.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Valley-by-Bailey-Zindel.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Waves-by-Angus-Gray.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Wood-by-Tod-S.jpg",
+      "owner": "zorin-os-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/X-Z17Pro.jpg",
+      "owner": "zorin-os-pro-wallpapers-17"
+    },
+    {
+      "path": "/usr/share/backgrounds/Zorin-Dark.jpg",
+      "owner": "zorin-os-wallpapers"
+    },
+    {
+      "path": "/usr/share/backgrounds/Zorin.jpg",
+      "owner": "zorin-os-wallpapers"
+    }
+  ],
+  "notes": "Exact stock-wallpaper set captured from the verified Zorin OS 17.3 target audit. Direct package purge is prohibited because target simulation removes Zorin desktop/artwork metapackages. Replacement uses local dpkg diversions to move only the audited wallpaper/catalog files out of GNOME discovery paths while keeping all Zorin packages installed and recoverable."
+}

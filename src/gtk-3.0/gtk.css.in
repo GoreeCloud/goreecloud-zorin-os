@@ -1,0 +1,500 @@
+/*
+ * GoreeCloud Zorin OS Theme
+ * Generated from shared source. Do not edit generated copies.
+ * Mode: {{MODE}}
+ *
+ * The built-in GTK 3 Adwaita stylesheet remains the compatibility base.
+ */
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/{{GTK_BASE_IMPORT}}");
+
+@define-color gc_canvas {{CANVAS}};
+@define-color gc_surface {{SURFACE}};
+@define-color gc_elevated {{ELEVATED}};
+@define-color gc_deep {{DEEP}};
+@define-color gc_text {{TEXT}};
+@define-color gc_muted {{MUTED}};
+@define-color gc_border {{BORDER}};
+@define-color gc_accent {{ACCENT}};
+@define-color gc_accent_hover {{ACCENT_HOVER}};
+@define-color gc_accent_soft {{ACCENT_SOFT}};
+@define-color gc_on_accent {{ON_ACCENT}};
+@define-color gc_selection {{SELECTION}};
+@define-color gc_destructive {{DESTRUCTIVE}};
+@define-color gc_destructive_hover {{DESTRUCTIVE_HOVER}};
+@define-color gc_atmosphere_amber {{ATMOSPHERE_AMBER}};
+
+/* GTK 3 applications such as Nautilus 42.6 and GNOME Settings still consume
+ * the historical symbolic color API from the active theme. Map those names to
+ * the same Glaze semantic roles so application-provided CSS does not fall back
+ * to Adwaita/Zorin blue and neutral-charcoal defaults. */
+@define-color theme_fg_color {{TEXT}};
+@define-color theme_text_color {{TEXT}};
+@define-color theme_bg_color {{SURFACE}};
+@define-color theme_base_color {{CANVAS}};
+@define-color theme_selected_bg_color {{SELECTION}};
+@define-color theme_selected_fg_color {{TEXT}};
+@define-color theme_unfocused_fg_color {{MUTED}};
+@define-color theme_unfocused_text_color {{MUTED}};
+@define-color theme_unfocused_bg_color {{CANVAS}};
+@define-color theme_unfocused_base_color {{DEEP}};
+@define-color theme_unfocused_selected_bg_color {{SELECTION}};
+@define-color theme_unfocused_selected_fg_color {{MUTED}};
+@define-color theme_insensitive_bg_color {{SURFACE}};
+@define-color theme_insensitive_fg_color {{MUTED}};
+@define-color theme_tooltip_bg_color {{DEEP}};
+@define-color theme_tooltip_fg_color {{TEXT}};
+@define-color selected_bg_color {{SELECTION}};
+@define-color selected_fg_color {{TEXT}};
+@define-color borders {{BORDER}};
+@define-color unfocused_borders {{BORDER}};
+
+/* Glaze UI surface hierarchy: canvas -> surface -> elevated/deep. */
+.background,
+window,
+dialog {
+  background-color: @gc_canvas;
+  color: @gc_text;
+}
+
+decoration {
+  border-radius: 24px 24px 0 0;
+}
+
+headerbar,
+.titlebar {
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+  border-color: @gc_border;
+  box-shadow: inset 0 -1px @gc_border;
+  padding: 4px 6px;
+}
+
+/* Keep inactive windows frosted instead of dropping back to a flat gray
+ * Zorin base surface. Text still softens to preserve focus hierarchy. */
+headerbar:backdrop,
+.titlebar:backdrop {
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_muted;
+}
+
+headerbar button,
+.titlebar button,
+button {
+  min-height: 32px;
+  min-width: 32px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+  box-shadow: none;
+}
+
+button:hover {
+  border-color: @gc_accent_soft;
+  background-color: @gc_elevated;
+}
+
+button:active,
+button:checked,
+button.suggested-action {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+button.suggested-action:hover,
+button:active:hover,
+button:checked:hover {
+  border-color: @gc_accent_hover;
+  background-color: @gc_accent_hover;
+  color: @gc_on_accent;
+}
+
+button:backdrop {
+  border-color: @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_muted;
+}
+
+button.destructive-action {
+  border-color: @gc_destructive;
+  background-color: @gc_destructive;
+  color: #FFFFFF;
+}
+
+button.destructive-action:hover {
+  border-color: @gc_destructive_hover;
+  background-color: @gc_destructive_hover;
+  color: #FFFFFF;
+}
+
+/* Keep GTK stack-switcher tabs readable over Zorin Appearance's custom
+ * segmented surface. The selected Zorin/Other segment does not consistently
+ * accept our accent fill, so retain light text and use the accent as a ring. */
+stackswitcher button,
+stackswitcher button > label {
+  color: @gc_text;
+}
+
+stackswitcher button {
+  border-color: @gc_border;
+  background-color: @gc_surface;
+}
+
+stackswitcher button:hover {
+  border-color: @gc_accent_soft;
+  background-color: @gc_elevated;
+  color: @gc_text;
+}
+
+stackswitcher button:hover > label {
+  color: @gc_text;
+}
+
+stackswitcher button:checked {
+  border-color: @gc_accent;
+  background-color: @gc_elevated;
+  color: @gc_text;
+  box-shadow: inset 0 0 0 1px @gc_accent;
+}
+
+stackswitcher button:checked > label {
+  color: @gc_text;
+}
+
+entry,
+spinbutton,
+combobox button {
+  min-height: 32px;
+  border-radius: 16px;
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+  box-shadow: none;
+}
+
+entry:focus,
+spinbutton:focus,
+combobox button:focus {
+  border-color: @gc_accent;
+  box-shadow: inset 0 0 0 1px @gc_accent;
+}
+
+entry:backdrop,
+spinbutton:backdrop,
+combobox button:backdrop {
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_muted;
+}
+
+entry selection,
+textview text selection {
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+switch {
+  min-height: 24px;
+  min-width: 44px;
+  border-radius: 999px;
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_elevated;
+  color: @gc_text;
+}
+
+/* Zorin OS 17.3 Settings is GNOME Control Center 41.7 linked directly to
+ * GTK 3 + libhandy, not GTK 4/libadwaita. The verified ZorinBlue-Dark GTK 3
+ * base paints checked switches with background: image(#bde6fb), which outranks
+ * the lower-specificity generic switch background-image reset above. Override
+ * the exact checked/backdrop/slider states after the composed Zorin base. */
+switch:checked {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  background-image: image(@gc_accent);
+  color: @gc_on_accent;
+}
+
+switch:backdrop:checked {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  background-image: image(@gc_accent);
+  color: @gc_on_accent;
+}
+
+switch slider {
+  min-height: 20px;
+  min-width: 20px;
+  border-radius: 999px;
+  background-color: @gc_surface;
+}
+
+switch:checked slider,
+switch:backdrop:checked slider {
+  background-color: @gc_on_accent;
+  box-shadow: none;
+}
+
+check,
+radio {
+  border: 1px solid @gc_border;
+  background-image: none;
+  background-color: @gc_surface;
+  color: @gc_text;
+}
+
+check {
+  border-radius: 8px;
+}
+
+radio {
+  border-radius: 999px;
+}
+
+check:checked,
+radio:checked {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+menu,
+.menu,
+popover,
+.popover {
+  border: 1px solid @gc_border;
+  border-radius: 16px;
+  background-color: @gc_surface;
+  color: @gc_text;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+menuitem,
+.menuitem,
+modelbutton {
+  min-height: 28px;
+  border-radius: 8px;
+  color: @gc_text;
+}
+
+menuitem:hover,
+.menuitem:hover,
+modelbutton:hover {
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+.view,
+treeview.view,
+iconview,
+textview text {
+  background-color: @gc_canvas;
+  color: @gc_text;
+}
+
+.view:backdrop,
+treeview.view:backdrop,
+iconview:backdrop,
+textview text:backdrop {
+  background-color: @gc_canvas;
+  color: @gc_muted;
+}
+
+.view:selected,
+treeview.view:selected,
+iconview:selected {
+  background-color: @gc_accent;
+  color: @gc_on_accent;
+}
+
+row:selected,
+row:selected:hover,
+row:selected:focus {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+/* Selected rows stay softly blue even when their window is inactive. This
+ * prevents the gray selected-state fallback visible in overlapping windows. */
+row:selected:backdrop {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+row:selected label,
+row:selected image,
+row:selected:hover label,
+row:selected:hover image,
+row:selected:focus label,
+row:selected:focus image,
+row:selected:backdrop label,
+row:selected:backdrop image {
+  color: @gc_text;
+}
+
+/* Target-device diagnostics show the verified Zorin GTK 3 base also paints
+ * row.activatable:selected with both background-color and background image at
+ * higher selector specificity. GNOME Control Center's CcPanelList is built
+ * from GtkListBox rows, so mirror that exact activatable selected-state
+ * contract after the Zorin base instead of relying on the lower-specificity
+ * generic row:selected rule. */
+row.activatable:selected,
+row.activatable:selected:hover,
+row.activatable:selected:focus,
+row.activatable:selected:active,
+row.activatable:selected:backdrop {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+  box-shadow: none;
+}
+
+row.activatable:selected label,
+row.activatable:selected image,
+row.activatable:selected:hover label,
+row.activatable:selected:hover image,
+row.activatable:selected:focus label,
+row.activatable:selected:focus image,
+row.activatable:selected:active label,
+row.activatable:selected:active image,
+row.activatable:selected:backdrop label,
+row.activatable:selected:backdrop image {
+  color: @gc_text;
+}
+
+.sidebar,
+placessidebar list {
+  background-color: @gc_surface;
+  color: @gc_text;
+  border-color: @gc_border;
+}
+
+.sidebar row:selected,
+.sidebar row:selected:backdrop,
+placessidebar row:selected,
+placessidebar row:selected:backdrop {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+}
+
+/* Nautilus 42.6 ships a more specific .nautilus-window .sidebar-row:selected
+ * rule than the generic places-sidebar contract. Pin that exact target state
+ * to the Glaze selection token so the verified Zorin GTK 3 base cannot leave
+ * the active location on a pale Zorin-blue or inactive-gray selection. */
+.nautilus-window .sidebar-row:selected,
+.nautilus-window .sidebar-row:selected:hover,
+.nautilus-window .sidebar-row:selected:focus,
+.nautilus-window .sidebar-row:selected:backdrop {
+  background-image: none;
+  background-color: @gc_selection;
+  color: @gc_text;
+  box-shadow: inset 0 0 0 1px alpha(@gc_accent, 0.28);
+}
+
+.nautilus-window .sidebar-row:selected label,
+.nautilus-window .sidebar-row:selected image,
+.nautilus-window .sidebar-row:selected:hover label,
+.nautilus-window .sidebar-row:selected:hover image,
+.nautilus-window .sidebar-row:selected:focus label,
+.nautilus-window .sidebar-row:selected:focus image,
+.nautilus-window .sidebar-row:selected:backdrop label,
+.nautilus-window .sidebar-row:selected:backdrop image {
+  color: @gc_text;
+}
+
+notebook > header {
+  border-color: @gc_border;
+  background-color: @gc_surface;
+}
+
+notebook > header > tabs > tab {
+  min-height: 32px;
+  padding: 4px 12px;
+  color: @gc_muted;
+  border-bottom: 2px solid transparent;
+}
+
+notebook > header > tabs > tab:hover {
+  color: @gc_text;
+}
+
+notebook > header > tabs > tab:checked {
+  color: @gc_text;
+  border-bottom-color: @gc_accent;
+}
+
+scrollbar {
+  background-color: transparent;
+}
+
+scrollbar trough {
+  background-color: transparent;
+}
+
+scrollbar slider {
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 999px;
+  background-color: @gc_border;
+}
+
+scrollbar slider:hover {
+  background-color: @gc_muted;
+}
+
+progressbar trough,
+scale trough {
+  border-radius: 999px;
+  background-color: @gc_elevated;
+}
+
+progressbar progress,
+scale highlight {
+  border-radius: 999px;
+  background-color: @gc_accent;
+}
+
+scale slider {
+  border-radius: 999px;
+  border-color: @gc_accent;
+  background-color: @gc_surface;
+}
+
+separator {
+  min-width: 1px;
+  min-height: 1px;
+  background-color: @gc_border;
+}
+
+tooltip {
+  border: 1px solid @gc_border;
+  border-radius: 8px;
+  background-color: @gc_deep;
+  color: @gc_text;
+}
+
+.osd {
+  border: 1px solid @gc_border;
+  border-radius: 16px;
+  background-color: @gc_deep;
+  color: @gc_text;
+}
+
+levelbar block.filled {
+  border-color: @gc_accent;
+  background-color: @gc_accent;
+}
+
+*:disabled {
+  color: @gc_muted;
+}
