@@ -205,7 +205,7 @@ def main() -> int:
             header.set_margin_end(24)
             header.set_margin_top(20)
             header.set_margin_bottom(16)
-            heading = Gtk.Label(label="Cursor acceptance · revision 2")
+            heading = Gtk.Label(label=f"Cursor acceptance · {runtime_id}")
             heading.set_xalign(0.0)
             heading.get_style_context().add_class("acceptance-heading")
             intro = Gtk.Label(
@@ -228,7 +228,7 @@ def main() -> int:
             outer.pack_start(scenes, True, True, 0)
 
             self.status = Gtk.Label(
-                label="Default pointer is accepted. Review the remaining families on both backgrounds."
+                label="Review footprint, animation, Light/Dark legibility, and hotspot accuracy for the active revision."
             )
             self.status.set_xalign(0.0)
             self.status.set_line_wrap(True)
