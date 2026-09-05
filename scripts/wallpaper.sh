@@ -9,20 +9,21 @@ CATALOG_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-background-properties"
 CATALOG_FILE="$CATALOG_DIR/goreecloud-zorin.xml"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/goreecloud-zorin/wallpaper"
 SCHEMA="org.gnome.desktop.background"
+DEFAULT_MODE="light"
 
 usage() {
   cat <<'EOF'
 Usage:
   ./scripts/wallpaper.sh install
   ./scripts/wallpaper.sh list
-  ./scripts/wallpaper.sh apply default|current|light|WALLPAPER_ID
+  ./scripts/wallpaper.sh apply default|current|light|dark|deep-dark|WALLPAPER_ID
   ./scripts/wallpaper.sh restore
   ./scripts/wallpaper.sh status
   ./scripts/wallpaper.sh replace-stock plan|apply|status|restore|finalize
 
-The GoreeCloud gallery is light-first. GNOME Settings exposes only the eight
-Light wallpapers. Dark and Deep Dark compatibility derivatives remain installed
-as hidden catalog entries so validation/recovery contracts stay complete.
+The GoreeCloud gallery is light-first, not light-only. GNOME Settings exposes
+all 24 wallpapers: the eight Light variants first, followed by eight Dark and
+eight Deep Dark variants. The default applied wallpaper remains Light.
 
 The default installed wallpaper palette is Glaze UI V1.2 Development.
 
@@ -31,25 +32,37 @@ stock wallpaper/catalog files out of GNOME discovery paths.
 EOF
 }
 
-primary_id() {
-  python3 - "$MANIFEST" <<'PY'
+detect_mode() {
+  local theme
+  theme="$(gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null | tr -d "'" || true)"
+  case "$theme" in
+    GoreeCloud-Zorin-Light) printf '%s\n' "light" ;;
+    GoreeCloud-Zorin-Dark) printf '%s\n' "dark" ;;
+    GoreeCloud-Zorin-DeepDark) printf '%s\n' "deep-dark" ;;
+    *) printf '%s\n' "$DEFAULT_MODE" ;;
+  esac
+}
+
+primary_id_for_mode() {
+  python3 - "$MANIFEST" "$1" <<'PY'
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
-matches=[w["id"] for w in data["wallpapers"] if w["mode"] == "light"]
+mode=sys.argv[2]
+matches=[w["id"] for w in data["wallpapers"] if w["mode"] == mode]
 if len(matches) != 1:
-    raise SystemExit(f"Expected one primary Light wallpaper; found {len(matches)}")
+    raise SystemExit(f"Expected one primary wallpaper for {mode}; found {len(matches)}")
 print(matches[0])
 PY
 }
 
-file_for_light_id() {
+file_for_id() {
   python3 - "$MANIFEST" "$1" <<'PY'
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
 wallpaper_id=sys.argv[2]
-matches=[w for w in data["catalog"] if w["id"] == wallpaper_id and w["mode"] == "light"]
+matches=[w for w in data["catalog"] if w["id"] == wallpaper_id]
 if len(matches) != 1:
-    raise SystemExit(f"Unknown or non-Light wallpaper ID: {wallpaper_id}")
+    raise SystemExit(f"Unknown or duplicate wallpaper ID: {wallpaper_id}")
 print(matches[0]["id"] + ".svg")
 PY
 }
@@ -62,9 +75,6 @@ install_wallpapers() {
   python3 "$ROOT/scripts/validate_wallpapers.py" >/dev/null
   mkdir -p -- "$DEST_DIR" "$CATALOG_DIR"
 
-  # Replace only GoreeCloud-generated SVGs. Keeping all 24 derivatives on disk
-  # preserves the source/recovery contract, while the catalog hides non-Light
-  # entries from Settings with deleted=true.
   find "$DEST_DIR" -maxdepth 1 -type f -name '*.svg' -delete
 
   local temp_dir
@@ -88,13 +98,12 @@ PY
   python3 "$ROOT/scripts/build_background_catalog.py" \
     --manifest "$MANIFEST" \
     --filename-root "$DEST_DIR" \
-    --mode light \
     --output "$CATALOG_FILE" >/dev/null
 
   rm -rf -- "$temp_dir"
   trap - RETURN
   printf 'Installed GoreeCloud wallpaper source set to:\n  %s\n' "$DEST_DIR"
-  printf 'Installed Light-visible user background catalog to:\n  %s\n' "$CATALOG_FILE"
+  printf 'Installed 24-wallpaper Light/Dark/Deep Dark background catalog to:\n  %s\n' "$CATALOG_FILE"
 }
 
 backup_settings() {
@@ -112,21 +121,24 @@ backup_settings() {
 }
 
 apply_wallpaper() {
-  local selection="$1" wallpaper_id file
+  local selection="$1" mode wallpaper_id file
   case "$selection" in
-    default|current|light)
-      wallpaper_id="$(primary_id)"
+    default)
+      wallpaper_id="$(primary_id_for_mode "$DEFAULT_MODE")"
       ;;
-    dark|deep-dark)
-      echo "Dark wallpaper modes are hidden from the light-first GoreeCloud gallery." >&2
-      exit 64
+    current)
+      mode="$(detect_mode)"
+      wallpaper_id="$(primary_id_for_mode "$mode")"
+      ;;
+    light|dark|deep-dark)
+      wallpaper_id="$(primary_id_for_mode "$selection")"
       ;;
     *)
       wallpaper_id="$selection"
       ;;
   esac
 
-  file="$(file_for_light_id "$wallpaper_id")"
+  file="$(file_for_id "$wallpaper_id")"
   command -v gsettings >/dev/null 2>&1 || {
     echo "gsettings is required to apply a wallpaper." >&2
     exit 69
@@ -151,7 +163,7 @@ PY
     gsettings set "$SCHEMA" picture-options "'zoom'"
   fi
 
-  printf 'Applied GoreeCloud Light wallpaper %s:\n  %s\n' "$wallpaper_id" "$target"
+  printf 'Applied GoreeCloud wallpaper %s:\n  %s\n' "$wallpaper_id" "$target"
   printf 'Previous GNOME background settings were preserved at:\n  %s\n' "$snapshot"
 }
 
@@ -182,13 +194,24 @@ list_wallpapers() {
   python3 - "$MANIFEST" <<'PY'
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
-for category in data["collection"]["categories"]:
-    print(f"\n{category}")
-    items=[item for item in data["catalog"] if item["category"] == category and item["mode"] == "light"]
-    items.sort(key=lambda item: (item["family"], item["id"]))
-    for item in items:
-        print(f"  {item['id']:<38} {item['family']}")
-print("\nVisible gallery: Light only (8 wallpapers)")
+mode_order={"light": 0, "dark": 1, "deep-dark": 2}
+category_order={name: i for i, name in enumerate(data["collection"]["categories"])}
+items=sorted(
+    data["catalog"],
+    key=lambda item: (
+        mode_order.get(item["mode"], 99),
+        category_order.get(item["category"], 99),
+        item["family"],
+        item["id"],
+    ),
+)
+current=None
+for item in items:
+    if item["mode"] != current:
+        current=item["mode"]
+        print(f"\n{current.replace('-', ' ').title()}")
+    print(f"  {item['id']:<38} {item['category']} — {item['family']}")
+print("\nGallery order: 8 Light, 8 Dark, 8 Deep Dark")
 PY
 }
 
