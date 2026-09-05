@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev5
+version: 0.1.0-dev6
 
 supported_platforms:
   - linux
@@ -44,7 +44,7 @@ platform_systems:
     result: applicable-blocked
     version: "1.1.0"
     evidence: []
-    notes: Current Stable consumer target is 1.1.0. Dev5 retains the representative-device-verified light appearance, visible keyboard focus, and semantic status roles from the Stable line, while final native rendered/accessibility acceptance and application conformance remain incomplete.
+    notes: Current Stable consumer target is 1.1.0. Dev6 preserves the representative-device-verified light appearance, visible focus, semantic status treatment, and completed core maintenance workflows while adding adaptive desktop composition, ATK status/control semantics, text-wrap resilience, and high-contrast fallback behavior. Final native rendered, large-text, assistive-technology, resilience, and application conformance acceptance remain incomplete.
   mesh:
     result: applicable-blocked
     version: null
@@ -92,6 +92,10 @@ external_dependencies:
     purpose: Native Zorin OS desktop interface.
     required: true
     version_constraint: null
+  - name: ATK introspection
+    purpose: Native assistive-technology roles, names, descriptions, and status change semantics.
+    required: true
+    version_constraint: null
   - name: PolicyKit
     purpose: Explicit authorization for APT cache cleanup and Linux file-cache reclaim.
     required: true
@@ -120,8 +124,8 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native rendered/accessibility acceptance remains incomplete; representative Zorin OS dev4 light-default, status-salience, and keyboard-focus rendering are verified but broader appearance/window-size/accessibility coverage remains open.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, keyboard-focus, cancellation, privileged-success, and all present cleanup functions are representative-device verified through dev5; dev6 compact-window, large-text, high-contrast, and assistive-technology behavior still requires target-device acceptance.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
-    - Representative Zorin OS PolicyKit cancellation paths are verified. Dev5 now preserves completion state across the post-action refresh scan and presents an explicit completion notice, but privileged-success execution still requires target-device revalidation before it can be claimed complete.
-    - Actual cleanup operations, broader accessibility/appearance, package rollback, and remaining platform-system acceptance remain incomplete.
+    - Package rollback remains unverified.
+    - Official GoreeCloud Care application icon/branding remains incomplete.
     - Release Candidate and release evidence are intentionally absent for this Development build.
