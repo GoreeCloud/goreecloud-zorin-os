@@ -33,6 +33,20 @@ def validate_svg(path: Path) -> None:
                 fail(f"{path}: external resources are prohibited")
 
 
+def validate_line_only_symbolic(path: Path) -> None:
+    """Keep Nautilus empty-state symbols free of enclosed fill geometry."""
+    root = ET.parse(path).getroot()
+    geometry = []
+    for node in root.iter():
+        tag = node.tag.rsplit("}", 1)[-1].lower()
+        if tag in {"path", "rect", "circle", "ellipse", "polygon", "polyline", "line"}:
+            geometry.append(tag)
+    if not geometry or any(tag != "line" for tag in geometry):
+        fail(f"{path}: symbolic folder geometry must use line elements only, found {geometry}")
+    if any(node.attrib.get("fill", "").lower() not in {"", "none"} for node in root.iter()):
+        fail(f"{path}: symbolic folder must not contain painted fill geometry")
+
+
 def validate_xcursor(path: Path, expected_sizes: set[int]) -> None:
     data = path.read_bytes()
     if len(data) < 16:
@@ -106,8 +120,10 @@ def main() -> int:
             validate_svg(path)
 
         for required_symbolic in ("folder-symbolic.svg", "folder-open-symbolic.svg"):
-            if not (icon_root / "scalable" / "places" / required_symbolic).is_file():
+            symbolic_path = icon_root / "scalable" / "places" / required_symbolic
+            if not symbolic_path.is_file():
                 fail(f"generated icon theme is missing {required_symbolic}")
+            validate_line_only_symbolic(symbolic_path)
 
         identity = ROOT / icons["identity_source"]
         if (icon_root / "scalable" / "apps" / "start-here.svg").read_bytes() != identity.read_bytes():
