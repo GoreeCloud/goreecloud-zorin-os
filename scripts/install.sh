@@ -2,15 +2,20 @@
 set -euo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-DEST="${XDG_DATA_HOME:-$HOME/.local/share}/themes"
+DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+THEME_DEST="$DATA_HOME/themes"
+ICON_DEST="$DATA_HOME/icons"
 STAMP="$(date +%Y%m%d-%H%M%S)"
-RECOVERY_ROOT="$DEST/.goreecloud-zorin-recovery/$STAMP"
+THEME_RECOVERY_ROOT="$THEME_DEST/.goreecloud-zorin-recovery/$STAMP"
+ASSET_RECOVERY_ROOT="$ICON_DEST/.goreecloud-zorin-recovery/$STAMP"
 REPLACE_STOCK=0
 THEMES=(
   "GoreeCloud-Zorin-Light"
   "GoreeCloud-Zorin-Dark"
   "GoreeCloud-Zorin-DeepDark"
 )
+ICON_THEME="GoreeCloud-Zorin"
+CURSOR_THEME="GoreeCloud-Zorin-Cursors"
 
 usage() {
   cat <<'EOF'
@@ -18,9 +23,10 @@ Usage:
   ./scripts/install.sh
   ./scripts/install.sh --replace-stock
 
-The default install activates GoreeCloud-Zorin-Light and its primary light
-wallpaper. --replace-stock additionally removes the audited Zorin OS 17.3
-stock wallpaper packages after the recovery-backed safety checks pass.
+The install activates the light-first GoreeCloud desktop experience:
+Applications theme, Shell theme, GoreeCloud icons, GoreeCloud cursors, and the
+primary light wallpaper. --replace-stock additionally removes the audited
+Zorin OS 17.3 stock wallpaper packages after recovery-backed checks pass.
 EOF
 }
 
@@ -44,35 +50,53 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python3 "$ROOT/scripts/build.py" --output "$TEMP_ROOT"
+python3 "$ROOT/scripts/build.py" --output "$TEMP_ROOT/themes"
+python3 "$ROOT/scripts/build_icons.py" --output "$TEMP_ROOT/icons"
+python3 "$ROOT/scripts/build_cursors.py" --output "$TEMP_ROOT/cursors"
 
 # Zorin OS 17.3's GTK 3, GTK 4, and Shell themes contain extensive
 # platform-specific selectors and assets. Compose the generated GoreeCloud
 # semantic overrides on top of the exact verified local Zorin 17.3 base before
-# touching an existing installed GoreeCloud theme. The composer fails closed
-# when package version or base hashes differ from target evidence captured
-# during Development.
-python3 "$ROOT/scripts/compose_zorin_base.py" "$TEMP_ROOT"
+# touching an existing installed GoreeCloud theme.
+python3 "$ROOT/scripts/compose_zorin_base.py" "$TEMP_ROOT/themes"
 
-mkdir -p -- "$DEST"
+mkdir -p -- "$THEME_DEST" "$ICON_DEST"
 
-backed_up=0
+theme_backed_up=0
 for theme in "${THEMES[@]}"; do
-  target="$DEST/$theme"
+  target="$THEME_DEST/$theme"
   if [[ -e "$target" ]]; then
-    mkdir -p -- "$RECOVERY_ROOT"
-    mv -- "$target" "$RECOVERY_ROOT/$theme"
-    backed_up=1
+    mkdir -p -- "$THEME_RECOVERY_ROOT"
+    mv -- "$target" "$THEME_RECOVERY_ROOT/$theme"
+    theme_backed_up=1
   fi
-  cp -a -- "$TEMP_ROOT/$theme" "$target"
+  cp -a -- "$TEMP_ROOT/themes/$theme" "$target"
 done
 
-activate_light_theme() {
+asset_backed_up=0
+for asset in "$ICON_THEME" "$CURSOR_THEME"; do
+  target="$ICON_DEST/$asset"
+  if [[ -e "$target" ]]; then
+    mkdir -p -- "$ASSET_RECOVERY_ROOT"
+    mv -- "$target" "$ASSET_RECOVERY_ROOT/$asset"
+    asset_backed_up=1
+  fi
+done
+cp -a -- "$TEMP_ROOT/icons/$ICON_THEME" "$ICON_DEST/$ICON_THEME"
+cp -a -- "$TEMP_ROOT/cursors/$CURSOR_THEME" "$ICON_DEST/$CURSOR_THEME"
+
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+  gtk-update-icon-cache -f "$ICON_DEST/$ICON_THEME" >/dev/null 2>&1 || true
+fi
+
+activate_light_experience() {
   if ! command -v gsettings >/dev/null 2>&1; then
     return 0
   fi
 
   gsettings set org.gnome.desktop.interface gtk-theme "'GoreeCloud-Zorin-Light'"
+  gsettings set org.gnome.desktop.interface icon-theme "'$ICON_THEME'"
+  gsettings set org.gnome.desktop.interface cursor-theme "'$CURSOR_THEME'"
 
   if gsettings list-schemas | grep -Fxq 'org.gnome.shell.extensions.user-theme'; then
     gsettings set org.gnome.shell.extensions.user-theme name "'GoreeCloud-Zorin-Light'"
@@ -83,7 +107,7 @@ activate_light_theme() {
   fi
 }
 
-activate_light_theme
+activate_light_experience
 "$ROOT/scripts/wallpaper.sh" apply default
 
 if [[ "$REPLACE_STOCK" -eq 1 ]]; then
@@ -92,17 +116,25 @@ if [[ "$REPLACE_STOCK" -eq 1 ]]; then
 fi
 
 echo
-echo "Installed GoreeCloud Zorin themes to:"
-echo "  $DEST"
-echo "Activated: GoreeCloud-Zorin-Light"
-echo "Applied the primary GoreeCloud light wallpaper."
+echo "Installed and activated GoreeCloud desktop assets:"
+echo "  Applications: GoreeCloud-Zorin-Light"
+echo "  Shell:        GoreeCloud-Zorin-Light"
+echo "  Icons:        $ICON_THEME"
+echo "  Cursor:       $CURSOR_THEME"
+echo "  Wallpaper:    primary GoreeCloud light wallpaper"
+echo
+echo "Theme directory:"
+echo "  $THEME_DEST"
+echo "Icon/cursor directory:"
+echo "  $ICON_DEST"
 
-echo "GTK 3, GTK 4/libadwaita, and GNOME Shell were composed from the"
-echo "verified local Zorin OS 17.3 base before GoreeCloud Glaze UI overrides."
-
-if [[ "$backed_up" -eq 1 ]]; then
+if [[ "$theme_backed_up" -eq 1 ]]; then
   echo "Previous GoreeCloud theme folders were preserved at:"
-  echo "  $RECOVERY_ROOT"
+  echo "  $THEME_RECOVERY_ROOT"
+fi
+if [[ "$asset_backed_up" -eq 1 ]]; then
+  echo "Previous GoreeCloud icon/cursor folders were preserved at:"
+  echo "  $ASSET_RECOVERY_ROOT"
 fi
 
 if [[ "$REPLACE_STOCK" -eq 1 ]]; then
@@ -110,7 +142,7 @@ if [[ "$REPLACE_STOCK" -eq 1 ]]; then
   echo "Recovery remains available through:"
   echo "  ./scripts/wallpaper.sh replace-stock restore"
 else
-  echo "The complete 24-wallpaper GoreeCloud collection is installed user-locally."
+  echo "The complete GoreeCloud wallpaper collection is installed user-locally."
   echo "To remove the audited Zorin stock wallpaper set later:"
   echo "  ./scripts/wallpaper.sh replace-stock apply"
 fi
