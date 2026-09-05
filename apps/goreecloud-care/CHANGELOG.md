@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-dev10 — 2026-09-05
+- Recorded fresh representative-device dev9 HighContrast evidence. The system HighContrast presentation now visibly replaces GoreeCloud Care's light Development palette, confirming that the dev9 `GTK_THEME` takeover remediation works on the target laptop.
+- Recorded a new blocking accessibility result from that same pass: pressing Tab produces no visibly perceivable focus response. This is negative keyboard-under-HighContrast evidence; it does not by itself prove whether logical GTK focus traversal stopped or whether focus merely became visually silent.
+- Source inspection identified the most direct regression boundary: Care's normal application CSS contains the established explicit `button:focus, checkbutton:focus` ring, but HighContrast correctly detaches that entire provider to yield palette authority to the system theme. The target HighContrast theme did not provide a sufficiently perceivable replacement focus indication.
+- Added a separate focus-resilience GTK provider that defines only a 3-pixel focus outline using `@theme_fg_color`. It is installed one priority level below Care's normal application CSS, preserving the established normal Care focus treatment while remaining available when the normal palette provider is removed for HighContrast.
+- Added pure source-level regression coverage proving the fallback applies to buttons and checkbuttons, uses a theme-derived color, and does not define application palette/background colors.
+- Advanced runtime, Python project metadata, Debian package, AppStream metadata, validation guards, and CI package inspection to dev10. Dev10 is a source/package remediation candidate until representative-device HighContrast keyboard validation passes.
+
 ## 0.1.0-dev9 — 2026-09-05
 - Recorded the first representative-device HighContrast acceptance pass from an isolated `GTK_THEME=HighContrast goreecloud-care` launch. Screenshots verify clearly visible keyboard focus on Scan, a category checkbox, and Memory Refresh, plus readable unclipped normal-width layout.
 - Classified HighContrast rendering itself as failed/open: the application still displayed the GoreeCloud light Development palette instead of yielding to the system HighContrast presentation.
@@ -27,7 +35,7 @@
 
 ## 0.1.0-dev6 — 2026-09-05
 - Started the accessibility and adaptive-window acceptance phase after representative-device dev5 testing verified every current maintenance function, including controlled nonzero APT archive removal.
-- Added a compact desktop composition below 680 logical pixels: category amounts move below their category content and the primary bottom actions stack vertically instead of compressing horizontally.
+- Added a compact desktop composition below 680 logical pixels: category amounts move below their content and the primary bottom actions stack vertically instead of compressing horizontally.
 - Defined a 480 × 420 logical-pixel minimum Development window and retained vertical scrolling so constrained-height and larger-text layouts remain reachable.
 - Added text wrapping for system status and category headings to reduce clipping risk under constrained width or large text.
 - Added GTK/ATK status semantics, dynamic accessible status names, action descriptions, selector descriptions, and descriptive accessible names for scanned category amounts.
@@ -39,14 +47,14 @@
 ## 0.1.0-dev5 — 2026-09-05
 - Fixed post-action status replacement that could hide successful privileged-action feedback behind the automatic refresh scan.
 - Added an explicit completion notice after successful PolicyKit-authorized APT cache cleanup and Memory Refresh.
-- Added a post-action refresh path that updates category/system values without overwriting the final success/attention result.
+- Added a post-action refresh path that updates category/system values without replacing the final action result.
 - Applied the same status-preservation behavior to normal selected cleanup and Trash refreshes so their final result remains visible after values refresh.
 - If a maintenance action completes but the follow-up scan fails, GoreeCloud Care now preserves the completed-action fact while reporting the refresh failure as attention instead of falsely claiming a fully refreshed result.
 - Repository validation is green; representative-device successful privileged-action execution remains a required acceptance gate before success is treated as verified.
 
 ## 0.1.0-dev4 — 2026-09-05
 - Changed GoreeCloud Care to open in a light appearance by default without modifying the user's desktop-wide Zorin OS appearance setting.
-- Reworked the persistent maintenance-status surface into a higher-salience semantic indicator with a symbol, bold state title, stronger border/surface treatment, and explicit text so changed state is not communicated by color alone.
+- Reworked the persistent maintenance-status surface into a higher-salience semantic indicator with a symbol, bold state label, stronger surface/border treatment, and explicit text so changed state is not communicated by color alone.
 - Classified ordinary user cancellation as an attention/changed-state condition rather than a warning or error; cancellation now uses a prominent but non-critical presentation.
 - Added distinct informational, attention, success, and error status treatments mapped from current Glaze UI V1.1 semantic roles while keeping final Glaze UI conformance/acceptance explicitly open.
 - Preserved the representative-device-verified high-contrast keyboard-focus treatment.
