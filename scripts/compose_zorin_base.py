@@ -16,7 +16,7 @@ TARGET_PACKAGE_VERSION = "4.2.2"
 DEFAULT_BASE_ROOT = Path("/usr/share/themes")
 DEFAULT_COPYRIGHT = Path("/usr/share/doc/zorin-desktop-themes/copyright")
 REPO_ROOT = Path(__file__).resolve().parents[1]
-PALETTES_PATH = REPO_ROOT / "config" / "palettes.json"
+DEFAULT_PALETTES = REPO_ROOT / "config" / "palettes.json"
 GTK3_ADWAITA_IMPORT_PREFIX = '@import url("resource:///org/gtk/libgtk/theme/Adwaita/'
 
 # The verified Zorin OS 17.3 GTK 4 files correspond to the pre-5.x theme
@@ -92,7 +92,23 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_BASE_ROOT,
         help="system theme root; defaults to /usr/share/themes",
     )
+    parser.add_argument(
+        "--palette-config",
+        type=Path,
+        default=DEFAULT_PALETTES,
+        help=(
+            "palette contract used for target GTK 4 state rewrites and composition metadata; "
+            "defaults to config/palettes.json"
+        ),
+    )
     return parser.parse_args()
+
+
+def resolve_input(path: Path) -> Path:
+    path = path.expanduser()
+    if path.is_absolute():
+        return path.resolve()
+    return (REPO_ROOT / path).resolve()
 
 
 def sha256_file(path: Path) -> str:
@@ -103,13 +119,21 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_palettes() -> dict[str, dict[str, str]]:
-    data = json.loads(PALETTES_PATH.read_text(encoding="utf-8"))
-    palettes = {variant["id"]: variant for variant in data["variants"]}
+def load_palette_contract(path: Path) -> tuple[dict[str, object], dict[str, dict[str, str]]]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if data.get("schema_version") != 1:
+        raise SystemExit(f"Unsupported palette schema in {path}")
+    design = data.get("design_system")
+    if not isinstance(design, dict) or not design.get("version"):
+        raise SystemExit(f"Palette contract is missing design_system.version: {path}")
+    variants = data.get("variants")
+    if not isinstance(variants, list):
+        raise SystemExit(f"Palette contract has no variants list: {path}")
+    palettes = {variant["id"]: variant for variant in variants}
     missing = sorted(set(VARIANT_BASE) - set(palettes))
     if missing:
         raise SystemExit(f"Missing GoreeCloud palette definitions for: {', '.join(missing)}")
-    return palettes
+    return design, palettes
 
 
 def installed_package_version() -> str:
@@ -180,9 +204,7 @@ def replace_selector_rule_once(css: str, selector: str, new_rule: str, label: st
     values that legitimately differ between Light and Dark.
     """
     selector_pattern = r"\s+".join(re.escape(part) for part in selector.split())
-    pattern = re.compile(
-        rf"(?m)^[ \t]*{selector_pattern}\s*\{{[^{{}}]*\}}"
-    )
+    pattern = re.compile(rf"(?m)^[ \t]*{selector_pattern}\s*\{{[^{{}}]*\}}")
     matches = list(pattern.finditer(css))
     if len(matches) != 1:
         literal_count = css.count(selector)
@@ -264,6 +286,8 @@ def compose_variant(
     base_name: str,
     evidence: dict,
     palette: dict[str, str],
+    design: dict[str, object],
+    palette_path: Path,
 ) -> None:
     theme = theme_root / theme_id
     gtk3_dir = theme / "gtk-3.0"
@@ -297,17 +321,24 @@ def compose_variant(
         palette,
     )
 
+    design_name = str(design.get("name", "Glaze UI"))
+    design_version = str(design["version"])
+    lifecycle = design.get("lifecycle")
+    design_label = f"{design_name} {design_version}"
+    if lifecycle:
+        design_label += f" ({lifecycle})"
+
     gtk3_banner = (
-        "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
+        f"\n\n/* GoreeCloud {design_label} semantic overrides.\n"
         " * GTK 3 base copied locally from the verified installed Zorin OS 17.3 theme. */\n"
     )
     gtk4_banner = (
-        "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
+        f"\n\n/* GoreeCloud {design_label} semantic overrides.\n"
         " * GTK 4 base copied locally from the verified installed Zorin OS 17.3 theme.\n"
         " * Hash-pinned Zorin 17.3 selected/checked state blocks were rewritten above before overrides. */\n"
     )
     shell_banner = (
-        "\n\n/* GoreeCloud Glaze UI V1.1 semantic overrides.\n"
+        f"\n\n/* GoreeCloud {design_label} semantic overrides.\n"
         " * Base copied locally from the verified installed Zorin OS 17.3 Shell theme. */\n"
     )
     composed_gtk3 = base_gtk3.rstrip() + gtk3_banner + gtk3_override
@@ -333,6 +364,12 @@ def compose_variant(
         "package": TARGET_PACKAGE,
         "package_version": TARGET_PACKAGE_VERSION,
         "base_theme": base_name,
+        "palette_contract": str(palette_path),
+        "design_system": {
+            "name": design_name,
+            "version": design_version,
+            "lifecycle": lifecycle,
+        },
         "verified_files": evidence,
         "target_rewrites": {
             "gtk4_selected_and_checked_state_rules": gtk4_state_rewrites,
@@ -341,7 +378,8 @@ def compose_variant(
             "The GoreeCloud repository does not redistribute these Zorin base bytes. "
             "The installer copied them locally from this device after exact hash verification, "
             "rewrote only the verified Zorin OS 17.3 GTK 4 generic selected-row and checked-switch "
-            "state blocks in that hash-pinned base, then appended GoreeCloud Glaze UI semantic overrides."
+            "state blocks in that hash-pinned base using the selected Glaze palette contract, "
+            "then appended GoreeCloud semantic overrides."
         ),
     }
     (theme / "goreecloud-base.json").write_text(
@@ -357,6 +395,7 @@ def main() -> int:
     args = parse_args()
     theme_root = args.theme_root.expanduser().resolve()
     base_root = args.base_root.expanduser().resolve()
+    palette_path = resolve_input(args.palette_config)
 
     package_version = installed_package_version()
     if package_version != TARGET_PACKAGE_VERSION:
@@ -366,7 +405,7 @@ def main() -> int:
             "Run ./scripts/diagnose.sh before adapting this Development candidate."
         )
 
-    palettes = load_palettes()
+    design, palettes = load_palette_contract(palette_path)
     verified = {
         base_name: verify_base(base_root, base_name)
         for base_name in sorted(set(VARIANT_BASE.values()))
@@ -382,9 +421,12 @@ def main() -> int:
             base_name,
             verified[base_name],
             palettes[theme_id],
+            design,
+            palette_path,
         )
         print(
-            f"Composed {theme_id} with verified {base_name} target base "
+            f"Composed {theme_id} with verified {base_name} target base, "
+            f"{design.get('name', 'Glaze UI')} {design['version']} palette state rewrites, "
             "and verified Zorin 17.3 GTK 4 selected/checked state rewrites"
         )
 
