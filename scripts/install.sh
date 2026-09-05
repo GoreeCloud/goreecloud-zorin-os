@@ -28,7 +28,9 @@ Usage:
 
 The install activates the light-first GoreeCloud desktop experience using the
 Glaze UI V1.2 Development palette: Applications theme, Shell theme, GoreeCloud
-icons, GoreeCloud cursors, and the primary light wallpaper.
+icons, GoreeCloud cursors, and the primary light wallpaper. The background
+gallery contains all 24 Light, Dark, and Deep Dark GoreeCloud wallpapers, with
+Light variants listed first.
 
 --replace-stock additionally moves the exact audited Zorin OS 17.3 stock
 wallpaper files/catalogs out of GNOME discovery paths with package-safe dpkg
@@ -63,6 +65,7 @@ python3 "$ROOT/scripts/build_icons.py" --output "$TEMP_ROOT/icons"
 python3 "$ROOT/scripts/build_cursors.py" --output "$TEMP_ROOT/cursors"
 python3 "$ROOT/scripts/validate_desktop_assets.py" >/dev/null
 python3 "$ROOT/scripts/validate_v12_preview.py" >/dev/null
+python3 "$ROOT/scripts/validate_light_catalog.py" >/dev/null
 
 # Zorin OS 17.3's GTK 3, GTK 4, and Shell themes contain extensive
 # platform-specific selectors and assets. Compose the generated GoreeCloud
@@ -180,6 +183,7 @@ echo "  Shell:        GoreeCloud-Zorin-Light"
 echo "  Icons:        $ICON_THEME"
 echo "  Cursor:       $CURSOR_THEME"
 echo "  Wallpaper:    primary GoreeCloud light wallpaper"
+echo "  Gallery:      24 visible (8 Light / 8 Dark / 8 Deep Dark)"
 echo
 echo "Theme directory:"
 echo "  $THEME_DEST"
@@ -214,7 +218,7 @@ if [[ "$REPLACE_STOCK" -eq 1 ]]; then
   echo "Recovery remains available through:"
   echo "  ./scripts/wallpaper.sh replace-stock restore"
 else
-  echo "The GoreeCloud light wallpaper catalog is installed user-locally."
+  echo "The complete GoreeCloud wallpaper catalog is installed user-locally."
   echo "To replace the audited Zorin stock wallpaper gallery later:"
   echo "  ./scripts/wallpaper.sh replace-stock apply"
 fi
