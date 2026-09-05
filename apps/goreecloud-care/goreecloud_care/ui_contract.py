@@ -1,6 +1,8 @@
 """Pure UI-contract helpers for GoreeCloud Care Development."""
 
-COMPACT_WIDTH = 680
+# Switch before constrained/large-text layouts reach the point where the regular
+# horizontal composition can no longer transition into its compact form.
+COMPACT_WIDTH = 820
 MIN_WINDOW_WIDTH = 480
 MIN_WINDOW_HEIGHT = 420
 REGULAR_BORDER = 18
