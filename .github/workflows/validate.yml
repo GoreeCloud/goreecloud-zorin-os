@@ -34,5 +34,8 @@ jobs:
       - name: Validate wallpaper collection
         run: python3 ./scripts/validate_wallpapers.py
 
+      - name: Validate stock wallpaper replacement source
+        run: python3 ./scripts/validate_system_wallpapers.py
+
       - name: Validate generated themes
         run: ./scripts/validate.sh --gtk

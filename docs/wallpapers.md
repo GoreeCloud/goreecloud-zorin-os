@@ -4,11 +4,11 @@
 
 Development. The collection source is implemented; target-device acceptance is partial.
 
-The target laptop has rendered **GoreeCloud Horizon Dark** successfully at its current desktop resolution with readable panel/dock chrome and no obvious crop failure in the supplied full-desktop screenshot. That evidence applies only to this wallpaper and view. The remaining 23 wallpapers, user-catalog discovery, restore behavior, and any system-wide stock-wallpaper replacement still require direct target verification.
+The target laptop has rendered **GoreeCloud Horizon Dark** successfully at its current desktop resolution with readable panel/dock chrome and no obvious crop failure in the supplied full-desktop screenshot. Zorin Settings now also visibly consumes the generated user-scoped catalog: the supplied Background view shows the 24 GoreeCloud wallpapers ahead of the still-present stock Zorin set. This verifies catalog discovery and thumbnail rendering for the collection as a gallery, but it does not yet visually accept every wallpaper individually.
 
 ## Scope
 
-This repository now defines **24 original 3840×2160 SVG wallpapers** across four balanced categories:
+This repository defines **24 original 3840×2160 SVG wallpapers** across four balanced categories:
 
 | Category | Families | Count |
 | --- | --- | ---: |
@@ -27,13 +27,19 @@ Wardveil Security and Privacy Shield wallpapers are **supporting abstract identi
 ```text
 assets/wallpapers/
 config/wallpapers.json
+config/zorin-stock-wallpapers-17.3.json
 scripts/build_background_catalog.py
 scripts/validate_wallpapers.py
+scripts/validate_system_wallpapers.py
 scripts/wallpaper.sh
 scripts/diagnose_backgrounds.sh
+scripts/system_wallpapers.py
+scripts/system_wallpapers.sh
 ```
 
 `config/wallpapers.json` keeps the three Horizon wallpapers as the primary Light/Dark/DeepDark mapping for `apply current`, while the full `catalog` contains all 24 options.
+
+`config/zorin-stock-wallpapers-17.3.json` is the evidence-bound removal manifest for the verified Zorin OS 17.3 laptop. It is intentionally pinned to the audited package versions, three system background catalogs, and 28 package-owned stock JPEG paths. If those facts change, the privileged removal workflow must fail closed until new target evidence is captured.
 
 ## User-local install and catalog
 
@@ -56,7 +62,7 @@ and generates a user-scoped GNOME Background Properties catalog at:
 ~/.local/share/gnome-background-properties/goreecloud-zorin.xml
 ```
 
-Whether Zorin OS 17.3 Settings consumes the user-scoped catalog is a target-runtime behavior and must be verified; source generation alone does not prove the 24 thumbnails will appear in Settings.
+Target evidence now verifies that Zorin OS 17.3 Settings consumes this user-scoped catalog and renders all 24 GoreeCloud thumbnails in the Background gallery.
 
 Apply the primary wallpaper matching the active GoreeCloud theme:
 
@@ -81,27 +87,62 @@ Applying a wallpaper records a GNOME settings snapshot first. Restore the latest
 
 ## Stock Zorin wallpaper replacement
 
-The project requirement is to replace the stock Zorin wallpaper set with the GoreeCloud collection. Permanently deleting package-owned system files is a privileged destructive operation and is not performed by the ordinary theme or wallpaper installer.
+The target audit is complete. It identifies the stock wallpaper set as package-owned by exactly:
 
-Before a system replacement implementation is accepted, run the read-only target audit:
-
-```bash
-./scripts/diagnose_backgrounds.sh
+```text
+zorin-os-wallpapers          17.1
+zorin-os-wallpapers-17       17.1
+zorin-os-pro-wallpapers      17
+zorin-os-pro-wallpapers-17   17
 ```
 
-The audit reports the actual Zorin 17.3 background-property catalogs, wallpaper roots, package ownership, wallpaper-related packages, and current GNOME background settings. This evidence is required before defining the exact files/packages to remove or divert.
+The audited active stock set consists of three GNOME Background Properties XML catalogs and 28 JPEG files under `/usr/share/backgrounds`. The exact paths and expected owners are recorded in `config/zorin-stock-wallpapers-17.3.json`.
 
-The intended controlled migration is:
+The ordinary theme/wallpaper installer still never modifies or deletes system wallpaper packages. Privileged removal is isolated in `scripts/system_wallpapers.sh`.
 
-1. identify the exact stock catalogs/files and owning packages on the target;
-2. preserve a restorable system recovery copy;
-3. install the 24 GoreeCloud assets and a system background catalog;
-4. remove the stock entries from the Settings gallery;
-5. verify Settings shows only the intended GoreeCloud set;
-6. verify desktop, login/lock/background behavior and package-update behavior;
-7. only after acceptance, permanently purge the preserved stock recovery material if still desired.
+### Controlled removal sequence
 
-Do not use broad recursive deletion of `/usr/share/backgrounds` or guess wallpaper package names. Package updates may also recreate package-owned wallpaper files, so “permanent” replacement must be verified against the actual package ownership/update model.
+First run the read-only plan:
+
+```bash
+./scripts/system_wallpapers.sh plan
+```
+
+`plan` verifies:
+
+1. the host is the verified Zorin OS 17.3 target;
+2. all four audited wallpaper packages are installed at the exact recorded versions;
+3. every audited stock path exists and has the expected package owner;
+4. the 24-wallpaper GoreeCloud user catalog and all referenced SVGs are ready;
+5. `apt-get --simulate purge` proposes removal of exactly the four audited wallpaper packages and no other package.
+
+Only after the plan output is reviewed should privileged removal run:
+
+```bash
+sudo ./scripts/system_wallpapers.sh apply
+```
+
+Before package removal, `apply` captures the exact stock files in a root-owned recovery archive, records checksums and package state, saves the apt simulation, and downloads the exact four `.deb` packages into the recovery transaction. It then re-runs all preconditions and purges only the audited wallpaper packages. Any package-version, ownership, path, replacement-catalog, recovery-download, or apt-removal-set mismatch aborts the operation.
+
+After `apply`, reopen Settings → Background and verify that only the intended GoreeCloud collection remains. Keep the recovery transaction until this screenshot/visual acceptance is complete.
+
+Rollback remains available with:
+
+```bash
+sudo ./scripts/system_wallpapers.sh restore
+```
+
+`restore` reinstalls the archived exact wallpaper packages, restores the captured stock files, checks the recorded SHA-256 values, and verifies the package/path state.
+
+Only after removal is visually accepted and rollback is no longer required should the recovery copy be irreversibly deleted:
+
+```bash
+sudo ./scripts/system_wallpapers.sh finalize
+```
+
+`finalize` is deliberately separate from `apply`. It is refused unless the stock packages and audited stock paths remain absent and the 24-wallpaper GoreeCloud replacement catalog is still ready.
+
+Do not use broad recursive deletion of `/usr/share/backgrounds`, manually remove unrelated files, or purge wallpaper packages outside this evidence-bound workflow.
 
 ## Validation
 
@@ -115,10 +156,13 @@ Source validation covers:
 - no script elements;
 - no remote, file, or embedded-data href resources;
 - generated GNOME catalog count and filenames;
-- executable/syntax validation for wallpaper helpers.
+- the exact Zorin OS 17.3 stock-package/version/catalog/path manifest;
+- the four-package no-collateral purge safety contract;
+- recovery/restore/finalize workflow presence;
+- executable/syntax/ShellCheck validation for wallpaper helpers.
 
-Static checks do not establish visual quality or system replacement success.
+Static checks do not establish actual package-removal success or visual acceptance.
 
 ## Remaining target acceptance
 
-Before release qualification, verify all 24 wallpapers in representative desktop views, the generated user catalog, Light/Dark/DeepDark visual balance, panel/dock/icon readability, wallpaper restore, and the eventual system replacement/rollback path. The PR remains Draft until those and the broader theme acceptance gates are complete.
+Before release qualification, complete the read-only system-removal plan, then the controlled removal and post-removal Settings verification if the plan is clean. Keep recovery until the post-removal gallery is accepted. Also verify representative Light/Dark/DeepDark wallpapers, panel/dock/icon readability, wallpaper settings restore, package-removal rollback, and the broader theme acceptance gates. The PR remains Draft until those checks are complete.
