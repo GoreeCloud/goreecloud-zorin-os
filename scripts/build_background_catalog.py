@@ -16,7 +16,10 @@ def parse_args() -> argparse.Namespace:
         "--mode",
         choices=("light", "dark", "deep-dark"),
         default=None,
-        help="optionally expose only one wallpaper mode in the generated GNOME catalog",
+        help=(
+            "optionally expose only one wallpaper mode in GNOME Settings; "
+            "other source entries remain in the XML as deleted=true compatibility entries"
+        ),
     )
     return p.parse_args()
 
@@ -28,14 +31,20 @@ def main() -> int:
     if len(catalog) < 20:
         raise SystemExit("Wallpaper source catalog must contain at least 20 entries")
 
-    if args.mode is not None:
-        catalog = [item for item in catalog if item.get("mode") == args.mode]
-        if not catalog:
-            raise SystemExit(f"Wallpaper catalog contains no {args.mode} entries")
+    if args.mode is not None and not any(item.get("mode") == args.mode for item in catalog):
+        raise SystemExit(f"Wallpaper catalog contains no {args.mode} entries")
 
     root = ET.Element("wallpapers")
+    visible = 0
     for item in catalog:
-        wallpaper = ET.SubElement(root, "wallpaper", {"deleted": "false"})
+        is_visible = args.mode is None or item.get("mode") == args.mode
+        if is_visible:
+            visible += 1
+        wallpaper = ET.SubElement(
+            root,
+            "wallpaper",
+            {"deleted": "false" if is_visible else "true"},
+        )
         title = f"{item['category']} — {item['family']}"
         if args.mode is None:
             title += f" — {item['mode'].replace('-', ' ').title()}"
@@ -50,7 +59,7 @@ def main() -> int:
     tree = ET.ElementTree(root)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     tree.write(args.output, encoding="utf-8", xml_declaration=True)
-    print(f"Generated GNOME wallpaper catalog: {len(catalog)} entries")
+    print(f"Generated GNOME wallpaper catalog: {visible} visible / {len(catalog)} source entries")
     return 0
 
 
