@@ -81,6 +81,24 @@ def symbolic_folder_icon(opened: bool = False) -> str:
     return svg(body)
 
 
+def symbolic_star_icon() -> str:
+    """Nautilus Starred empty-state icon using the same line-only contract."""
+    return svg(
+        '  <g fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
+        '    <line x1="32" y1="9" x2="38" y2="24" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="38" y1="24" x2="54" y2="25" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="54" y1="25" x2="42" y2="35" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="42" y1="35" x2="46" y2="51" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="46" y1="51" x2="32" y2="42" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="32" y1="42" x2="18" y2="51" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="18" y1="51" x2="22" y2="35" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="22" y1="35" x2="10" y2="25" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="10" y1="25" x2="26" y2="24" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="26" y1="24" x2="32" y2="9" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '  </g>\n'
+    )
+
+
 def write(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
@@ -119,6 +137,7 @@ def main() -> int:
         "folder": folder_icon(),
         "folder-symbolic": symbolic_folder_icon(),
         "folder-open-symbolic": symbolic_folder_icon(opened=True),
+        "starred-symbolic": symbolic_star_icon(),
         "folder-documents": folder_icon('  <path d="M25 32h15v16H25z" fill="#FFFFFF" stroke="#174EA6" stroke-width="1.5"/><path d="M28 36h9M28 40h9M28 44h7" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"/>'),
         "folder-download": folder_icon('  <path d="M32 31v13m-6-5 6 6 6-6" fill="none" stroke="#174EA6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'),
         "folder-music": folder_icon('  <path d="M38 31v13c0 4-7 5-7 1 0-3 4-4 7-3V34l9-2v10c0 4-7 5-7 1 0-3 4-4 7-3V29Z" fill="#174EA6"/>'),
