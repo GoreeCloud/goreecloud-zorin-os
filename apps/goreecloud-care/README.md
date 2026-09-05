@@ -1,7 +1,7 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev8`  
+**Version:** `0.1.0-dev9`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
@@ -28,7 +28,7 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 - Dev8 large-text-aware compact selection: the GTK `GDK_DPI_SCALE` used by the 200%-text acceptance harness is converted into an effective layout width before the 820-logical-pixel compact contract is evaluated, preventing the text-scaled allocation from hiding a physically narrow window.
 - Compact HeaderBar behavior that omits the Development subtitle when the compact composition is active instead of relying on visible ellipsis.
 - GTK/ATK status semantics: the maintenance status surface exposes a status role and updated accessible name, category counts expose descriptive accessible names, and action controls include clearer assistive descriptions.
-- High-contrast resilience: common GTK HighContrast theme names suppress the application color provider so the system high-contrast presentation can take precedence.
+- Dev9 HighContrast remediation: effective HighContrast state now includes a process-local `GTK_THEME` override as well as `Gtk.Settings:gtk-theme-name`, so isolated accessibility test launches can suppress the application color provider correctly.
 - A minimum supported Development window size plus vertical scrolling and wrapping for long/status/system text to improve large-text and constrained-window behavior.
 - No telemetry, advertising, cloud upload, or network requirement.
 - Symlink-safe user cleanup: links are unlinked, never traversed.
@@ -40,14 +40,16 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-Representative Zorin OS 17.3 testing through dev5 verifies light-default rendering, visible keyboard focus, both first-stage and PolicyKit cancellation paths, successful privileged Memory Refresh and APT cleanup, nonzero APT archive removal, controlled application-cache deletion, thumbnail-cache deletion, stale user-owned `/tmp` deletion, permanent Trash deletion, completion reporting, and post-action refresh behavior. Dev6 target testing verified the normal-text compact/minimum-window composition but exposed a combined 200%-text defect. Dev7 raised the normal-text compact threshold to 820 logical pixels and passed exact-head CI plus local dev7 source/package validation on the representative laptop, yet direct `GDK_DPI_SCALE=2` screenshots still showed the regular composition at the narrowest reachable window. Dev8 corrects that target-device failure by evaluating an effective width adjusted for the 200%-text DPI scale. Exact dev8 head `45b5f11a49f363ebcaf753c892245a31109bc9bb` passed all three GitHub workflow families; the representative laptop passed 24 local tests plus XML/source validation, built and installed `0.1.0~dev8`, and fresh wide/narrow `GDK_DPI_SCALE=2` screenshots verify the regular wide composition plus the compact narrow composition with subtitle omission, category-amount reflow, complete vertical scrolling, and vertically stacked full-width bottom actions. Treat the combined 200%-text/compact adaptive-layout slice as representative-device accepted. Full keyboard-under-resilience and assistive-technology acceptance remain separate open gates.
+Representative Zorin OS 17.3 testing through dev5 verifies light-default rendering, visible keyboard focus, both first-stage and PolicyKit cancellation paths, successful privileged Memory Refresh and APT cleanup, nonzero APT archive removal, controlled application-cache deletion, thumbnail-cache deletion, stale user-owned `/tmp` deletion, permanent Trash deletion, completion reporting, and post-action refresh behavior. Dev6 target testing verified the normal-text compact/minimum-window composition but exposed a combined 200%-text defect. Dev7 raised the normal-text compact threshold to 820 logical pixels and passed exact-head CI plus local dev7 source/package validation on the representative laptop, yet direct `GDK_DPI_SCALE=2` screenshots still showed the regular composition at the narrowest reachable window. Dev8 corrected that target-device failure by evaluating an effective width adjusted for the 200%-text DPI scale. Exact dev8 head `45b5f11a49f363ebcaf753c892245a31109bc9bb` passed all three GitHub workflow families; the representative laptop passed 24 local tests plus XML/source validation, built and installed `0.1.0~dev8`, and fresh wide/narrow `GDK_DPI_SCALE=2` screenshots verify the regular wide composition plus the compact narrow composition with subtitle omission, category-amount reflow, complete vertical scrolling, and vertically stacked full-width bottom actions. Treat the combined 200%-text/compact adaptive-layout slice as representative-device accepted.
+
+The first requested HighContrast target pass produced mixed/negative evidence: focus was clearly visible on Scan, a category checkbox, and Memory Refresh and the layout remained readable, but `GTK_THEME=HighContrast goreecloud-care` still rendered the GoreeCloud light Development palette. Dev9 addresses the source cause by treating the explicit `GTK_THEME` process override as part of the effective HighContrast state. Dev9 target-device HighContrast rendering remains **unverified** until the updated package is installed and the same acceptance pass is repeated.
 
 The generated Debian package is Development software. Package rollback, official GoreeCloud Care visual assets, HighContrast/assistive-technology acceptance, full current-Stable Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev8_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev9_all.deb
 ```
 
 Uninstall with:
