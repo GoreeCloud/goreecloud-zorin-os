@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">GoreeCloud Meridian {{mode_label}}</title>
+  <desc id="desc">Original GoreeCloud supporting wallpaper with cloudlike meridian ribbons, restrained Glaze atmosphere, and open workspace.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.48" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
+    <radialGradient id="aura" cx="0.22" cy="0.18" r="0.64"><stop stop-color="{{amber}}" stop-opacity="0.20"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
+    <radialGradient id="aura2" cx="0.78" cy="0.30" r="0.72"><stop stop-color="{{accent2}}" stop-opacity="0.28"/><stop offset="1" stop-color="{{accent}}" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/>
+  <rect width="3840" height="2160" fill="url(#aura)"/>
+  <rect width="3840" height="2160" fill="url(#aura2)"/>
+  <g fill="none" stroke="{{soft}}" stroke-linecap="round">
+    <path d="M-180 540C540 190 1090 260 1630 570S2790 1020 4020 410" stroke-opacity="0.10" stroke-width="3"/>
+    <path d="M-140 760C610 390 1210 430 1740 710S2930 1120 4040 650" stroke-opacity="0.13" stroke-width="5"/>
+    <path d="M-100 1020C680 660 1300 700 1880 960S3060 1310 4040 930" stroke-opacity="0.09" stroke-width="3"/>
+  </g>
+  <g opacity="0.88">
+    <path d="M0 1620C520 1450 940 1500 1350 1670S2250 1830 2890 1510S3510 1400 3840 1500V2160H0Z" fill="{{elevated}}"/>
+    <path d="M0 1800C590 1630 1120 1690 1620 1840S2630 1980 3230 1690S3610 1670 3840 1730V2160H0Z" fill="{{selection}}" opacity="0.70"/>
+  </g>
+  <g fill="{{soft}}" opacity="0.28">
+    <circle cx="520" cy="430" r="7"/><circle cx="910" cy="610" r="4"/><circle cx="3130" cy="410" r="6"/><circle cx="3390" cy="720" r="4"/>
+  </g>
+</svg>

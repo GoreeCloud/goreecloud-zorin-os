@@ -40,9 +40,10 @@ for theme in "${THEMES[@]}"; do
   cp -a -- "$TEMP_ROOT/$theme" "$target"
 done
 
-# Wallpaper artwork is original GoreeCloud source stored in this repository.
-# Installation is user-local and does not overwrite Zorin's system wallpaper
-# files. Activation remains explicit/reversible through wallpaper.sh.
+# Original GoreeCloud wallpaper source is installed user-locally. This step
+# installs all catalog entries and the user background-properties catalog.
+# Privileged stock-Zorin wallpaper removal is intentionally a separate,
+# evidence-gated system migration.
 "$ROOT/scripts/wallpaper.sh" install
 
 echo
@@ -59,6 +60,10 @@ fi
 echo
 echo "Next: open Zorin Appearance -> Themes -> Other, then select"
 echo "a GoreeCloud variant for Applications and Shell."
-echo "To replace the current desktop wallpaper with the matching GoreeCloud"
-echo "Horizon wallpaper, run:"
+echo "The 24-wallpaper GoreeCloud collection is installed user-locally."
+echo "List options with:"
+echo "  ./scripts/wallpaper.sh list"
+echo "Apply the primary wallpaper matching the active theme with:"
 echo "  ./scripts/wallpaper.sh apply current"
+echo "Before any privileged stock-wallpaper replacement, run:"
+echo "  ./scripts/diagnose_backgrounds.sh"

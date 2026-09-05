@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Privacy Filter {{mode_label}}</title>
+  <desc id="desc">Privacy Shield supporting wallpaper with filtered layers, controlled visibility, and bounded translucent content regions. Supporting artwork only; not a privacy-status indicator.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{canvas}}"/><stop offset="1" stop-color="{{deep}}"/></linearGradient>
+    <radialGradient id="amber" cx="0.15" cy="0.14" r="0.40"><stop stop-color="{{amber}}" stop-opacity="0.10"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/><rect width="3840" height="2160" fill="url(#amber)"/>
+  <g transform="translate(520 390)">
+    <rect x="0" y="0" width="2800" height="1380" rx="230" fill="{{surface}}" opacity="0.38" stroke="{{soft}}" stroke-opacity="0.14" stroke-width="4"/>
+    <rect x="260" y="240" width="2280" height="900" rx="170" fill="{{elevated}}" opacity="0.50"/>
+    <g fill="{{selection}}" opacity="0.78">
+      <rect x="80" y="410" width="2640" height="170" rx="85"/>
+      <rect x="180" y="690" width="2440" height="150" rx="75" opacity="0.82"/>
+      <rect x="330" y="950" width="2140" height="130" rx="65" opacity="0.66"/>
+    </g>
+    <g fill="{{accent}}" opacity="0.36">
+      <circle cx="740" cy="690" r="250"/><circle cx="2040" cy="650" r="310"/>
+    </g>
+  </g>
+</svg>

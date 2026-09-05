@@ -1,87 +1,124 @@
-# GoreeCloud Horizon Wallpapers
+# GoreeCloud Zorin Wallpaper Collection
 
 ## Status
 
-Development / source-implemented. Target-device visual acceptance is still required.
+Development. The collection source is implemented; target-device acceptance is partial.
 
-## Purpose
+The target laptop has rendered **GoreeCloud Horizon Dark** successfully at its current desktop resolution with readable panel/dock chrome and no obvious crop failure in the supplied full-desktop screenshot. That evidence applies only to this wallpaper and view. The remaining 23 wallpapers, user-catalog discovery, restore behavior, and any system-wide stock-wallpaper replacement still require direct target verification.
 
-`GoreeCloud Horizon` is an original wallpaper family for the GoreeCloud Zorin OS theme. The artwork is stored directly in this repository as scalable SVG source and is designed to replace the visual role of the stock desktop wallpaper without copying or redistributing Zorin wallpaper assets.
+## Scope
 
-The collection follows the current GLAZE UI V1.1 / 1.1.0 palette used by this repository.
+This repository now defines **24 original 3840×2160 SVG wallpapers** across four balanced categories:
 
-## Variants
+| Category | Families | Count |
+| --- | --- | ---: |
+| GoreeCloud | Horizon, Meridian | 6 |
+| Glaze UI | Aurora, Lattice | 6 |
+| Wardveil Security | Core, Fold | 6 |
+| Privacy Shield | Bands, Filter | 6 |
+| **Total** | 8 families × Light/Dark/Deep Dark | **24** |
 
-| Wallpaper | Theme | Native canvas | Primary palette |
-| --- | --- | --- | --- |
-| `goreecloud-horizon-light.svg` | `GoreeCloud-Zorin-Light` | 3840×2160 | `#F4F7F8`, `#0F6B6F`, `#8FD6D2` |
-| `goreecloud-horizon-dark.svg` | `GoreeCloud-Zorin-Dark` | 3840×2160 | `#101A20`, `#1C8A8D`, `#8FD6D2` |
-| `goreecloud-horizon-deep-dark.svg` | `GoreeCloud-Zorin-DeepDark` | 3840×2160 | `#081016`, `#1C8A8D`, `#8FD6D2` |
+Every family has Light, Dark, and Deep Dark variants mapped to the same GLAZE UI V1.1 / 1.1.0 palette roles used by the desktop theme.
 
-All three use a restrained horizon/ridge composition, mineral-teal atmospheric treatment, and a small amber atmosphere token. They contain no external images, scripts, remote resources, or Zorin artwork.
+Wardveil Security and Privacy Shield wallpapers are **supporting abstract identity artwork**, not canonical product marks and not security/privacy status indicators. Wardveil compositions use calm paired veil/core geometry; Privacy Shield compositions use layered privacy-band/filter geometry. They intentionally avoid generic padlocks, checkmarks, hacker imagery, neon threat graphics, and other misleading security/privacy symbolism.
 
-## Repository layout
+## Source
 
 ```text
 assets/wallpapers/
-  goreecloud-horizon-light.svg
-  goreecloud-horizon-dark.svg
-  goreecloud-horizon-deep-dark.svg
 config/wallpapers.json
+scripts/build_background_catalog.py
+scripts/validate_wallpapers.py
 scripts/wallpaper.sh
+scripts/diagnose_backgrounds.sh
 ```
 
-## User-local installation
+`config/wallpapers.json` keeps the three Horizon wallpapers as the primary Light/Dark/DeepDark mapping for `apply current`, while the full `catalog` contains all 24 options.
 
-The main theme installer copies the wallpaper files to:
+## User-local install and catalog
+
+Run:
+
+```bash
+./scripts/wallpaper.sh install
+./scripts/wallpaper.sh list
+```
+
+The helper copies all 24 SVGs to:
 
 ```text
 ~/.local/share/backgrounds/GoreeCloud-Zorin
 ```
 
-It does not remove or overwrite files under `/usr/share/backgrounds`.
+and generates a user-scoped GNOME Background Properties catalog at:
 
-The current desktop wallpaper changes only when explicitly requested:
+```text
+~/.local/share/gnome-background-properties/goreecloud-zorin.xml
+```
+
+Whether Zorin OS 17.3 Settings consumes the user-scoped catalog is a target-runtime behavior and must be verified; source generation alone does not prove the 24 thumbnails will appear in Settings.
+
+Apply the primary wallpaper matching the active GoreeCloud theme:
 
 ```bash
 ./scripts/wallpaper.sh apply current
 ```
 
-The `current` mode maps the active GoreeCloud GTK theme to the matching wallpaper. Explicit modes are also supported:
+Or apply any exact ID from `./scripts/wallpaper.sh list`, for example:
 
 ```bash
-./scripts/wallpaper.sh apply light
-./scripts/wallpaper.sh apply dark
-./scripts/wallpaper.sh apply deep-dark
+./scripts/wallpaper.sh apply glaze-aurora-dark
+./scripts/wallpaper.sh apply wardveil-core-dark
+./scripts/wallpaper.sh apply privacy-bands-dark
+./scripts/wallpaper.sh apply goreecloud-meridian-dark
 ```
 
-Before modifying GNOME background settings, the helper stores a snapshot under `${XDG_STATE_HOME:-~/.local/state}/goreecloud-zorin/wallpaper`. Restore the newest snapshot with:
+Applying a wallpaper records a GNOME settings snapshot first. Restore the latest snapshot with:
 
 ```bash
 ./scripts/wallpaper.sh restore
 ```
 
-## Validation boundary
+## Stock Zorin wallpaper replacement
 
-Source validation checks:
+The project requirement is to replace the stock Zorin wallpaper set with the GoreeCloud collection. Permanently deleting package-owned system files is a privileged destructive operation and is not performed by the ordinary theme or wallpaper installer.
 
-- exactly three wallpaper variants are declared;
-- each entry maps to an existing GoreeCloud theme and matching Glaze palette roles;
-- each asset is valid SVG XML with `3840×2160` dimensions and `0 0 3840 2160` view box;
-- no SVG scripts or external/embedded href resources are present;
-- `scripts/wallpaper.sh` is executable and shell-syntax valid.
+Before a system replacement implementation is accepted, run the read-only target audit:
 
-Source validation does not prove desktop composition quality.
+```bash
+./scripts/diagnose_backgrounds.sh
+```
 
-## Required target acceptance
+The audit reports the actual Zorin 17.3 background-property catalogs, wallpaper roots, package ownership, wallpaper-related packages, and current GNOME background settings. This evidence is required before defining the exact files/packages to remove or divert.
 
-Before release qualification:
+The intended controlled migration is:
 
-1. Install all three wallpapers on the target Zorin OS 17.3 laptop.
-2. Apply each wallpaper with its matching Light, Dark, or Deep Dark theme.
-3. Capture full-desktop screenshots at the laptop's actual native resolution.
-4. Check cropping/zoom behavior, panel/dock readability, desktop-icon readability where enabled, lock-screen/background compatibility if used, and visual balance behind representative windows.
-5. Verify `./scripts/wallpaper.sh restore` returns to the prior GNOME background settings.
-6. Verify no Zorin system wallpaper files were modified or deleted.
+1. identify the exact stock catalogs/files and owning packages on the target;
+2. preserve a restorable system recovery copy;
+3. install the 24 GoreeCloud assets and a system background catalog;
+4. remove the stock entries from the Settings gallery;
+5. verify Settings shows only the intended GoreeCloud set;
+6. verify desktop, login/lock/background behavior and package-update behavior;
+7. only after acceptance, permanently purge the preserved stock recovery material if still desired.
 
-Until these checks are complete, the wallpaper collection remains Development and must not be treated as Stable wallpaper acceptance.
+Do not use broad recursive deletion of `/usr/share/backgrounds` or guess wallpaper package names. Package updates may also recreate package-owned wallpaper files, so “permanent” replacement must be verified against the actual package ownership/update model.
+
+## Validation
+
+Source validation covers:
+
+- at least 20 assets, currently exactly 24;
+- all four required categories with at least five options each;
+- unique IDs and Light/Dark/DeepDark mappings;
+- exact Glaze palette-role mapping;
+- 3840×2160 SVG size/viewBox;
+- no script elements;
+- no remote, file, or embedded-data href resources;
+- generated GNOME catalog count and filenames;
+- executable/syntax validation for wallpaper helpers.
+
+Static checks do not establish visual quality or system replacement success.
+
+## Remaining target acceptance
+
+Before release qualification, verify all 24 wallpapers in representative desktop views, the generated user catalog, Light/Dark/DeepDark visual balance, panel/dock/icon readability, wallpaper restore, and the eventual system replacement/rollback path. The PR remains Draft until those and the broader theme acceptance gates are complete.

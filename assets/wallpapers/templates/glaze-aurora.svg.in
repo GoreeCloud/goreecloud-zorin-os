@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Glaze Aurora {{mode_label}}</title>
+  <desc id="desc">Glaze UI supporting wallpaper using layered translucent panes, deep-teal aura, soft amber optical lighting, and restrained depth.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.7" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
+    <radialGradient id="teal" cx="0.70" cy="0.24" r="0.60"><stop stop-color="{{accent2}}" stop-opacity="0.34"/><stop offset="1" stop-color="{{accent}}" stop-opacity="0"/></radialGradient>
+    <radialGradient id="amber" cx="0.16" cy="0.14" r="0.44"><stop stop-color="{{amber}}" stop-opacity="0.20"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{surface}}" stop-opacity="0.72"/><stop offset="1" stop-color="{{elevated}}" stop-opacity="0.28"/></linearGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/><rect width="3840" height="2160" fill="url(#teal)"/><rect width="3840" height="2160" fill="url(#amber)"/>
+  <g transform="rotate(-8 1920 1080)">
+    <rect x="480" y="510" width="1220" height="760" rx="110" fill="url(#pane)" stroke="{{soft}}" stroke-opacity="0.18" stroke-width="4"/>
+    <rect x="1180" y="700" width="1450" height="870" rx="130" fill="url(#pane)" opacity="0.88" stroke="{{accent2}}" stroke-opacity="0.22" stroke-width="4"/>
+    <rect x="2300" y="420" width="880" height="620" rx="100" fill="url(#pane)" opacity="0.70" stroke="{{amber}}" stroke-opacity="0.15" stroke-width="3"/>
+  </g>
+  <path d="M0 1880C760 1630 1380 1780 1980 1880S3200 1990 3840 1710V2160H0Z" fill="{{selection}}" opacity="0.42"/>
+</svg>

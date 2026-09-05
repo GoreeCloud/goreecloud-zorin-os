@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Wardveil Core {{mode_label}}</title>
+  <desc id="desc">Wardveil Security supporting wallpaper: calm paired protective veil forms surround a bounded central core. Supporting artwork only; not a security-status indicator.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="{{deep}}"/><stop offset="1" stop-color="{{canvas}}"/></linearGradient>
+    <radialGradient id="aura" cx="0.50" cy="0.45" r="0.62"><stop stop-color="{{accent2}}" stop-opacity="0.24"/><stop offset="1" stop-color="{{accent}}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="veilL" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{elevated}}" stop-opacity="0.90"/><stop offset="1" stop-color="{{selection}}" stop-opacity="0.54"/></linearGradient>
+    <linearGradient id="veilR" x1="1" y1="0" x2="0" y2="1"><stop stop-color="{{elevated}}" stop-opacity="0.90"/><stop offset="1" stop-color="{{selection}}" stop-opacity="0.54"/></linearGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/><rect width="3840" height="2160" fill="url(#aura)"/>
+  <g opacity="0.95">
+    <path d="M790 420C1230 470 1540 700 1810 1030C1610 1430 1260 1640 850 1740C1120 1410 1240 1120 1190 850C1130 650 980 510 790 420Z" fill="url(#veilL)" stroke="{{soft}}" stroke-opacity="0.17" stroke-width="4"/>
+    <path d="M3050 420C2610 470 2300 700 2030 1030C2230 1430 2580 1640 2990 1740C2720 1410 2600 1120 2650 850C2710 650 2860 510 3050 420Z" fill="url(#veilR)" stroke="{{soft}}" stroke-opacity="0.17" stroke-width="4"/>
+    <circle cx="1920" cy="1110" r="150" fill="{{accent}}" opacity="0.88"/>
+    <circle cx="1920" cy="1110" r="72" fill="{{soft}}" opacity="0.64"/>
+  </g>
+  <path d="M0 1990C760 1890 1430 1960 1920 2020S3110 2080 3840 1940V2160H0Z" fill="{{surface}}" opacity="0.60"/>
+</svg>

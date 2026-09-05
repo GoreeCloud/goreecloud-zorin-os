@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Wardveil Fold {{mode_label}}</title>
+  <desc id="desc">Wardveil Security supporting wallpaper with quiet layered veil folds and protected central negative space. Supporting artwork only; not a security-status indicator.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{canvas}}"/><stop offset="1" stop-color="{{deep}}"/></linearGradient>
+    <radialGradient id="amber" cx="0.18" cy="0.14" r="0.42"><stop stop-color="{{amber}}" stop-opacity="0.12"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/><rect width="3840" height="2160" fill="url(#amber)"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M420 1620C980 1330 1300 1080 1510 680C1660 960 1770 1190 1920 1370" stroke="{{elevated}}" stroke-width="210" opacity="0.76"/>
+    <path d="M3420 1620C2860 1330 2540 1080 2330 680C2180 960 2070 1190 1920 1370" stroke="{{elevated}}" stroke-width="210" opacity="0.76"/>
+    <path d="M650 1760C1150 1470 1430 1240 1610 930" stroke="{{selection}}" stroke-width="90" opacity="0.66"/>
+    <path d="M3190 1760C2690 1470 2410 1240 2230 930" stroke="{{selection}}" stroke-width="90" opacity="0.66"/>
+  </g>
+  <ellipse cx="1920" cy="1410" rx="190" ry="130" fill="{{accent}}" opacity="0.72"/>
+  <g fill="{{soft}}" opacity="0.22"><circle cx="640" cy="480" r="6"/><circle cx="3200" cy="540" r="5"/><circle cx="2920" cy="340" r="4"/></g>
+</svg>
