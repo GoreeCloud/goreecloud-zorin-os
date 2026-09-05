@@ -43,23 +43,40 @@ def folder_icon(glyph: str = "") -> str:
 def symbolic_folder_icon(opened: bool = False) -> str:
     """Large symbolic folder treatment used by Nautilus empty-state views.
 
-    Keep these deliberately outline-first. Nautilus may apply symbolic-state
-    color/opacity processing to large empty-state icons; broad filled geometry
-    therefore becomes a muddy gray mass even when the source SVG is pale. A
-    clean Ice/Blue outline survives that processing while staying consistent
-    with the normal GoreeCloud folder family.
+    Nautilus' symbolic pipeline can flatten SVG paint into a monochrome mask.
+    Even a nominally unfilled closed path can therefore read as a filled gray
+    block after recoloring. Build the empty-state mark from independent line
+    segments only: there is no enclosed fill geometry for the symbolic loader
+    to turn into a muddy silhouette, while the folder remains recognizable at
+    large sizes.
     """
     if opened:
         body = (
-            '  <path d="M8 23c0-4 3-7 7-7h12l6 7h17c4 0 7 3 7 7v3" fill="none" stroke="#8FC4E8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>\n'
-            '  <path d="M13 34c1-3 3-5 7-5h37l-7 23c-1 4-4 6-8 6H14c-5 0-8-4-6-9Z" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>\n'
-            '  <path d="M20 34h29" fill="none" stroke="#DCECF6" stroke-width="2" stroke-linecap="round"/>\n'
+            '  <g fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
+            '    <line x1="10" y1="27" x2="10" y2="19" stroke="#8FC4E8" stroke-width="3"/>\n'
+            '    <line x1="10" y1="19" x2="27" y2="19" stroke="#8FC4E8" stroke-width="3"/>\n'
+            '    <line x1="27" y1="19" x2="34" y2="26" stroke="#8FC4E8" stroke-width="3"/>\n'
+            '    <line x1="34" y1="26" x2="54" y2="26" stroke="#8FC4E8" stroke-width="3"/>\n'
+            '    <line x1="54" y1="26" x2="54" y2="31" stroke="#8FC4E8" stroke-width="3"/>\n'
+            '    <line x1="13" y1="33" x2="57" y2="33" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="57" y1="33" x2="50" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="50" y1="53" x2="9" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="9" y1="53" x2="13" y2="33" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="18" y1="37" x2="48" y2="37" stroke="#DCECF6" stroke-width="2"/>\n'
+            '  </g>\n'
         )
     else:
         body = (
-            '  <path d="M8 22c0-4 3-7 7-7h12l6 7h17c4 0 7 3 7 7v23c0 4-3 7-7 7H15c-4 0-7-3-7-7Z" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linejoin="round"/>\n'
-            '  <path d="M9 29h47" fill="none" stroke="#8FC4E8" stroke-width="2.5" stroke-linecap="round"/>\n'
-            '  <path d="M14 19h11l6 7" fill="none" stroke="#DCECF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>\n'
+            '  <g fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
+            '    <line x1="10" y1="51" x2="10" y2="19" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="10" y1="19" x2="27" y2="19" stroke="#8FC4E8" stroke-width="3"/>\n'
+            '    <line x1="27" y1="19" x2="34" y2="26" stroke="#8FC4E8" stroke-width="3"/>\n'
+            '    <line x1="34" y1="26" x2="54" y2="26" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="54" y1="26" x2="54" y2="51" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="10" y1="51" x2="54" y2="51" stroke="#3B82F6" stroke-width="3"/>\n'
+            '    <line x1="10" y1="30" x2="54" y2="30" stroke="#8FC4E8" stroke-width="2.5"/>\n'
+            '    <line x1="15" y1="23" x2="25" y2="23" stroke="#DCECF6" stroke-width="2"/>\n'
+            '  </g>\n'
         )
     return svg(body)
 
