@@ -40,6 +40,22 @@ def folder_icon(glyph: str = "") -> str:
     )
 
 
+def symbolic_folder_icon(opened: bool = False) -> str:
+    if opened:
+        body = (
+            '  <path d="M7 20c0-3 2-5 5-5h14l5 6h21c3 0 5 2 5 5v5H18c-3 0-5 2-6 5L7 52Z" fill="#8FC4E8" opacity=".62"/>\n'
+            '  <path d="M13 34c1-3 3-5 6-5h39l-7 24c-1 3-3 5-7 5H12c-4 0-6-3-5-7Z" fill="#DCECF6" stroke="#3B82F6" stroke-width="2.2"/>\n'
+            '  <path d="M18 33h34" stroke="#FBFDFE" stroke-width="2" opacity=".92"/>\n'
+        )
+    else:
+        body = (
+            '  <path d="M7 19c0-3 2-5 5-5h14l5 6h21c3 0 5 2 5 5v27c0 4-3 7-7 7H14c-4 0-7-3-7-7Z" fill="#DCECF6" stroke="#3B82F6" stroke-width="2.2"/>\n'
+            '  <path d="M8 25h48" stroke="#FBFDFE" stroke-width="2" opacity=".92"/>\n'
+            '  <path d="M10 19c0-2 1-3 3-3h12l5 6H10Z" fill="#8FC4E8" opacity=".7"/>\n'
+        )
+    return svg(body)
+
+
 def write(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
@@ -76,6 +92,8 @@ def main() -> int:
 
     place_icons = {
         "folder": folder_icon(),
+        "folder-symbolic": symbolic_folder_icon(),
+        "folder-open-symbolic": symbolic_folder_icon(opened=True),
         "folder-documents": folder_icon('  <path d="M25 32h15v16H25z" fill="#FFFFFF" stroke="#174EA6" stroke-width="1.5"/><path d="M28 36h9M28 40h9M28 44h7" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"/>'),
         "folder-download": folder_icon('  <path d="M32 31v13m-6-5 6 6 6-6" fill="none" stroke="#174EA6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'),
         "folder-music": folder_icon('  <path d="M38 31v13c0 4-7 5-7 1 0-3 4-4 7-3V34l9-2v10c0 4-7 5-7 1 0-3 4-4 7-3V29Z" fill="#174EA6"/>'),
