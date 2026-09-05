@@ -17,19 +17,27 @@ Primary user: a person maintaining their own GoreeCloud/Zorin OS workstation.
 - Cleanup candidates are individual leaf nodes; broad recursive deletion of cache/temp directories is not used.
 - Errors are surfaced and failed items are not counted as successful deletion.
 
-## Interface and appearance
+## Interface, accessibility, and appearance
 - GoreeCloud Care opens in a light appearance by default on the target Zorin OS laptop.
 - The application-local light preference must not change the desktop-wide Zorin OS appearance setting.
+- System high-contrast presentation takes precedence over the application color mapping; GoreeCloud Care must retain usable hierarchy and control semantics when its Development color provider is suppressed.
 - Status feedback must communicate changed state with text plus a recognizable symbol and an appropriate semantic surface/border treatment; color alone is not sufficient.
+- The maintenance status surface must expose assistive-technology semantics and update its accessible name when operation state changes.
 - User-initiated cancellation is an attention/changed-state condition, not an error or destructive warning. It must be immediately noticeable without exaggerating it into a critical condition.
 - Keyboard focus must remain visibly perceivable on supported interactive controls.
-- Current Stable Glaze UI remains the governing design target; these Development mappings do not establish conformance until rendered, accessibility, and platform-native evidence is accepted.
+- Interactive controls must remain reachable by keyboard and expose useful accessible names/descriptions through the GTK/ATK mapping.
+- Category counts must remain associated with understandable category text for visual and assistive-technology users.
+- Long status, system, description, and heading text must wrap instead of clipping.
+- The desktop window must support a compact composition below the Development breakpoint: category amounts move below category content and the bottom action row becomes a vertical action stack.
+- The compact composition must preserve action availability, focus order, reading order, and vertical scrolling rather than depending on horizontal scrolling.
+- The Development window has a defined minimum supported size of 480 × 420 logical pixels; narrower or shorter unsupported sizes are not claimed.
+- Current Stable Glaze UI V1.1 / 1.1.0 remains the governing design target; these Development mappings do not establish conformance until rendered, accessibility, resilience, and platform-native evidence is accepted.
 
 ## Data and privacy
 The app reads local filesystem metadata, `/proc/meminfo`, and disk usage. It sends nothing over the network and contains no telemetry.
 
 ## Platform and toolkit
-Python 3 + GTK 3/PyGObject, selected to match the verified Zorin OS 17.3 desktop application's GTK 3 environment. PolicyKit is used for privileged maintenance.
+Python 3 + GTK 3/PyGObject, selected to match the verified Zorin OS 17.3 desktop application's GTK 3 environment. ATK semantics are exposed through GTK accessibility objects. PolicyKit is used for privileged maintenance.
 
 ## Exclusions in this Development slice
 - No automatic scheduled deletion.
@@ -42,4 +50,4 @@ Python 3 + GTK 3/PyGObject, selected to match the verified Zorin OS 17.3 desktop
 - No GoreeCloud cloud account requirement or remote management.
 
 ## Release status
-Development / nonconformant. Target-device acceptance and Integral Platform System evidence remain open.
+Development / nonconformant. Core maintenance execution is representative-device verified through dev5. Dev6 adaptive-window, large-text, high-contrast, and assistive-technology acceptance plus remaining Integral Platform System evidence remain open.
