@@ -23,6 +23,24 @@ EXPECTED_IDENTITY = {
     "Privacy Shield": "privacy-shield",
 }
 
+# Wallpaper is environmental artwork, not an extension of interaction/status color.
+# Keep semantic UI roles out of wallpaper source so changing an accent, selection,
+# warning, or destructive contract cannot silently recolor identity artwork.
+FORBIDDEN_WALLPAPER_TOKENS = {
+    "{{accent}}",
+    "{{accent2}}",
+    "{{accent_hover}}",
+    "{{accent_soft}}",
+    "{{soft}}",
+    "{{on}}",
+    "{{on_accent}}",
+    "{{selection}}",
+    "{{amber}}",
+    "{{atmosphere_amber}}",
+    "{{destructive}}",
+    "{{destructive_hover}}",
+}
+
 
 def fail(message: str) -> None:
     raise SystemExit(message)
@@ -53,7 +71,13 @@ def geometry_signature(root: ET.Element) -> list[tuple[str, tuple[tuple[str, str
         local = element.tag.rsplit("}", 1)[-1]
         if local not in {"path", "circle", "polygon", "polyline", "rect", "line", "ellipse"}:
             continue
-        attrs = tuple(sorted((k.rsplit("}", 1)[-1], v) for k, v in element.attrib.items() if k.rsplit("}", 1)[-1] in keep))
+        attrs = tuple(
+            sorted(
+                (k.rsplit("}", 1)[-1], v)
+                for k, v in element.attrib.items()
+                if k.rsplit("}", 1)[-1] in keep
+            )
+        )
         if attrs:
             result.append((local, attrs))
     return result
@@ -138,6 +162,8 @@ def main() -> int:
             fail(f"{item['id']}: unknown theme_id {item['theme_id']}")
         if item["mode"] != palette["mode"]:
             fail(f"{item['id']}: mode does not match theme palette")
+        # These manifest fields remain compatibility metadata for the V1.1
+        # installed collection. They are deliberately not presentation inputs.
         for key in ("canvas", "accent", "accent_soft", "atmosphere_amber"):
             if item[key] != palette[key]:
                 fail(f"{item['id']}: {key} does not match {item['theme_id']}")
@@ -150,6 +176,12 @@ def main() -> int:
         template = source.read_text(encoding="utf-8")
         if "{{identity_inner}}" not in template or "{{identity_viewbox}}" not in template:
             fail(f"{item['id']}: source template does not embed the canonical identity")
+        forbidden = sorted(token for token in FORBIDDEN_WALLPAPER_TOKENS if token in template)
+        if forbidden:
+            fail(
+                f"{item['id']}: wallpaper source consumes semantic UI token(s): "
+                f"{', '.join(forbidden)}"
+            )
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
