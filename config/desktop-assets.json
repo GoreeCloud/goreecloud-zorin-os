@@ -28,14 +28,25 @@
   "cursor_theme": {
     "id": "GoreeCloud-Zorin-Cursors",
     "name": "GoreeCloud Zorin Cursors",
-    "comment": "Frost White and GoreeCloud Blue cursor theme",
+    "comment": "Frost White and Graphite cursors with GoreeCloud Blue activity accents",
     "inherits": [
       "Adwaita"
     ],
     "sizes": [
       24,
       32,
-      48
+      48,
+      64,
+      96
+    ],
+    "supersample": 4,
+    "animation_frames": 8,
+    "animation_delay_ms": 55,
+    "animated_cursor_names": [
+      "watch",
+      "wait",
+      "left_ptr_watch",
+      "progress"
     ],
     "palette": {
       "frost": "#F4F8FA",
@@ -61,6 +72,8 @@
       "progress",
       "not-allowed",
       "forbidden",
+      "dnd-copy",
+      "copy",
       "sb_h_double_arrow",
       "size_hor",
       "sb_v_double_arrow",
