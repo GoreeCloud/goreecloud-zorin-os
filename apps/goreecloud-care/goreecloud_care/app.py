@@ -213,7 +213,13 @@ class CareWindow(Gtk.ApplicationWindow):
         self.set_status(f"Scan complete. Up to {human_bytes(total)} is visible across all maintenance categories.")
         return False
 
-    def _confirm(self, primary: str, secondary: str, destructive: bool = False) -> bool:
+    def _confirm(
+        self,
+        primary: str,
+        secondary: str,
+        destructive: bool = False,
+        cancel_status: str | None = None,
+    ) -> bool:
         dialog = Gtk.MessageDialog(
             transient_for=self,
             modal=True,
@@ -231,7 +237,10 @@ class CareWindow(Gtk.ApplicationWindow):
             cancel.grab_focus()
         response = dialog.run()
         dialog.destroy()
-        return response == response_id
+        accepted = response == response_id
+        if not accepted and cancel_status:
+            self.set_status(cancel_status)
+        return accepted
 
     def _show_notice(self, primary: str, secondary: str, message_type=Gtk.MessageType.INFO) -> None:
         dialog = Gtk.MessageDialog(
@@ -262,6 +271,7 @@ class CareWindow(Gtk.ApplicationWindow):
         if not self._confirm(
             "Clean the selected categories?",
             f"About {human_bytes(total)} is currently eligible from: {names}. Files may be recreated by applications.",
+            cancel_status="Selected cleanup cancelled. No cache or temporary files were changed.",
         ):
             return
         self.set_status("Cleaning selected user-owned cache and temporary files…")
@@ -292,6 +302,7 @@ class CareWindow(Gtk.ApplicationWindow):
             "Permanently empty Trash?",
             f"This will permanently delete {amount} from your Trash. This action cannot be undone by GoreeCloud Care.",
             destructive=True,
+            cancel_status="Trash emptying cancelled. No Trash contents were removed.",
         ):
             return
         self.set_status("Permanently emptying Trash…")
@@ -325,6 +336,7 @@ class CareWindow(Gtk.ApplicationWindow):
         if not self._confirm(
             "Clean the APT package cache?",
             f"This removes {amount} of downloaded .deb archives when present. Administrator authentication is required.",
+            cancel_status="APT cache cleanup cancelled before administrator authorization. No privileged changes were made.",
         ):
             return
         self.set_status("Requesting administrator authorization for APT cache cleanup…")
@@ -339,6 +351,7 @@ class CareWindow(Gtk.ApplicationWindow):
             "Linux normally manages these caches automatically. This can temporarily increase available RAM, "
             "but is not a lasting speed boost and may make later file/app loads slower while caches rebuild. "
             "Administrator authentication is required.",
+            cancel_status="Memory-cache reclaim cancelled before administrator authorization. No privileged changes were made.",
         ):
             return
         self.set_status("Requesting administrator authorization for memory-cache reclaim…")
