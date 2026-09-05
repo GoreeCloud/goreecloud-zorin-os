@@ -1,7 +1,7 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev2`  
+**Version:** `0.1.0-dev3`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
@@ -18,7 +18,8 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 - Display disk, available-memory, and file-cache status.
 - “Memory Refresh” action that truthfully reclaims Linux file caches after a warning and PolicyKit authorization. It does **not** claim a lasting RAM/performance boost.
 - Explicit keyboard-focus presentation for interactive controls and fail-safe Cancel-first confirmation dialogs.
-- Explicit PolicyKit cancellation/error reporting so a dismissed authentication request is never presented as success.
+- Explicit cancellation status for GoreeCloud Care confirmation dialogs so cancelling an operation never fails silently.
+- Explicit PolicyKit cancellation/error reporting, including the observed Zorin OS `Request dismissed` result, so a dismissed authentication request is never presented as success.
 - No telemetry, advertising, cloud upload, or network requirement.
 - Symlink-safe user cleanup: links are unlinked, never traversed.
 
@@ -29,12 +30,12 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-The generated Debian package is Development software. Representative Zorin OS 17.3 source validation, build, installation, launch, and initial rendering have been exercised, but the dev2 accessibility/PolicyKit fixes still require target-device revalidation. Actual cleanup acceptance, package upgrade/rollback, official GoreeCloud Care visual assets, Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+The generated Debian package is Development software. Representative Zorin OS 17.3 source validation, build, installation, launch, initial rendering, and keyboard-focus visibility have been exercised. The dev3 cancellation-feedback changes still require target-device revalidation. Actual privileged-success behavior, cleanup acceptance, package rollback, official GoreeCloud Care visual assets, Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev2_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev3_all.deb
 ```
 
 Uninstall with:
