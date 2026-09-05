@@ -20,9 +20,9 @@ Usage:
   ./scripts/wallpaper.sh status
   ./scripts/wallpaper.sh replace-stock plan|apply|status|restore|finalize
 
-The installed GoreeCloud wallpaper gallery is light-only. Source retains Dark
-and Deep Dark compatibility derivatives for validation, but GNOME Settings
-exposes only the eight Light wallpapers.
+The GoreeCloud gallery is light-first. GNOME Settings exposes only the eight
+Light wallpapers. Dark and Deep Dark compatibility derivatives remain installed
+as hidden catalog entries so validation/recovery contracts stay complete.
 
 The default installed wallpaper palette is Glaze UI V1.2 Development.
 
@@ -62,8 +62,9 @@ install_wallpapers() {
   python3 "$ROOT/scripts/validate_wallpapers.py" >/dev/null
   mkdir -p -- "$DEST_DIR" "$CATALOG_DIR"
 
-  # Remove only our generated SVG files so an earlier 24-entry install cannot
-  # leave Dark/Deep Dark thumbnails behind after migrating to light-only.
+  # Replace only GoreeCloud-generated SVGs. Keeping all 24 derivatives on disk
+  # preserves the source/recovery contract, while the catalog hides non-Light
+  # entries from Settings with deleted=true.
   find "$DEST_DIR" -maxdepth 1 -type f -name '*.svg' -delete
 
   local temp_dir
@@ -80,8 +81,7 @@ install_wallpapers() {
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
 for item in data["catalog"]:
-    if item["mode"] == "light":
-        print(item["id"])
+    print(item["id"])
 PY
 )
 
@@ -93,8 +93,8 @@ PY
 
   rm -rf -- "$temp_dir"
   trap - RETURN
-  printf 'Installed GoreeCloud Light wallpaper collection to:\n  %s\n' "$DEST_DIR"
-  printf 'Installed Light-only user background catalog to:\n  %s\n' "$CATALOG_FILE"
+  printf 'Installed GoreeCloud wallpaper source set to:\n  %s\n' "$DEST_DIR"
+  printf 'Installed Light-visible user background catalog to:\n  %s\n' "$CATALOG_FILE"
 }
 
 backup_settings() {
@@ -118,7 +118,7 @@ apply_wallpaper() {
       wallpaper_id="$(primary_id)"
       ;;
     dark|deep-dark)
-      echo "Dark wallpaper modes are not installed in the light-first GoreeCloud gallery." >&2
+      echo "Dark wallpaper modes are hidden from the light-first GoreeCloud gallery." >&2
       exit 64
       ;;
     *)
@@ -188,12 +188,12 @@ for category in data["collection"]["categories"]:
     items.sort(key=lambda item: (item["family"], item["id"]))
     for item in items:
         print(f"  {item['id']:<38} {item['family']}")
-print("\nInstalled gallery: Light only")
+print("\nVisible gallery: Light only (8 wallpapers)")
 PY
 }
 
 show_status() {
-  printf 'GoreeCloud Light wallpaper asset directory:\n  %s\n' "$DEST_DIR"
+  printf 'GoreeCloud wallpaper asset directory:\n  %s\n' "$DEST_DIR"
   if [[ -d "$DEST_DIR" ]]; then
     find "$DEST_DIR" -maxdepth 1 -type f -name '*.svg' -print | sort
   fi
