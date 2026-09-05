@@ -105,6 +105,10 @@ def main() -> int:
         for path in svgs:
             validate_svg(path)
 
+        for required_symbolic in ("folder-symbolic.svg", "folder-open-symbolic.svg"):
+            if not (icon_root / "scalable" / "places" / required_symbolic).is_file():
+                fail(f"generated icon theme is missing {required_symbolic}")
+
         identity = ROOT / icons["identity_source"]
         if (icon_root / "scalable" / "apps" / "start-here.svg").read_bytes() != identity.read_bytes():
             fail("start-here icon does not preserve the canonical GoreeCloud mark")
