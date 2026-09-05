@@ -34,7 +34,7 @@ jobs:
       - name: Validate wallpaper collection
         run: python3 ./scripts/validate_wallpapers.py
 
-      - name: Validate light-first wallpaper visibility
+      - name: Validate light-first multi-mode wallpaper gallery
         run: python3 ./scripts/validate_light_catalog.py
 
       - name: Validate desktop icon and cursor assets
