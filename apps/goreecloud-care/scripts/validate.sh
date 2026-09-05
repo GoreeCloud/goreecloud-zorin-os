@@ -22,6 +22,13 @@ grep -F 'gtk-application-prefer-dark-theme' goreecloud_care/app.py >/dev/null
 grep -F 'settings.set_property("gtk-application-prefer-dark-theme", False)' goreecloud_care/app.py >/dev/null
 grep -F '.status-banner.status-attention' goreecloud_care/app.py >/dev/null
 grep -F '"Action cancelled"' goreecloud_care/app.py >/dev/null
+# Adaptive/accessibility invariants for dev6.
+grep -F 'self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)' goreecloud_care/app.py >/dev/null
+grep -F 'def _apply_layout(' goreecloud_care/app.py >/dev/null
+grep -F 'Atk.Role.STATUSBAR' goreecloud_care/app.py >/dev/null
+grep -F 'visible-data-changed' goreecloud_care/app.py >/dev/null
+grep -F 'is_high_contrast_theme' goreecloud_care/app.py >/dev/null
+grep -F 'gir1.2-atk-1.0' scripts/build-deb.sh >/dev/null
 # Post-action completion must survive the automatic values refresh.
 grep -F 'def _refresh_after_action(' goreecloud_care/app.py >/dev/null
 grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
