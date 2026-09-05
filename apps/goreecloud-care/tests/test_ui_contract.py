@@ -15,6 +15,10 @@ class UIContractTests(unittest.TestCase):
         self.assertFalse(is_compact_width(COMPACT_WIDTH))
         self.assertFalse(is_compact_width(COMPACT_WIDTH + 1))
 
+    def test_compact_breakpoint_covers_large_text_narrow_range(self):
+        self.assertTrue(is_compact_width(800))
+        self.assertFalse(is_compact_width(900))
+
     def test_minimum_window_remains_usable_desktop_size(self):
         self.assertGreaterEqual(MIN_WINDOW_WIDTH, 480)
         self.assertGreaterEqual(MIN_WINDOW_HEIGHT, 420)
