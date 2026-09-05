@@ -14,24 +14,24 @@
 - Light application appearance by default without changing the desktop-wide Zorin OS appearance.
 - Adaptive compact-window composition for constrained desktop widths.
 - Normal-text compact transition at 820 logical pixels.
-- Dev8 effective-width adaptation for the `GDK_DPI_SCALE` 200%-text acceptance path so a large text scale triggers compact composition before the target desktop's minimum-width floor.
+- Effective-width adaptation for the `GDK_DPI_SCALE` 200%-text acceptance path.
 - Compact HeaderBar reduction that omits the Development subtitle while preserving the application title and Scan action.
 - GTK/ATK status, control-description, selector-description, and category-count accessibility semantics.
-- Dev9 effective HighContrast detection that honors both `Gtk.Settings` theme state and process-local `GTK_THEME` overrides used by isolated accessibility test launches.
+- Effective HighContrast detection that honors both `Gtk.Settings` theme state and process-local `GTK_THEME` overrides.
+- Dev10 focus-resilience provider that uses the active GTK theme foreground color and sits one priority level below Care's normal application CSS, so HighContrast can own the palette without leaving keyboard focus visually silent.
 - Local-only operation and zero telemetry.
 - Conservative symlink handling and fixed privileged-action allowlist.
 
 ## Representative-device verified
 - Through dev5: Zorin OS 17.3 source validation, package build, upgrade/install, launch, keyboard focus visibility, first-stage and PolicyKit cancellation, successful PolicyKit-authorized Memory Refresh and APT cleanup, controlled nonzero Application cache / Thumbnail cache / Temporary files / Trash / APT archive deletion, completion reporting, and post-action values refresh.
 - Dev6: normal-text compact/minimum-window adaptive composition, vertical reachability, full-width stacked bottom actions, category-amount reflow, and visible focus at the compact bottom control path.
-- Dev6 negative evidence: at the narrowest `GDK_DPI_SCALE=2` window, the old 680-pixel compact transition was not reachable; the regular count/action composition remained active.
-- Dev7 source/package validation: exact branch head `6e81f119372cc0aa3eb5a9098266340d8bca540c` passed 20 local tests, XML/source validation, package build, upgrade/install to `0.1.0~dev7`, and all three exact-head GitHub workflow families.
-- Dev7 target rendering is negative for the combined 200%-text/compact slice: at the narrowest reachable `GDK_DPI_SCALE=2` window, the HeaderBar subtitle remains visible, category amounts remain right-aligned, and the bottom action group remains horizontal. Text wrapping, vertical scrolling, and visible focus on `Clean selected` remain positive.
-- Dev8 combined 200%-text/compact acceptance: exact head `45b5f11a49f363ebcaf753c892245a31109bc9bb` passed all three GitHub workflow families; the representative laptop passed 24 local tests plus XML/source validation, built and installed `0.1.0~dev8`, and fresh `GDK_DPI_SCALE=2` screenshots verify the regular wide composition and the compact narrow composition. At the narrowest reachable enlarged-text width the Development subtitle is omitted, category amounts reflow below descriptions, content wraps without horizontal clipping, scrolling reaches the bottom, and the three maintenance actions form a full-width vertical stack.
-- First HighContrast pass on the installed dev8 runtime: keyboard focus was visibly clear on Scan, Thumbnail cache, and Memory Refresh and the normal-width layout remained readable, but `GTK_THEME=HighContrast` did not displace the light Development palette. Treat this as negative HighContrast rendering evidence; dev9 source remediation is not yet target-accepted.
+- Dev8: combined 200%-text/compact acceptance at exact runtime head `45b5f11a49f363ebcaf753c892245a31109bc9bb`; wide and narrow `GDK_DPI_SCALE=2` views preserve wrapping, scrolling, compact HeaderBar behavior, category-amount reflow, and the full-width vertical action stack.
+- First HighContrast pass on installed dev8: focus was visibly clear on Scan, a category checkbox, and Memory Refresh, but `GTK_THEME=HighContrast` failed to displace the light Development palette.
+- Fresh dev9 HighContrast pass: the system HighContrast presentation now visibly replaces the light Care palette, confirming the dev9 takeover fix. In the same state, pressing Tab produces no visibly perceivable focus response. Treat palette takeover as positive evidence but keyboard-under-HighContrast as failed/open; this does not prove whether logical focus traversal is absent or merely visually silent.
 
 ## Planned before RC
-- Build/install dev9 and repeat target-device HighContrast rendering, then validate HighContrast at constrained width and keyboard focus through the full resilience-mode control path.
+- Build/install dev10 and repeat target-device HighContrast keyboard validation at normal and constrained widths. Confirm a visible focus indicator across Scan, all three cleanup selectors, Reclaim file cache, Clean selected, Empty Trash, and Clean APT cache.
+- If dev10 shows a focus ring but activation proves Tab still does not move logical focus, implement a separate native traversal remediation; do not add custom key handling without that evidence.
 - Assistive-technology semantic acceptance.
 - Additional supported appearance/resilience decisions and evidence, including dark/system appearance where applicable.
 - Package uninstall/downgrade/rollback validation.
