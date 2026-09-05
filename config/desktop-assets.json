@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "status": "Development",
+  "target": "Zorin OS 17.3",
+  "design_direction": "light-first",
+  "icon_theme": {
+    "id": "GoreeCloud-Zorin",
+    "name": "GoreeCloud Zorin",
+    "comment": "Light-first GoreeCloud icon theme for Zorin OS",
+    "inherits": [
+      "ZorinBlue",
+      "Adwaita",
+      "hicolor"
+    ],
+    "identity_source": "assets/wallpapers/identity/goreecloud-mark-transparent.svg",
+    "palette": {
+      "frost": "#F4F8FA",
+      "crystal": "#FBFDFE",
+      "ice": "#DCECF6",
+      "glacier": "#8FC4E8",
+      "primary_blue": "#3B82F6",
+      "deep_blue": "#174EA6",
+      "graphite": "#151C22",
+      "muted": "#61717C"
+    },
+    "minimum_generated_icons": 16
+  },
+  "cursor_theme": {
+    "id": "GoreeCloud-Zorin-Cursors",
+    "name": "GoreeCloud Zorin Cursors",
+    "comment": "Frost White and GoreeCloud Blue cursor theme",
+    "inherits": [
+      "Adwaita"
+    ],
+    "sizes": [
+      24,
+      32,
+      48
+    ],
+    "palette": {
+      "frost": "#F4F8FA",
+      "primary_blue": "#3B82F6",
+      "deep_blue": "#174EA6",
+      "graphite": "#151C22",
+      "blocked": "#B3261E"
+    },
+    "required_cursor_names": [
+      "left_ptr",
+      "default",
+      "arrow",
+      "hand2",
+      "pointer",
+      "xterm",
+      "text",
+      "crosshair",
+      "fleur",
+      "move",
+      "watch",
+      "wait",
+      "left_ptr_watch",
+      "progress",
+      "not-allowed",
+      "forbidden",
+      "sb_h_double_arrow",
+      "size_hor",
+      "sb_v_double_arrow",
+      "size_ver",
+      "nwse-resize",
+      "nesw-resize"
+    ]
+  }
+}
