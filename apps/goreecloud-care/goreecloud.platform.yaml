@@ -46,7 +46,20 @@ platform_systems:
     evidence:
       - tests/test_ui_contract.py
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
-    notes: Current Stable consumer target is 1.1.0. Dev6 established normal-text compact/minimum-window behavior. Dev7 passed exact-head CI and representative-device source/package validation but failed the combined GDK_DPI_SCALE=2 compact-rendering gate. Dev8 exact head 45b5f11a49f363ebcaf753c892245a31109bc9bb passed all three workflow families and representative-device source/package validation, and fresh GDK_DPI_SCALE=2 wide/narrow screenshots accept the combined 200%-text + compact/minimum-width adaptive-layout slice: compact HeaderBar subtitle omission, category-amount reflow, content wrapping, complete vertical scrolling, and a vertical full-width bottom action stack are verified. HighContrast, full keyboard-under-resilience, assistive-technology, broader appearance/resilience, and final application conformance acceptance remain incomplete.
+    notes: >-
+      Current Stable consumer target is 1.1.0. Dev6 established normal-text
+      compact/minimum-window behavior. Dev7 passed exact-head CI and
+      representative-device source/package validation but failed the combined
+      GDK_DPI_SCALE=2 compact-rendering gate. Dev8 exact head
+      45b5f11a49f363ebcaf753c892245a31109bc9bb passed all three workflow
+      families and representative-device source/package validation, and fresh
+      GDK_DPI_SCALE=2 wide/narrow screenshots accept the combined 200%-text +
+      compact/minimum-width adaptive-layout slice: compact HeaderBar subtitle
+      omission, category-amount reflow, content wrapping, complete vertical
+      scrolling, and a vertical full-width bottom action stack are verified.
+      HighContrast, full keyboard-under-resilience, assistive-technology,
+      broader appearance/resilience, and final application conformance
+      acceptance remain incomplete.
   mesh:
     result: applicable-blocked
     version: null
