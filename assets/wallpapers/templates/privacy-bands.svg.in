@@ -1,19 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
   <title id="title">Privacy Shield Bands {{mode_label}}</title>
-  <desc id="desc">Privacy Shield wallpaper using the approved canonical shield and its layered privacy-band visual language. The artwork identifies Privacy Shield and does not indicate privacy or protection status.</desc>
+  <desc id="desc">Quiet Privacy Shield environmental wallpaper preserving the canonical shield and layered privacy-band identity with low-frequency cool light. The artwork does not indicate privacy or protection status.</desc>
   <defs>
-    <linearGradient id="wpPrivacyBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.56" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
-    <linearGradient id="wpPrivacyBand" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#DDF7FF" stop-opacity="0.06"/><stop offset="0.46" stop-color="#BFD3FF" stop-opacity="0.26"/><stop offset="1" stop-color="#7A5CFA" stop-opacity="0.06"/></linearGradient>
-    <radialGradient id="wpPrivacyGlow" cx="0.35" cy="0.45" r="0.52"><stop stop-color="#5B8CFF" stop-opacity="0.20"/><stop offset="1" stop-color="#5B8CFF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="privacyBandsBg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="{{deep}}"/>
+      <stop offset="0.54" stop-color="{{canvas}}"/>
+      <stop offset="1" stop-color="{{surface}}"/>
+    </linearGradient>
+    <radialGradient id="privacyBandsLight" cx="0.72" cy="0.44" r="0.50">
+      <stop stop-color="#5B8CFF" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#5B8CFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="privacyBandsField" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#DDF7FF" stop-opacity="0.025"/>
+      <stop offset="0.52" stop-color="#BFD3FF" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#7A5CFA" stop-opacity="0.025"/>
+    </linearGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#wpPrivacyBg)"/><rect width="3840" height="2160" fill="url(#wpPrivacyGlow)"/>
-  <path d="M-180 620C920 380 1830 470 4020 890V1130C1800 710 890 650-180 880Z" fill="url(#wpPrivacyBand)"/>
-  <path d="M-220 1080C860 850 1870 900 4070 1310V1530C1830 1160 820 1120-220 1360Z" fill="#D5EAFF" opacity="0.09"/>
-  <path d="M-140 1460C930 1290 2050 1390 4000 1730V1910C2030 1600 910 1520-140 1680Z" fill="#AFC7FF" opacity="0.08"/>
-  <rect x="620" y="410" width="1320" height="1320" rx="330" fill="{{surface}}" opacity="0.17" stroke="#7BD9FF" stroke-opacity="0.20" stroke-width="4"/>
-  <svg x="700" y="490" width="1160" height="1160" viewBox="{{identity_viewbox}}" aria-hidden="true">
+  <rect width="3840" height="2160" fill="url(#privacyBandsBg)"/>
+  <rect width="3840" height="2160" fill="url(#privacyBandsLight)"/>
+
+  <path d="M-180 760C820 570 1650 620 4020 1020V1180C1640 810 810 790-180 960Z" fill="url(#privacyBandsField)"/>
+  <path d="M-220 1170C840 1010 1730 1050 4060 1400V1530C1700 1230 830 1210-220 1370Z" fill="#D5EAFF" opacity="0.045"/>
+  <path d="M-140 1510C970 1410 1980 1470 3980 1740" fill="none" stroke="#AFC7FF" stroke-opacity="0.055" stroke-width="28" stroke-linecap="round"/>
+
+  <circle cx="2940" cy="1040" r="520" fill="{{surface}}" opacity="0.055"/>
+  <circle cx="2940" cy="1040" r="410" fill="none" stroke="#BFD3FF" stroke-opacity="0.08" stroke-width="4"/>
+  <rect x="2540" y="640" width="800" height="800" rx="225" fill="{{surface}}" opacity="0.10" stroke="#7BD9FF" stroke-opacity="0.12" stroke-width="3"/>
+  <svg x="2610" y="710" width="660" height="660" viewBox="{{identity_viewbox}}" aria-hidden="true">
 {{identity_inner}}
   </svg>
-  <circle cx="2990" cy="1060" r="420" fill="{{surface}}" opacity="0.12"/>
-  <circle cx="2990" cy="1060" r="300" fill="none" stroke="#BFD3FF" stroke-opacity="0.16" stroke-width="5"/>
 </svg>
