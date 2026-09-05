@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-dev4 — 2026-09-05
+- Changed GoreeCloud Care to open in a light appearance by default without modifying the user's desktop-wide Zorin OS appearance setting.
+- Reworked the persistent maintenance-status surface into a higher-salience semantic indicator with a symbol, bold state title, stronger border/surface treatment, and explicit text so changed state is not communicated by color alone.
+- Classified ordinary user cancellation as an attention/changed-state condition rather than a warning or error; cancellation now uses a prominent but non-critical presentation.
+- Added distinct informational, attention, success, and error status treatments mapped from current Glaze UI V1.1 semantic roles while keeping final Glaze UI conformance/acceptance explicitly open.
+- Preserved the representative-device-verified high-contrast keyboard-focus treatment.
+- Added source validation checks for the light-default preference and attention-status implementation.
+
 ## 0.1.0-dev3 — 2026-09-05
 - Preserved the dev2 keyboard-focus treatment after representative Zorin OS screenshots verified that focus is now visibly perceivable on checkboxes and buttons.
 - Added explicit status feedback when a user cancels any GoreeCloud Care confirmation dialog, including cache cleanup, Trash emptying, APT cache cleanup, and memory-cache reclaim; cancellation now states that no corresponding changes were made.
