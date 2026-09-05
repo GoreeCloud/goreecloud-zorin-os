@@ -17,6 +17,17 @@ class PrivilegeOutcomeTests(unittest.TestCase):
         self.assertIn("was cancelled", outcome.message)
         self.assertIn("made no privileged changes", outcome.message)
 
+    def test_zorin_request_dismissed_text_is_cancelled(self):
+        outcome = interpret_pkexec_result(
+            1,
+            "Error executing command as another user: Request dismissed",
+            "APT cache cleanup",
+        )
+        self.assertFalse(outcome.completed)
+        self.assertTrue(outcome.cancelled)
+        self.assertIn("was cancelled", outcome.message)
+        self.assertIn("made no privileged changes", outcome.message)
+
     def test_authorization_error_is_not_success(self):
         outcome = interpret_pkexec_result(127, "Not authorized", "Memory-cache reclaim")
         self.assertFalse(outcome.completed)
