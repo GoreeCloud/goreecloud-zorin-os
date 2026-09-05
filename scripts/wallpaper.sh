@@ -3,68 +3,54 @@ set -euo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 MANIFEST="$ROOT/config/wallpapers.json"
+PALETTE_CONFIG="${GOREECLOUD_PALETTE_CONFIG:-$ROOT/config/palettes-v1.2.json}"
 DEST_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/backgrounds/GoreeCloud-Zorin"
 CATALOG_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-background-properties"
 CATALOG_FILE="$CATALOG_DIR/goreecloud-zorin.xml"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/goreecloud-zorin/wallpaper"
 SCHEMA="org.gnome.desktop.background"
-DEFAULT_MODE="light"
 
 usage() {
   cat <<'EOF'
 Usage:
   ./scripts/wallpaper.sh install
   ./scripts/wallpaper.sh list
-  ./scripts/wallpaper.sh apply default|current|light|dark|deep-dark|WALLPAPER_ID
+  ./scripts/wallpaper.sh apply default|current|light|WALLPAPER_ID
   ./scripts/wallpaper.sh restore
   ./scripts/wallpaper.sh status
   ./scripts/wallpaper.sh replace-stock plan|apply|status|restore|finalize
 
-The helper installs the full GoreeCloud wallpaper collection user-locally and
-writes a GNOME Background Properties catalog under the current user's data
-directory. Light is the primary/default GoreeCloud wallpaper mode.
+The installed GoreeCloud wallpaper gallery is light-only. Source retains Dark
+and Deep Dark compatibility derivatives for validation, but GNOME Settings
+exposes only the eight Light wallpapers.
 
-replace-stock exposes the recovery-backed Zorin OS 17.3 stock-wallpaper
-replacement workflow. The package-safe workflow keeps Zorin packages installed
-and diverts only the exact audited stock wallpaper/catalog files out of GNOME
-discovery paths. apply/restore/finalize invoke sudo when needed.
+The default installed wallpaper palette is Glaze UI V1.2 Development.
+
+replace-stock keeps Zorin packages installed and diverts only the exact audited
+stock wallpaper/catalog files out of GNOME discovery paths.
 EOF
 }
 
-detect_mode() {
-  local theme
-  theme="$(gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null | tr -d "'" || true)"
-  case "$theme" in
-    GoreeCloud-Zorin-Light) printf '%s\n' "light" ;;
-    GoreeCloud-Zorin-Dark) printf '%s\n' "dark" ;;
-    GoreeCloud-Zorin-DeepDark) printf '%s\n' "deep-dark" ;;
-    *)
-      printf '%s\n' "$DEFAULT_MODE"
-      ;;
-  esac
-}
-
-primary_id_for_mode() {
-  python3 - "$MANIFEST" "$1" <<'PY'
+primary_id() {
+  python3 - "$MANIFEST" <<'PY'
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
-mode=sys.argv[2]
-matches=[w["id"] for w in data["wallpapers"] if w["mode"] == mode]
+matches=[w["id"] for w in data["wallpapers"] if w["mode"] == "light"]
 if len(matches) != 1:
-    raise SystemExit(f"Expected one primary wallpaper for {mode}; found {len(matches)}")
+    raise SystemExit(f"Expected one primary Light wallpaper; found {len(matches)}")
 print(matches[0])
 PY
 }
 
-file_for_id() {
+file_for_light_id() {
   python3 - "$MANIFEST" "$1" <<'PY'
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
 wallpaper_id=sys.argv[2]
-matches=[w["id"] for w in data["catalog"] if w["id"] == wallpaper_id]
+matches=[w for w in data["catalog"] if w["id"] == wallpaper_id and w["mode"] == "light"]
 if len(matches) != 1:
-    raise SystemExit(f"Unknown or duplicate wallpaper ID: {wallpaper_id}")
-print(matches[0] + ".svg")
+    raise SystemExit(f"Unknown or non-Light wallpaper ID: {wallpaper_id}")
+print(matches[0]["id"] + ".svg")
 PY
 }
 
@@ -75,10 +61,18 @@ schema_has_key() {
 install_wallpapers() {
   python3 "$ROOT/scripts/validate_wallpapers.py" >/dev/null
   mkdir -p -- "$DEST_DIR" "$CATALOG_DIR"
+
+  # Remove only our generated SVG files so an earlier 24-entry install cannot
+  # leave Dark/Deep Dark thumbnails behind after migrating to light-only.
+  find "$DEST_DIR" -maxdepth 1 -type f -name '*.svg' -delete
+
   local temp_dir
   temp_dir="$(mktemp -d)"
   trap 'rm -rf -- "$temp_dir"' RETURN
-  python3 "$ROOT/scripts/build_wallpapers.py" --output "$temp_dir" >/dev/null
+  python3 "$ROOT/scripts/build_wallpapers.py" \
+    --palette-config "$PALETTE_CONFIG" \
+    --output "$temp_dir" >/dev/null
+
   while IFS= read -r wallpaper_id; do
     [[ -n "$wallpaper_id" ]] || continue
     cp -f -- "$temp_dir/$wallpaper_id.svg" "$DEST_DIR/$wallpaper_id.svg"
@@ -86,17 +80,21 @@ install_wallpapers() {
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
 for item in data["catalog"]:
-    print(item["id"])
+    if item["mode"] == "light":
+        print(item["id"])
 PY
 )
+
   python3 "$ROOT/scripts/build_background_catalog.py" \
     --manifest "$MANIFEST" \
     --filename-root "$DEST_DIR" \
-    --output "$CATALOG_FILE"
+    --mode light \
+    --output "$CATALOG_FILE" >/dev/null
+
   rm -rf -- "$temp_dir"
   trap - RETURN
-  printf 'Installed GoreeCloud wallpaper collection to:\n  %s\n' "$DEST_DIR"
-  printf 'Installed user background catalog to:\n  %s\n' "$CATALOG_FILE"
+  printf 'Installed GoreeCloud Light wallpaper collection to:\n  %s\n' "$DEST_DIR"
+  printf 'Installed Light-only user background catalog to:\n  %s\n' "$CATALOG_FILE"
 }
 
 backup_settings() {
@@ -114,19 +112,21 @@ backup_settings() {
 }
 
 apply_wallpaper() {
-  local selection="$1" mode wallpaper_id file
-  if [[ "$selection" == "default" ]]; then
-    wallpaper_id="$(primary_id_for_mode "$DEFAULT_MODE")"
-  elif [[ "$selection" == "current" ]]; then
-    mode="$(detect_mode)"
-    wallpaper_id="$(primary_id_for_mode "$mode")"
-  elif [[ "$selection" == "light" || "$selection" == "dark" || "$selection" == "deep-dark" ]]; then
-    wallpaper_id="$(primary_id_for_mode "$selection")"
-  else
-    wallpaper_id="$selection"
-  fi
+  local selection="$1" wallpaper_id file
+  case "$selection" in
+    default|current|light)
+      wallpaper_id="$(primary_id)"
+      ;;
+    dark|deep-dark)
+      echo "Dark wallpaper modes are not installed in the light-first GoreeCloud gallery." >&2
+      exit 64
+      ;;
+    *)
+      wallpaper_id="$selection"
+      ;;
+  esac
 
-  file="$(file_for_id "$wallpaper_id")"
+  file="$(file_for_light_id "$wallpaper_id")"
   command -v gsettings >/dev/null 2>&1 || {
     echo "gsettings is required to apply a wallpaper." >&2
     exit 69
@@ -151,7 +151,7 @@ PY
     gsettings set "$SCHEMA" picture-options "'zoom'"
   fi
 
-  printf 'Applied GoreeCloud wallpaper %s:\n  %s\n' "$wallpaper_id" "$target"
+  printf 'Applied GoreeCloud Light wallpaper %s:\n  %s\n' "$wallpaper_id" "$target"
   printf 'Previous GNOME background settings were preserved at:\n  %s\n' "$snapshot"
 }
 
@@ -182,20 +182,18 @@ list_wallpapers() {
   python3 - "$MANIFEST" <<'PY'
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
-mode_order={"light": 0, "dark": 1, "deep-dark": 2}
 for category in data["collection"]["categories"]:
     print(f"\n{category}")
-    items=[item for item in data["catalog"] if item["category"] == category]
-    items.sort(key=lambda item: (mode_order.get(item["mode"], 99), item["family"], item["id"]))
+    items=[item for item in data["catalog"] if item["category"] == category and item["mode"] == "light"]
+    items.sort(key=lambda item: (item["family"], item["id"]))
     for item in items:
-        marker="*" if item["mode"] == "light" else " "
-        print(f" {marker} {item['id']:<38} {item['family']} / {item['mode']}")
-print("\n* primary light-mode options")
+        print(f"  {item['id']:<38} {item['family']}")
+print("\nInstalled gallery: Light only")
 PY
 }
 
 show_status() {
-  printf 'GoreeCloud wallpaper asset directory:\n  %s\n' "$DEST_DIR"
+  printf 'GoreeCloud Light wallpaper asset directory:\n  %s\n' "$DEST_DIR"
   if [[ -d "$DEST_DIR" ]]; then
     find "$DEST_DIR" -maxdepth 1 -type f -name '*.svg' -print | sort
   fi
@@ -217,8 +215,6 @@ replace_stock() {
       "$ROOT/scripts/system_wallpapers.sh" "$action"
       ;;
     apply)
-      # Ensure the complete GoreeCloud catalog exists and make the primary
-      # light wallpaper active before diverting the audited stock set.
       apply_wallpaper default
       sudo "$ROOT/scripts/system_wallpapers.sh" apply
       ;;
