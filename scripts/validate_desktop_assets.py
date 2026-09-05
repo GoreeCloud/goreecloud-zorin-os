@@ -202,6 +202,14 @@ def main() -> int:
     if cursors["id"] != "GoreeCloud-Zorin-Cursors":
         fail("cursor theme ID changed unexpectedly")
 
+    design_revision = int(cursors.get("design_revision", 0))
+    expected_runtime_id = f"{cursors['id']}-r{design_revision}"
+    if cursors.get("runtime_id") != expected_runtime_id:
+        fail(
+            "cursor runtime_id must track design_revision for target-device "
+            f"cache busting: expected {expected_runtime_id}"
+        )
+
     supersample = int(cursors.get("supersample", 1))
     if supersample < 4:
         fail("cursor rendering must use at least 4x supersampling")
