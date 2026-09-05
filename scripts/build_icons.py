@@ -99,6 +99,58 @@ def symbolic_star_icon() -> str:
     )
 
 
+def symbolic_home_icon() -> str:
+    return svg(
+        '  <g fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
+        '    <line x1="10" y1="31" x2="32" y2="12" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="32" y1="12" x2="54" y2="31" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="14" y1="28" x2="14" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="50" y1="28" x2="50" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="14" y1="53" x2="50" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="27" y1="53" x2="27" y2="39" stroke="#3B82F6" stroke-width="2.5"/>\n'
+        '    <line x1="27" y1="39" x2="37" y2="39" stroke="#DCECF6" stroke-width="2.5"/>\n'
+        '    <line x1="37" y1="39" x2="37" y2="53" stroke="#3B82F6" stroke-width="2.5"/>\n'
+        '  </g>\n'
+    )
+
+
+def symbolic_recent_icon() -> str:
+    return svg(
+        '  <g fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
+        '    <line x1="32" y1="10" x2="46" y2="15" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="46" y1="15" x2="54" y2="29" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="54" y1="29" x2="49" y2="44" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="49" y1="44" x2="35" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="35" y1="53" x2="20" y2="49" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="20" y1="49" x2="11" y2="35" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="11" y1="35" x2="15" y2="20" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="15" y1="20" x2="32" y2="10" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="32" y1="19" x2="32" y2="33" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="32" y1="33" x2="42" y2="38" stroke="#3B82F6" stroke-width="3"/>\n'
+        '  </g>\n'
+    )
+
+
+def symbolic_trash_icon(full: bool = False) -> str:
+    body = (
+        '  <g fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
+        '    <line x1="17" y1="19" x2="47" y2="19" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="26" y1="12" x2="38" y2="12" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="21" y1="24" x2="23" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="43" y1="24" x2="41" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="23" y1="53" x2="41" y2="53" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="29" y1="29" x2="29" y2="46" stroke="#DCECF6" stroke-width="2.5"/>\n'
+        '    <line x1="35" y1="29" x2="35" y2="46" stroke="#DCECF6" stroke-width="2.5"/>\n'
+    )
+    if full:
+        body += (
+            '    <line x1="26" y1="31" x2="38" y2="44" stroke="#3B82F6" stroke-width="2.5"/>\n'
+            '    <line x1="38" y1="31" x2="26" y2="44" stroke="#3B82F6" stroke-width="2.5"/>\n'
+        )
+    body += '  </g>\n'
+    return svg(body)
+
+
 def write(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
@@ -138,6 +190,10 @@ def main() -> int:
         "folder-symbolic": symbolic_folder_icon(),
         "folder-open-symbolic": symbolic_folder_icon(opened=True),
         "starred-symbolic": symbolic_star_icon(),
+        "user-home-symbolic": symbolic_home_icon(),
+        "document-open-recent-symbolic": symbolic_recent_icon(),
+        "user-trash-symbolic": symbolic_trash_icon(),
+        "user-trash-full-symbolic": symbolic_trash_icon(full=True),
         "folder-documents": folder_icon('  <path d="M25 32h15v16H25z" fill="#FFFFFF" stroke="#174EA6" stroke-width="1.5"/><path d="M28 36h9M28 40h9M28 44h7" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"/>'),
         "folder-download": folder_icon('  <path d="M32 31v13m-6-5 6 6 6-6" fill="none" stroke="#174EA6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'),
         "folder-music": folder_icon('  <path d="M38 31v13c0 4-7 5-7 1 0-3 4-4 7-3V34l9-2v10c0 4-7 5-7 1 0-3 4-4 7-3V29Z" fill="#174EA6"/>'),
