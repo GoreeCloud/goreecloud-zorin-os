@@ -57,8 +57,9 @@ platform_systems:
   identity:
     result: not-applicable-justified
     version: null
-    evidence: []
-    notes: This local-only Development utility has no account/authentication surface; re-evaluate if remote or multi-user capabilities are introduced.
+    evidence:
+      - SPECIFICATIONS.md
+    notes: The Development specification explicitly excludes an account requirement and remote management; re-evaluate Identity applicability if remote or multi-user capabilities are introduced.
 
 health:
   health_endpoint: null
