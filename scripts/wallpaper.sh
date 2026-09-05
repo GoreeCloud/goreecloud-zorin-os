@@ -8,23 +8,25 @@ CATALOG_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-background-properties"
 CATALOG_FILE="$CATALOG_DIR/goreecloud-zorin.xml"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/goreecloud-zorin/wallpaper"
 SCHEMA="org.gnome.desktop.background"
+DEFAULT_MODE="light"
 
 usage() {
   cat <<'EOF'
 Usage:
   ./scripts/wallpaper.sh install
   ./scripts/wallpaper.sh list
-  ./scripts/wallpaper.sh apply current|light|dark|deep-dark|WALLPAPER_ID
+  ./scripts/wallpaper.sh apply default|current|light|dark|deep-dark|WALLPAPER_ID
   ./scripts/wallpaper.sh restore
   ./scripts/wallpaper.sh status
+  ./scripts/wallpaper.sh replace-stock plan|apply|status|restore|finalize
 
 The helper installs the full GoreeCloud wallpaper collection user-locally and
 writes a GNOME Background Properties catalog under the current user's data
-directory. Applying a wallpaper changes only the current user's GNOME desktop
-background settings and records a restorable settings snapshot first.
+directory. Light is the primary/default GoreeCloud wallpaper mode.
 
-This helper does not remove stock Zorin system wallpaper files. Use the
-read-only scripts/diagnose_backgrounds.sh before any privileged replacement.
+replace-stock exposes the recovery-backed Zorin OS 17.3 stock-wallpaper
+replacement workflow. The apply/restore/finalize actions invoke sudo when
+needed and remain fail-closed on package/version/path drift.
 EOF
 }
 
@@ -36,9 +38,7 @@ detect_mode() {
     GoreeCloud-Zorin-Dark) printf '%s\n' "dark" ;;
     GoreeCloud-Zorin-DeepDark) printf '%s\n' "deep-dark" ;;
     *)
-      echo "Cannot infer a GoreeCloud wallpaper from GTK theme: ${theme:-unknown}" >&2
-      echo "Choose a wallpaper ID or light, dark, or deep-dark explicitly." >&2
-      return 2
+      printf '%s\n' "$DEFAULT_MODE"
       ;;
   esac
 }
@@ -114,7 +114,9 @@ backup_settings() {
 
 apply_wallpaper() {
   local selection="$1" mode wallpaper_id file
-  if [[ "$selection" == "current" ]]; then
+  if [[ "$selection" == "default" ]]; then
+    wallpaper_id="$(primary_id_for_mode "$DEFAULT_MODE")"
+  elif [[ "$selection" == "current" ]]; then
     mode="$(detect_mode)"
     wallpaper_id="$(primary_id_for_mode "$mode")"
   elif [[ "$selection" == "light" || "$selection" == "dark" || "$selection" == "deep-dark" ]]; then
@@ -179,11 +181,15 @@ list_wallpapers() {
   python3 - "$MANIFEST" <<'PY'
 import json, sys
 data=json.load(open(sys.argv[1], encoding="utf-8"))
+mode_order={"light": 0, "dark": 1, "deep-dark": 2}
 for category in data["collection"]["categories"]:
     print(f"\n{category}")
-    for item in data["catalog"]:
-        if item["category"] == category:
-            print(f"  {item['id']:<38} {item['family']} / {item['mode']}")
+    items=[item for item in data["catalog"] if item["category"] == category]
+    items.sort(key=lambda item: (mode_order.get(item["mode"], 99), item["family"], item["id"]))
+    for item in items:
+        marker="*" if item["mode"] == "light" else " "
+        print(f" {marker} {item['id']:<38} {item['family']} / {item['mode']}")
+print("\n* primary light-mode options")
 PY
 }
 
@@ -201,6 +207,28 @@ show_status() {
       fi
     done
   fi
+}
+
+replace_stock() {
+  local action="$1"
+  case "$action" in
+    plan|status)
+      "$ROOT/scripts/system_wallpapers.sh" "$action"
+      ;;
+    apply)
+      # Ensure the complete GoreeCloud catalog exists and make the light
+      # GoreeCloud wallpaper active before the system stock set is removed.
+      apply_wallpaper default
+      sudo "$ROOT/scripts/system_wallpapers.sh" apply
+      ;;
+    restore|finalize)
+      sudo "$ROOT/scripts/system_wallpapers.sh" "$action"
+      ;;
+    *)
+      usage >&2
+      exit 64
+      ;;
+  esac
 }
 
 case "${1:-}" in
@@ -223,6 +251,10 @@ case "${1:-}" in
   status)
     [[ $# -eq 1 ]] || { usage >&2; exit 64; }
     show_status
+    ;;
+  replace-stock)
+    [[ $# -eq 2 ]] || { usage >&2; exit 64; }
+    replace_stock "$2"
     ;;
   *)
     usage >&2
