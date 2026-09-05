@@ -29,11 +29,27 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_OUTPUT,
         help="directory that will contain generated theme folders",
     )
+    parser.add_argument(
+        "--palette-config",
+        type=Path,
+        default=PALETTES,
+        help=(
+            "palette contract to render; defaults to config/palettes.json. "
+            "Use config/palettes-v1.2.json for the V1.2 development preview."
+        ),
+    )
     return parser.parse_args()
 
 
-def load_config() -> dict:
-    with PALETTES.open("r", encoding="utf-8") as handle:
+def resolve_input(path: Path) -> Path:
+    path = path.expanduser()
+    if path.is_absolute():
+        return path.resolve()
+    return (ROOT / path).resolve()
+
+
+def load_config(path: Path) -> dict:
+    with path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
     if data.get("schema_version") != 1:
         raise SystemExit("Unsupported palette schema version")
@@ -68,7 +84,8 @@ def render(template: str, tokens: dict[str, str], source: Path) -> str:
 def main() -> int:
     args = parse_args()
     output = args.output.expanduser().resolve()
-    config = load_config()
+    palette_path = resolve_input(args.palette_config)
+    config = load_config(palette_path)
 
     templates = {
         relative: path.read_text(encoding="utf-8")
@@ -99,7 +116,14 @@ def main() -> int:
 
         generated.append(theme_root)
 
-    print(f"Generated {len(generated)} theme variants in {output}")
+    design = config.get("design_system", {})
+    version = design.get("version", "unknown")
+    lifecycle = design.get("lifecycle")
+    label = f"Glaze UI {version}"
+    if lifecycle:
+        label += f" ({lifecycle})"
+    print(f"Generated {len(generated)} theme variants from {label} in {output}")
+    print(f"Palette contract: {palette_path}")
     for path in generated:
         print(f"  {path.name}")
     return 0
