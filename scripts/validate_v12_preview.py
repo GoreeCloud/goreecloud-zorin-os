@@ -112,8 +112,17 @@ def main() -> int:
             ],
             check=True,
         )
-        if len(list(theme_output.glob("*/index.theme"))) != 3:
+
+        index_files = list(theme_output.glob("*/index.theme"))
+        if len(index_files) != 3:
             fail("V1.2 preview did not render all three theme variants")
+        for index_file in index_files:
+            generated_metadata = index_file.read_text(encoding="utf-8")
+            if "Glaze UI 1.2.0" not in generated_metadata:
+                fail(f"{index_file.parent.name}: generated metadata does not identify Glaze UI 1.2.0")
+            if "V1.1" in generated_metadata or "Glaze UI 1.1.0" in generated_metadata:
+                fail(f"{index_file.parent.name}: generated V1.2 metadata contains stale V1.1 labeling")
+
         if len(list(wallpaper_output.glob("*.svg"))) < 20:
             fail("V1.2 preview did not render the complete wallpaper catalog")
 
