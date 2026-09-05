@@ -56,16 +56,22 @@ def load_config(path: Path) -> dict:
     variants = data.get("variants")
     if not isinstance(variants, list) or not variants:
         raise SystemExit("No theme variants are defined")
+    design = data.get("design_system")
+    if not isinstance(design, dict) or not design.get("version"):
+        raise SystemExit("Palette contract is missing design_system.version")
     return data
 
 
-def token_map(variant: dict) -> dict[str, str]:
+def token_map(variant: dict, design: dict) -> dict[str, str]:
     tokens = {
         key.upper(): str(value)
         for key, value in variant.items()
         if isinstance(value, (str, int, float))
     }
     tokens["THEME_ID"] = str(variant["id"])
+    tokens["GLAZE_NAME"] = str(design.get("name", "Glaze UI"))
+    tokens["GLAZE_VERSION"] = str(design["version"])
+    tokens["GLAZE_LIFECYCLE"] = str(design.get("lifecycle", "stable-predecessor"))
     return tokens
 
 
@@ -86,6 +92,7 @@ def main() -> int:
     output = args.output.expanduser().resolve()
     palette_path = resolve_input(args.palette_config)
     config = load_config(palette_path)
+    design = config["design_system"]
 
     templates = {
         relative: path.read_text(encoding="utf-8")
@@ -98,7 +105,7 @@ def main() -> int:
         if not isinstance(theme_id, str) or not re.fullmatch(r"[A-Za-z0-9-]+", theme_id):
             raise SystemExit(f"Invalid theme id: {theme_id!r}")
 
-        tokens = token_map(variant)
+        tokens = token_map(variant, design)
         theme_root = output / theme_id
 
         for relative, template in templates.items():
@@ -116,7 +123,6 @@ def main() -> int:
 
         generated.append(theme_root)
 
-    design = config.get("design_system", {})
     version = design.get("version", "unknown")
     lifecycle = design.get("lifecycle")
     label = f"Glaze UI {version}"
