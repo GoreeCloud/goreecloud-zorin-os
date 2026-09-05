@@ -1,21 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
-  <title id="title">Privacy Filter {{mode_label}}</title>
-  <desc id="desc">Privacy Shield supporting wallpaper with filtered layers, controlled visibility, and bounded translucent content regions. Supporting artwork only; not a privacy-status indicator.</desc>
+  <title id="title">Privacy Shield Filter {{mode_label}}</title>
+  <desc id="desc">Privacy Shield wallpaper centered on the approved canonical shield with a restrained filtering field derived from its layered privacy-band artwork. The artwork is not a privacy-status indicator.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{canvas}}"/><stop offset="1" stop-color="{{deep}}"/></linearGradient>
-    <radialGradient id="amber" cx="0.15" cy="0.14" r="0.40"><stop stop-color="{{amber}}" stop-opacity="0.10"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="wpPrivacyFilterBg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="{{canvas}}"/><stop offset="1" stop-color="{{deep}}"/></linearGradient>
+    <radialGradient id="wpPrivacyFilterGlow" cx="0.66" cy="0.45" r="0.50"><stop stop-color="#7BD9FF" stop-opacity="0.18"/><stop offset="1" stop-color="#7BD9FF" stop-opacity="0"/></radialGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#bg)"/><rect width="3840" height="2160" fill="url(#amber)"/>
-  <g transform="translate(520 390)">
-    <rect x="0" y="0" width="2800" height="1380" rx="230" fill="{{surface}}" opacity="0.38" stroke="{{soft}}" stroke-opacity="0.14" stroke-width="4"/>
-    <rect x="260" y="240" width="2280" height="900" rx="170" fill="{{elevated}}" opacity="0.50"/>
-    <g fill="{{selection}}" opacity="0.78">
-      <rect x="80" y="410" width="2640" height="170" rx="85"/>
-      <rect x="180" y="690" width="2440" height="150" rx="75" opacity="0.82"/>
-      <rect x="330" y="950" width="2140" height="130" rx="65" opacity="0.66"/>
-    </g>
-    <g fill="{{accent}}" opacity="0.36">
-      <circle cx="740" cy="690" r="250"/><circle cx="2040" cy="650" r="310"/>
-    </g>
+  <rect width="3840" height="2160" fill="url(#wpPrivacyFilterBg)"/><rect width="3840" height="2160" fill="url(#wpPrivacyFilterGlow)"/>
+  <g opacity="0.26">
+    <rect x="220" y="390" width="1520" height="150" rx="75" fill="#DDF7FF"/>
+    <rect x="420" y="670" width="1320" height="150" rx="75" fill="#BFD3FF"/>
+    <rect x="250" y="950" width="1490" height="150" rx="75" fill="#D5EAFF"/>
+    <rect x="510" y="1230" width="1230" height="150" rx="75" fill="#AFC7FF"/>
+    <rect x="320" y="1510" width="1420" height="150" rx="75" fill="#C5D8FF"/>
   </g>
+  <g fill="{{surface}}" opacity="0.22">
+    <circle cx="650" cy="465" r="46"/><circle cx="1050" cy="745" r="46"/><circle cx="730" cy="1025" r="46"/><circle cx="1180" cy="1305" r="46"/><circle cx="820" cy="1585" r="46"/>
+  </g>
+  <rect x="2180" y="350" width="1320" height="1320" rx="330" fill="{{surface}}" opacity="0.18" stroke="#5B8CFF" stroke-opacity="0.22" stroke-width="4"/>
+  <svg x="2260" y="430" width="1160" height="1160" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+  <path d="M0 2030H3840V2160H0Z" fill="{{elevated}}" opacity="0.58"/>
 </svg>

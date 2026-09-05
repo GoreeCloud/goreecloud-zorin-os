@@ -2,44 +2,72 @@
 
 ## Status
 
-Development. The collection source is implemented; target-device acceptance is partial.
+Development. Source implementation is identity-derived; target-device visual acceptance is pending for the redesigned artwork.
 
-The target laptop has rendered **GoreeCloud Horizon Dark** successfully at its current desktop resolution with readable panel/dock chrome and no obvious crop failure in the supplied full-desktop screenshot. Zorin Settings now also visibly consumes the generated user-scoped catalog: the supplied Background view shows the 24 GoreeCloud wallpapers ahead of the still-present stock Zorin set. This verifies catalog discovery and thumbnail rendering for the collection as a gallery, but it does not yet visually accept every wallpaper individually.
+The earlier 24-wallpaper abstract collection was rejected during target review because its compositions did not match the current approved GoreeCloud, Glaze UI, Wardveil Security, and Privacy Shield artwork closely enough. That visual direction is superseded by the current identity-derived source and must not be treated as accepted wallpaper artwork.
 
 ## Scope
 
-This repository defines **24 original 3840×2160 SVG wallpapers** across four balanced categories:
+The repository defines **24 3840×2160 SVG wallpapers** across four balanced categories:
 
-| Category | Families | Count |
+| Category | Identity / families | Count |
 | --- | --- | ---: |
-| GoreeCloud | Horizon, Meridian | 6 |
-| Glaze UI | Aurora, Lattice | 6 |
-| Wardveil Security | Core, Fold | 6 |
-| Privacy Shield | Bands, Filter | 6 |
+| GoreeCloud | Unified Clean — Horizon, Meridian | 6 |
+| Glaze UI | Facet — Aurora, Lattice | 6 |
+| Wardveil Security | Sentinel Fold — Core, Veil | 6 |
+| Privacy Shield | Approved Privacy Shield — Bands, Filter | 6 |
 | **Total** | 8 families × Light/Dark/Deep Dark | **24** |
 
-Every family has Light, Dark, and Deep Dark variants mapped to the same GLAZE UI V1.1 / 1.1.0 palette roles used by the desktop theme.
+Every wallpaper preserves the canonical identity geometry and identity colors from the current unified branding authority while using the Zorin theme's Glaze UI V1.1 Light/Dark/Deep Dark palette for the surrounding presentation field.
 
-Wardveil Security and Privacy Shield wallpapers are **supporting abstract identity artwork**, not canonical product marks and not security/privacy status indicators. Wardveil compositions use calm paired veil/core geometry; Privacy Shield compositions use layered privacy-band/filter geometry. They intentionally avoid generic padlocks, checkmarks, hacker imagery, neon threat graphics, and other misleading security/privacy symbolism.
+## Branding authority and synchronization
 
-## Source
+Canonical identity authority is:
 
 ```text
-assets/wallpapers/
-config/wallpapers.json
-config/zorin-stock-wallpapers-17.3.json
-scripts/build_background_catalog.py
-scripts/validate_wallpapers.py
-scripts/validate_system_wallpapers.py
-scripts/wallpaper.sh
-scripts/diagnose_backgrounds.sh
-scripts/system_wallpapers.py
-scripts/system_wallpapers.sh
+GoreeCloud/goreecloud-branding-assets
 ```
 
-`config/wallpapers.json` keeps the three Horizon wallpapers as the primary Light/Dark/DeepDark mapping for `apply current`, while the full `catalog` contains all 24 options.
+The exact authority commit and synchronized source metadata are pinned in:
 
-`config/zorin-stock-wallpapers-17.3.json` is the evidence-bound removal manifest for the verified Zorin OS 17.3 laptop. It is intentionally pinned to the audited package versions, three system background catalogs, and 28 package-owned stock JPEG paths. If those facts change, the privileged removal workflow must fail closed until new target evidence is captured.
+```text
+config/wallpaper-identities.json
+```
+
+Synchronized consumer copies live under:
+
+```text
+assets/wallpapers/identity/
+```
+
+They are retained only so wallpaper generation works reproducibly and offline. They are not independent branding masters. The wallpaper builder verifies every synchronized SVG against its pinned SHA-256 before rendering.
+
+Current canonical sources used by the wallpaper collection are:
+
+- GoreeCloud Unified Clean transparent/reversed marks from `official/`;
+- Glaze UI **Facet** from `systems/glaze-ui/glaze-ui-mark.svg`;
+- Wardveil Security **Sentinel Fold** from `systems/wardveil-security/wardveil-security-icon.svg`;
+- the approved Privacy Shield icon from `systems/privacy-shield/privacy-shield-icon.svg`.
+
+GoreeCloud's official mark is never arbitrarily recolored or redrawn. Dark and Deep Dark wallpapers use the approved reversed variant. Glaze UI, Wardveil Security, and Privacy Shield preserve the identity colors already authored in their canonical SVGs. Glaze presentation effects may surround the marks without modifying their canonical geometry.
+
+Wardveil Security and Privacy Shield artwork identifies those systems only. A wallpaper does not prove security protection, privacy state, runtime status, compliance, or production readiness.
+
+## Generation
+
+Wallpaper definitions are recorded in `config/wallpapers.json`. All 24 are generated from identity-aware templates under:
+
+```text
+assets/wallpapers/templates/
+```
+
+Build the collection with:
+
+```bash
+python3 ./scripts/build_wallpapers.py --output /tmp/goreecloud-wallpapers
+```
+
+The builder injects the verified canonical SVG interior into a nested SVG using the original canonical viewBox. It does not trace, approximate, recolor, or regenerate the logo geometry.
 
 ## User-local install and catalog
 
@@ -50,34 +78,27 @@ Run:
 ./scripts/wallpaper.sh list
 ```
 
-The helper copies all 24 SVGs to:
+The helper installs all 24 SVGs under:
 
 ```text
 ~/.local/share/backgrounds/GoreeCloud-Zorin
 ```
 
-and generates a user-scoped GNOME Background Properties catalog at:
+and generates the user GNOME Background Properties catalog at:
 
 ```text
 ~/.local/share/gnome-background-properties/goreecloud-zorin.xml
 ```
 
-Target evidence now verifies that Zorin OS 17.3 Settings consumes this user-scoped catalog and renders all 24 GoreeCloud thumbnails in the Background gallery.
+Target evidence already confirms Zorin OS 17.3 Settings consumes this user-scoped catalog and displays the complete 24-entry collection. That discovery result applies to the catalog mechanism, not to visual acceptance of the redesigned artwork.
 
-Apply the primary wallpaper matching the active GoreeCloud theme:
+Apply the primary identity-derived wallpaper matching the active GoreeCloud theme with:
 
 ```bash
 ./scripts/wallpaper.sh apply current
 ```
 
-Or apply any exact ID from `./scripts/wallpaper.sh list`, for example:
-
-```bash
-./scripts/wallpaper.sh apply glaze-aurora-dark
-./scripts/wallpaper.sh apply wardveil-core-dark
-./scripts/wallpaper.sh apply privacy-bands-dark
-./scripts/wallpaper.sh apply goreecloud-meridian-dark
-```
+Or apply any exact ID shown by `./scripts/wallpaper.sh list`.
 
 Applying a wallpaper records a GNOME settings snapshot first. Restore the latest snapshot with:
 
@@ -87,82 +108,29 @@ Applying a wallpaper records a GNOME settings snapshot first. Restore the latest
 
 ## Stock Zorin wallpaper replacement
 
-The target audit is complete. It identifies the stock wallpaper set as package-owned by exactly:
+The desired end state remains a GoreeCloud-only wallpaper gallery. The audited recovery-backed stock-removal tooling exists, but **privileged stock wallpaper removal is paused while the redesigned identity-derived collection is awaiting target visual acceptance**.
 
-```text
-zorin-os-wallpapers          17.1
-zorin-os-wallpapers-17       17.1
-zorin-os-pro-wallpapers      17
-zorin-os-pro-wallpapers-17   17
-```
+Do not run the privileged `apply` or `finalize` stock-removal subcommands until the redesigned 24-wallpaper set is installed, reviewed, and accepted on the target laptop.
 
-The audited active stock set consists of three GNOME Background Properties XML catalogs and 28 JPEG files under `/usr/share/backgrounds`. The exact paths and expected owners are recorded in `config/zorin-stock-wallpapers-17.3.json`.
-
-The ordinary theme/wallpaper installer still never modifies or deletes system wallpaper packages. Privileged removal is isolated in `scripts/system_wallpapers.sh`.
-
-### Controlled removal sequence
-
-First run the read-only plan:
-
-```bash
-./scripts/system_wallpapers.sh plan
-```
-
-`plan` verifies:
-
-1. the host is the verified Zorin OS 17.3 target;
-2. all four audited wallpaper packages are installed at the exact recorded versions;
-3. every audited stock path exists and has the expected package owner;
-4. the 24-wallpaper GoreeCloud user catalog and all referenced SVGs are ready;
-5. `apt-get --simulate purge` proposes removal of exactly the four audited wallpaper packages and no other package.
-
-Only after the plan output is reviewed should privileged removal run:
-
-```bash
-sudo ./scripts/system_wallpapers.sh apply
-```
-
-Before package removal, `apply` captures the exact stock files in a root-owned recovery archive, records checksums and package state, saves the apt simulation, and downloads the exact four `.deb` packages into the recovery transaction. It then re-runs all preconditions and purges only the audited wallpaper packages. Any package-version, ownership, path, replacement-catalog, recovery-download, or apt-removal-set mismatch aborts the operation.
-
-After `apply`, reopen Settings → Background and verify that only the intended GoreeCloud collection remains. Keep the recovery transaction until this screenshot/visual acceptance is complete.
-
-Rollback remains available with:
-
-```bash
-sudo ./scripts/system_wallpapers.sh restore
-```
-
-`restore` reinstalls the archived exact wallpaper packages, restores the captured stock files, checks the recorded SHA-256 values, and verifies the package/path state.
-
-Only after removal is visually accepted and rollback is no longer required should the recovery copy be irreversibly deleted:
-
-```bash
-sudo ./scripts/system_wallpapers.sh finalize
-```
-
-`finalize` is deliberately separate from `apply`. It is refused unless the stock packages and audited stock paths remain absent and the 24-wallpaper GoreeCloud replacement catalog is still ready.
-
-Do not use broad recursive deletion of `/usr/share/backgrounds`, manually remove unrelated files, or purge wallpaper packages outside this evidence-bound workflow.
+The read-only audit/plan paths remain available for inspection without changing packages.
 
 ## Validation
 
-Source validation covers:
+`python3 ./scripts/validate_wallpapers.py` verifies:
 
-- at least 20 assets, currently exactly 24;
-- all four required categories with at least five options each;
-- unique IDs and Light/Dark/DeepDark mappings;
-- exact Glaze palette-role mapping;
-- 3840×2160 SVG size/viewBox;
-- no script elements;
-- no remote, file, or embedded-data href resources;
-- generated GNOME catalog count and filenames;
-- the exact Zorin OS 17.3 stock-package/version/catalog/path manifest;
-- the four-package no-collateral purge safety contract;
-- recovery/restore/finalize workflow presence;
-- executable/syntax/ShellCheck validation for wallpaper helpers.
+- exactly 24 catalog entries across the four required categories;
+- Light, Dark, and Deep Dark mappings;
+- exact Glaze UI palette-role mapping for the surrounding wallpaper field;
+- pinned branding authority and synchronized canonical SVG SHA-256 values;
+- canonical identity viewBoxes;
+- identity/category mapping for every wallpaper;
+- presence of canonical geometry in every rendered derivative;
+- 3840×2160 rendered dimensions and viewBox;
+- no script elements or remote/file/data href resources;
+- generated GNOME background catalog count and filenames.
 
-Static checks do not establish actual package-removal success or visual acceptance.
+Source validation proves reproducibility and identity-source integrity. It does not prove visual quality on the target display.
 
 ## Remaining target acceptance
 
-Before release qualification, complete the read-only system-removal plan, then the controlled removal and post-removal Settings verification if the plan is clean. Keep recovery until the post-removal gallery is accepted. Also verify representative Light/Dark/DeepDark wallpapers, panel/dock/icon readability, wallpaper settings restore, package-removal rollback, and the broader theme acceptance gates. The PR remains Draft until those checks are complete.
+Install the redesigned collection on the Zorin OS 17.3 laptop, reopen Settings → Background, review the 24 thumbnails and representative full-desktop renders, and verify that Unified Clean, Facet, Sentinel Fold, and Privacy Shield are visibly faithful to their canonical artwork in Light/Dark/Deep Dark contexts. Only after that acceptance should stock wallpaper removal resume.

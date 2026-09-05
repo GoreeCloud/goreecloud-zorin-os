@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
+  <title id="title">GoreeCloud Unified Clean Horizon {{mode_label}}</title>
+  <desc id="desc">GoreeCloud wallpaper built around the approved Unified Clean platform mark, preserving its canonical geometry and colors while surrounding it with restrained Glaze UI atmosphere.</desc>
+  <defs>
+    <linearGradient id="wpGcBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.58" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
+    <radialGradient id="wpGcBlue" cx="0.55" cy="0.43" r="0.50"><stop stop-color="#3B82F6" stop-opacity="0.22"/><stop offset="1" stop-color="#174EA6" stop-opacity="0"/></radialGradient>
+    <radialGradient id="wpGcTeal" cx="0.18" cy="0.16" r="0.44"><stop stop-color="{{accent}}" stop-opacity="0.20"/><stop offset="1" stop-color="{{accent}}" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#wpGcBg)"/>
+  <rect width="3840" height="2160" fill="url(#wpGcBlue)"/>
+  <rect width="3840" height="2160" fill="url(#wpGcTeal)"/>
+  <g fill="none" stroke="#3B82F6" stroke-opacity="0.12">
+    <circle cx="1920" cy="1080" r="760" stroke-width="4"/>
+    <circle cx="1920" cy="1080" r="980" stroke-width="3"/>
+    <circle cx="1920" cy="1080" r="1210" stroke-width="2"/>
+  </g>
+  <path d="M2240 1080H3580C3660 1080 3720 1020 3720 940V720" fill="none" stroke="#174EA6" stroke-opacity="0.24" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="1920" cy="1080" r="18" fill="{{accent_soft}}" opacity="0.34"/>
+  <svg x="1320" y="480" width="1200" height="1200" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+  <path d="M0 1990C720 1880 1330 1910 1920 2000S3150 2070 3840 1910V2160H0Z" fill="{{selection}}" opacity="0.24"/>
+</svg>

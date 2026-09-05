@@ -1,17 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
-  <title id="title">Wardveil Fold {{mode_label}}</title>
-  <desc id="desc">Wardveil Security supporting wallpaper with quiet layered veil folds and protected central negative space. Supporting artwork only; not a security-status indicator.</desc>
+  <title id="title">Wardveil Security Sentinel Fold Veil {{mode_label}}</title>
+  <desc id="desc">Wardveil Security wallpaper preserving the canonical Sentinel Fold identity beside layered protective veil planes in its approved cool security color family. Artwork is identity only, not a security-status indicator.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{canvas}}"/><stop offset="1" stop-color="{{deep}}"/></linearGradient>
-    <radialGradient id="amber" cx="0.18" cy="0.14" r="0.42"><stop stop-color="{{amber}}" stop-opacity="0.12"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="wpWardFoldBg" x1="0" y1="0" x2="1" y2="0"><stop stop-color="{{canvas}}"/><stop offset="0.50" stop-color="{{deep}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
+    <linearGradient id="wpWardPlane1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#22D3EE" stop-opacity="0.26"/><stop offset="1" stop-color="#4F46E5" stop-opacity="0.08"/></linearGradient>
+    <linearGradient id="wpWardPlane2" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#60A5FA" stop-opacity="0.20"/><stop offset="1" stop-color="#7C3AED" stop-opacity="0.10"/></linearGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#bg)"/><rect width="3840" height="2160" fill="url(#amber)"/>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M420 1620C980 1330 1300 1080 1510 680C1660 960 1770 1190 1920 1370" stroke="{{elevated}}" stroke-width="210" opacity="0.76"/>
-    <path d="M3420 1620C2860 1330 2540 1080 2330 680C2180 960 2070 1190 1920 1370" stroke="{{elevated}}" stroke-width="210" opacity="0.76"/>
-    <path d="M650 1760C1150 1470 1430 1240 1610 930" stroke="{{selection}}" stroke-width="90" opacity="0.66"/>
-    <path d="M3190 1760C2690 1470 2410 1240 2230 930" stroke="{{selection}}" stroke-width="90" opacity="0.66"/>
+  <rect width="3840" height="2160" fill="url(#wpWardFoldBg)"/>
+  <path d="M0 260C820 360 1250 650 1650 1080C1200 1540 720 1810 0 1940Z" fill="url(#wpWardPlane1)"/>
+  <path d="M0 570C610 650 980 830 1290 1090C970 1390 590 1590 0 1720Z" fill="#E0F7FF" opacity="0.08"/>
+  <path d="M3840 190C3130 300 2760 620 2440 1040C2770 1470 3200 1760 3840 1940Z" fill="url(#wpWardPlane2)"/>
+  <path d="M3840 520C3270 650 2960 820 2690 1050C2960 1330 3300 1530 3840 1690Z" fill="#DDD6FE" opacity="0.08"/>
+  <rect x="2420" y="470" width="1040" height="1040" rx="260" fill="{{surface}}" opacity="0.20" stroke="#67E8F9" stroke-opacity="0.20" stroke-width="4"/>
+  <svg x="2500" y="550" width="880" height="880" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+  <g fill="none" stroke="#BFDBFE" stroke-opacity="0.12" stroke-width="4">
+    <path d="M650 520L1470 1060L650 1640"/><path d="M930 470L1790 1060L930 1710"/>
   </g>
-  <ellipse cx="1920" cy="1410" rx="190" ry="130" fill="{{accent}}" opacity="0.72"/>
-  <g fill="{{soft}}" opacity="0.22"><circle cx="640" cy="480" r="6"/><circle cx="3200" cy="540" r="5"/><circle cx="2920" cy="340" r="4"/></g>
 </svg>

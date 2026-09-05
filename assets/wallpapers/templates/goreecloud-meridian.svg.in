@@ -1,24 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
-  <title id="title">GoreeCloud Meridian {{mode_label}}</title>
-  <desc id="desc">Original GoreeCloud supporting wallpaper with cloudlike meridian ribbons, restrained Glaze atmosphere, and open workspace.</desc>
+  <title id="title">GoreeCloud Unified Clean Meridian {{mode_label}}</title>
+  <desc id="desc">GoreeCloud wallpaper preserving the approved Unified Clean platform mark while extending its open-boundary and deliberate-connection visual meaning across a Glaze UI field.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.48" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
-    <radialGradient id="aura" cx="0.22" cy="0.18" r="0.64"><stop stop-color="{{amber}}" stop-opacity="0.20"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
-    <radialGradient id="aura2" cx="0.78" cy="0.30" r="0.72"><stop stop-color="{{accent2}}" stop-opacity="0.28"/><stop offset="1" stop-color="{{accent}}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="wpGcMerBg" x1="0" y1="0" x2="1" y2="0"><stop stop-color="{{canvas}}"/><stop offset="0.52" stop-color="{{deep}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
+    <linearGradient id="wpGcRoute" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3B82F6" stop-opacity="0.08"/><stop offset="0.50" stop-color="#3B82F6" stop-opacity="0.52"/><stop offset="1" stop-color="#174EA6" stop-opacity="0.12"/></linearGradient>
+    <radialGradient id="wpGcMerGlow" cx="0.72" cy="0.50" r="0.48"><stop stop-color="#3B82F6" stop-opacity="0.20"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/></radialGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#bg)"/>
-  <rect width="3840" height="2160" fill="url(#aura)"/>
-  <rect width="3840" height="2160" fill="url(#aura2)"/>
-  <g fill="none" stroke="{{soft}}" stroke-linecap="round">
-    <path d="M-180 540C540 190 1090 260 1630 570S2790 1020 4020 410" stroke-opacity="0.10" stroke-width="3"/>
-    <path d="M-140 760C610 390 1210 430 1740 710S2930 1120 4040 650" stroke-opacity="0.13" stroke-width="5"/>
-    <path d="M-100 1020C680 660 1300 700 1880 960S3060 1310 4040 930" stroke-opacity="0.09" stroke-width="3"/>
+  <rect width="3840" height="2160" fill="url(#wpGcMerBg)"/>
+  <rect width="3840" height="2160" fill="url(#wpGcMerGlow)"/>
+  <path d="M-200 1160C480 930 1090 920 1580 1060S2570 1330 4100 850" fill="none" stroke="url(#wpGcRoute)" stroke-width="28" stroke-linecap="round"/>
+  <path d="M-180 1310C590 1110 1170 1130 1650 1260S2690 1450 4050 1040" fill="none" stroke="{{accent_soft}}" stroke-opacity="0.10" stroke-width="5"/>
+  <g fill="#3B82F6" opacity="0.30">
+    <circle cx="520" cy="1010" r="10"/><circle cx="1040" cy="1000" r="8"/><circle cx="1490" cy="1040" r="11"/><circle cx="3070" cy="1090" r="9"/><circle cx="3470" cy="950" r="7"/>
   </g>
-  <g opacity="0.88">
-    <path d="M0 1620C520 1450 940 1500 1350 1670S2250 1830 2890 1510S3510 1400 3840 1500V2160H0Z" fill="{{elevated}}"/>
-    <path d="M0 1800C590 1630 1120 1690 1620 1840S2630 1980 3230 1690S3610 1670 3840 1730V2160H0Z" fill="{{selection}}" opacity="0.70"/>
+  <rect x="2380" y="420" width="1040" height="1040" rx="260" fill="{{surface}}" opacity="0.22" stroke="{{border}}" stroke-opacity="0.48" stroke-width="3"/>
+  <svg x="2500" y="540" width="800" height="800" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+  <g fill="none" stroke="{{border}}" stroke-opacity="0.32" stroke-width="3">
+    <circle cx="820" cy="1080" r="340"/><circle cx="820" cy="1080" r="470"/><circle cx="820" cy="1080" r="600"/>
   </g>
-  <g fill="{{soft}}" opacity="0.28">
-    <circle cx="520" cy="430" r="7"/><circle cx="910" cy="610" r="4"/><circle cx="3130" cy="410" r="6"/><circle cx="3390" cy="720" r="4"/>
-  </g>
+  <circle cx="820" cy="1080" r="26" fill="{{accent}}"/>
 </svg>

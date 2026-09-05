@@ -1,17 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
-  <title id="title">Glaze Aurora {{mode_label}}</title>
-  <desc id="desc">Glaze UI supporting wallpaper using layered translucent panes, deep-teal aura, soft amber optical lighting, and restrained depth.</desc>
+  <title id="title">Glaze UI Facet Aurora {{mode_label}}</title>
+  <desc id="desc">Glaze UI wallpaper centered on the official Facet mark, preserving the canonical interlocking facet geometry and identity colors with surrounding translucent Glaze presentation surfaces.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.7" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
-    <radialGradient id="teal" cx="0.70" cy="0.24" r="0.60"><stop stop-color="{{accent2}}" stop-opacity="0.34"/><stop offset="1" stop-color="{{accent}}" stop-opacity="0"/></radialGradient>
-    <radialGradient id="amber" cx="0.16" cy="0.14" r="0.44"><stop stop-color="{{amber}}" stop-opacity="0.20"/><stop offset="1" stop-color="{{amber}}" stop-opacity="0"/></radialGradient>
-    <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{surface}}" stop-opacity="0.72"/><stop offset="1" stop-color="{{elevated}}" stop-opacity="0.28"/></linearGradient>
+    <linearGradient id="wpGlazeBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{{deep}}"/><stop offset="0.62" stop-color="{{canvas}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
+    <radialGradient id="wpGlazeCyan" cx="0.64" cy="0.36" r="0.56"><stop stop-color="#38BDF8" stop-opacity="0.28"/><stop offset="1" stop-color="#38BDF8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="wpGlazeViolet" cx="0.40" cy="0.62" r="0.50"><stop stop-color="#6366F1" stop-opacity="0.22"/><stop offset="1" stop-color="#6366F1" stop-opacity="0"/></radialGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#bg)"/><rect width="3840" height="2160" fill="url(#teal)"/><rect width="3840" height="2160" fill="url(#amber)"/>
-  <g transform="rotate(-8 1920 1080)">
-    <rect x="480" y="510" width="1220" height="760" rx="110" fill="url(#pane)" stroke="{{soft}}" stroke-opacity="0.18" stroke-width="4"/>
-    <rect x="1180" y="700" width="1450" height="870" rx="130" fill="url(#pane)" opacity="0.88" stroke="{{accent2}}" stroke-opacity="0.22" stroke-width="4"/>
-    <rect x="2300" y="420" width="880" height="620" rx="100" fill="url(#pane)" opacity="0.70" stroke="{{amber}}" stroke-opacity="0.15" stroke-width="3"/>
+  <rect width="3840" height="2160" fill="url(#wpGlazeBg)"/><rect width="3840" height="2160" fill="url(#wpGlazeCyan)"/><rect width="3840" height="2160" fill="url(#wpGlazeViolet)"/>
+  <g opacity="0.44">
+    <path d="M310 570L1140 250L1720 530L1400 860L950 650L590 830L930 1010L610 1330L300 1170Z" fill="{{surface}}" stroke="#38BDF8" stroke-opacity="0.18" stroke-width="4"/>
+    <path d="M3280 650L2950 480L2470 720L2880 920L2470 1130L2070 920L1720 1270L2470 1690L3290 1230L2960 900L2470 1140L2080 930L2470 720L2960 960Z" fill="{{elevated}}" opacity="0.34"/>
   </g>
-  <path d="M0 1880C760 1630 1380 1780 1980 1880S3200 1990 3840 1710V2160H0Z" fill="{{selection}}" opacity="0.42"/>
+  <rect x="1190" y="270" width="1460" height="1460" rx="330" fill="{{surface}}" opacity="0.18" stroke="{{border}}" stroke-opacity="0.44" stroke-width="4"/>
+  <svg x="1220" y="300" width="1400" height="1400" viewBox="{{identity_viewbox}}" aria-hidden="true">
+{{identity_inner}}
+  </svg>
+  <path d="M0 1980C760 1860 1410 1920 1960 2000S3150 2060 3840 1880V2160H0Z" fill="{{selection}}" opacity="0.28"/>
 </svg>
