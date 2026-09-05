@@ -14,7 +14,7 @@ stage {
 #panel {
   background-color: {{SHELL_PANEL}};
   color: {{TEXT}};
-  box-shadow: inset 0 -1px 0 {{SHELL_BORDER}};
+  box-shadow: inset 0 -1px 0 {{SHELL_BORDER}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 #panel .panel-button {
@@ -43,15 +43,15 @@ stage {
 .popup-menu-content {
   padding: 8px;
   border: 1px solid {{SHELL_BORDER}};
-  border-radius: 16px;
+  border-radius: 18px;
   background-color: {{SHELL_SURFACE}};
   color: {{TEXT}};
-  box-shadow: 0 8px 28px {{SHELL_SHADOW}};
+  box-shadow: 0 10px 32px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .popup-menu-item {
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   color: {{TEXT}};
 }
 
@@ -72,7 +72,7 @@ stage {
   border: 1px solid {{SHELL_BORDER}};
   border-radius: 24px;
   background-color: {{SHELL_SURFACE}};
-  box-shadow: 0 8px 28px {{SHELL_SHADOW}};
+  box-shadow: 0 10px 32px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .app-well-app .overview-icon,
@@ -102,11 +102,12 @@ stage {
   color: {{TEXT}};
   selection-background-color: {{ACCENT}};
   selected-color: {{ON_ACCENT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .search-entry:focus {
   border-color: {{ACCENT}};
-  box-shadow: inset 0 0 0 1px {{ACCENT}};
+  box-shadow: inset 0 0 0 1px {{ACCENT}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .modal-dialog {
@@ -114,7 +115,7 @@ stage {
   border-radius: 24px;
   background-color: {{SHELL_SURFACE}};
   color: {{TEXT}};
-  box-shadow: 0 10px 36px {{SHELL_SHADOW}};
+  box-shadow: 0 12px 38px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .message-list-section,
@@ -126,8 +127,8 @@ stage {
 }
 
 /* GNOME Shell's date/notification menu contains nested buttons and messages
- * with their own default light surfaces. Map those concrete Shell classes so
- * dark variants do not produce white cards or dark-on-dark calendar labels. */
+ * with their own default surfaces. Map those concrete Shell classes so the
+ * GoreeCloud material hierarchy stays consistent in every appearance mode. */
 #calendarArea,
 .datemenu-today-button,
 .calendar,
@@ -180,6 +181,7 @@ stage {
   border-radius: 16px;
   background-color: {{SHELL_ELEVATED}};
   color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .events-button:hover,
@@ -190,6 +192,7 @@ stage {
 .weather-button:focus,
 .message:hover,
 .message:focus {
+  border-color: {{ACCENT_SOFT}};
   background-color: {{SHELL_HOVER}};
   color: {{TEXT}};
 }
@@ -227,52 +230,86 @@ stage {
   border-radius: 24px;
   background-color: {{SHELL_SURFACE}};
   color: {{TEXT}};
+  box-shadow: 0 12px 38px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .quick-toggle,
 .quick-menu-toggle .quick-toggle,
 .quick-settings .quick-toggle,
-.quick-settings .quick-menu-toggle .quick-toggle {
+.quick-settings .quick-menu-toggle .quick-toggle,
+.quick-settings .quick-toggle-menu-button {
+  border: 1px solid {{SHELL_BORDER}};
   border-radius: 16px;
+  background-image: none;
   background-color: {{SHELL_ELEVATED}};
   color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .quick-toggle:hover,
 .quick-menu-toggle .quick-toggle:hover,
 .quick-settings .quick-toggle:hover,
-.quick-settings .quick-menu-toggle .quick-toggle:hover {
+.quick-settings .quick-menu-toggle .quick-toggle:hover,
+.quick-settings .quick-toggle-menu-button:hover {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
   background-color: {{SHELL_HOVER}};
   color: {{TEXT}};
 }
 
+/* Checked toggles use an icy selected surface with a strong blue foreground
+ * instead of the stock Zorin cyan gradient. This keeps state obvious while
+ * matching the light Frost/Blue GoreeCloud identity shown by the wallpaper. */
 .quick-toggle:checked,
 .quick-menu-toggle .quick-toggle:checked,
 .quick-settings .quick-toggle:checked,
-.quick-settings .quick-menu-toggle .quick-toggle:checked {
-  background-color: {{ACCENT}};
-  color: {{ON_ACCENT}};
+.quick-settings .quick-menu-toggle .quick-toggle:checked,
+.quick-settings .quick-toggle-menu-button:checked {
+  border-color: {{ACCENT}};
+  background-image: none;
+  background-color: {{SELECTION}};
+  color: {{ACCENT}};
+  box-shadow: inset 0 0 0 1px {{SHELL_ACTIVE}}, inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.quick-toggle:checked:hover,
+.quick-menu-toggle .quick-toggle:checked:hover,
+.quick-settings .quick-toggle:checked:hover,
+.quick-settings .quick-menu-toggle .quick-toggle:checked:hover,
+.quick-settings .quick-toggle-menu-button:checked:hover {
+  border-color: {{ACCENT_HOVER}};
+  background-image: none;
+  background-color: {{SHELL_ACTIVE}};
+  color: {{ACCENT}};
 }
 
 .quick-settings .icon-button {
+  border: 1px solid {{SHELL_BORDER}};
+  background-image: none;
   background-color: {{SHELL_ELEVATED}};
   color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .quick-settings .icon-button:hover,
 .quick-settings .icon-button:focus {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
   background-color: {{SHELL_HOVER}};
   color: {{TEXT}};
 }
 
 .quick-settings .icon-button:active,
 .quick-settings .icon-button:checked {
-  background-color: {{ACCENT}};
-  color: {{ON_ACCENT}};
+  border-color: {{ACCENT}};
+  background-image: none;
+  background-color: {{SELECTION}};
+  color: {{ACCENT}};
 }
 
 .slider {
   -barlevel-active-background-color: {{ACCENT}};
   -barlevel-background-color: {{BORDER}};
   -barlevel-border-color: transparent;
+  -barlevel-overdrive-color: {{ACCENT_HOVER}};
 }
