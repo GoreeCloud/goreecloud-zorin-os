@@ -41,17 +41,25 @@ def folder_icon(glyph: str = "") -> str:
 
 
 def symbolic_folder_icon(opened: bool = False) -> str:
+    """Large symbolic folder treatment used by Nautilus empty-state views.
+
+    Keep these deliberately outline-first. Nautilus may apply symbolic-state
+    color/opacity processing to large empty-state icons; broad filled geometry
+    therefore becomes a muddy gray mass even when the source SVG is pale. A
+    clean Ice/Blue outline survives that processing while staying consistent
+    with the normal GoreeCloud folder family.
+    """
     if opened:
         body = (
-            '  <path d="M7 20c0-3 2-5 5-5h14l5 6h21c3 0 5 2 5 5v5H18c-3 0-5 2-6 5L7 52Z" fill="#8FC4E8" opacity=".62"/>\n'
-            '  <path d="M13 34c1-3 3-5 6-5h39l-7 24c-1 3-3 5-7 5H12c-4 0-6-3-5-7Z" fill="#DCECF6" stroke="#3B82F6" stroke-width="2.2"/>\n'
-            '  <path d="M18 33h34" stroke="#FBFDFE" stroke-width="2" opacity=".92"/>\n'
+            '  <path d="M8 23c0-4 3-7 7-7h12l6 7h17c4 0 7 3 7 7v3" fill="none" stroke="#8FC4E8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>\n'
+            '  <path d="M13 34c1-3 3-5 7-5h37l-7 23c-1 4-4 6-8 6H14c-5 0-8-4-6-9Z" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>\n'
+            '  <path d="M20 34h29" fill="none" stroke="#DCECF6" stroke-width="2" stroke-linecap="round"/>\n'
         )
     else:
         body = (
-            '  <path d="M7 19c0-3 2-5 5-5h14l5 6h21c3 0 5 2 5 5v27c0 4-3 7-7 7H14c-4 0-7-3-7-7Z" fill="#DCECF6" stroke="#3B82F6" stroke-width="2.2"/>\n'
-            '  <path d="M8 25h48" stroke="#FBFDFE" stroke-width="2" opacity=".92"/>\n'
-            '  <path d="M10 19c0-2 1-3 3-3h12l5 6H10Z" fill="#8FC4E8" opacity=".7"/>\n'
+            '  <path d="M8 22c0-4 3-7 7-7h12l6 7h17c4 0 7 3 7 7v23c0 4-3 7-7 7H15c-4 0-7-3-7-7Z" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linejoin="round"/>\n'
+            '  <path d="M9 29h47" fill="none" stroke="#8FC4E8" stroke-width="2.5" stroke-linecap="round"/>\n'
+            '  <path d="M14 19h11l6 7" fill="none" stroke="#DCECF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>\n'
         )
     return svg(body)
 
