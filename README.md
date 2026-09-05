@@ -2,7 +2,7 @@
 
 This repository contains the Development-stage GoreeCloud desktop experience for the verified Zorin OS 17.3 target environment.
 
-The project is now **light-first**. `GoreeCloud-Zorin-Light` is the primary experience and the installer activates it together with the GoreeCloud icon theme, cursor theme, and primary light wallpaper. Dark and Deep Dark remain secondary compatibility variants.
+The project is **light-first**. `GoreeCloud-Zorin-Light` is the primary experience and the installer activates it together with the GoreeCloud icon theme, cursor theme, and primary light wallpaper. Dark and Deep Dark remain secondary compatibility variants.
 
 ## Desktop assets
 
@@ -13,16 +13,16 @@ The repository currently provides:
 - `GoreeCloud-Zorin-DeepDark` — secondary compatibility theme;
 - `GoreeCloud-Zorin` — light-first icon theme;
 - `GoreeCloud-Zorin-Cursors` — Frost White + GoreeCloud Blue Xcursor theme;
-- 24 identity-derived GoreeCloud wallpapers;
+- 24 identity-derived wallpaper source derivatives, with only 8 Light wallpapers exposed in Settings;
 - recovery-backed replacement of the audited Zorin OS 17.3 stock wallpaper set without removing Zorin desktop packages.
 
-The V1.1 palette remains the default compatibility build contract while the repository carries a parallel Glaze UI V1.2 Development preview in `config/palettes-v1.2.json`.
+The default installer now renders and composes the desktop against the **Glaze UI V1.2 Development** palette in `config/palettes-v1.2.json`. The V1.1 palette remains available as the stable predecessor/compatibility contract in `config/palettes.json`.
 
 ## Verified target
 
 The installer supports the exact verified Zorin OS 17.3 theme package target. It fail-closes unless the local `zorin-desktop-themes` package and recorded GTK 3, GTK 4/libadwaita, and GNOME Shell base hashes match the tested environment.
 
-The repository does not redistribute Zorin base-theme bytes. During installation, the composer reads and verifies the already-installed local Zorin theme files, copies them into temporary generated GoreeCloud themes, rewrites only the verified target GTK 4 selected/checked state blocks, and appends GoreeCloud semantic overrides.
+The repository does not redistribute Zorin base-theme bytes. During installation, the composer reads and verifies the already-installed local Zorin theme files, copies them into temporary generated GoreeCloud themes, rewrites only the verified target GTK 4 selected/checked state blocks, and appends GoreeCloud semantic overrides using the selected V1.2 palette contract.
 
 ## Install the GoreeCloud desktop experience
 
@@ -32,15 +32,16 @@ The repository does not redistribute Zorin base-theme bytes. During installation
 
 The default install:
 
-- generates and installs all three Applications/Shell variants under `~/.local/share/themes`;
+- generates and installs all three Applications/Shell variants under `~/.local/share/themes` using Glaze UI V1.2 Development;
 - builds and installs `GoreeCloud-Zorin` under `~/.local/share/icons`;
 - builds and installs `GoreeCloud-Zorin-Cursors` under `~/.local/share/icons`;
 - activates `GoreeCloud-Zorin-Light` for Applications;
 - activates `GoreeCloud-Zorin-Light` for Shell when the User Themes extension schema is available;
 - activates the GoreeCloud icon theme;
 - activates the GoreeCloud cursor theme;
-- installs the complete wallpaper collection;
-- applies the primary light wallpaper.
+- installs all 24 wallpaper source derivatives for compatibility/recovery;
+- exposes only the 8 Light wallpapers in GNOME Settings;
+- applies the primary Light wallpaper.
 
 Existing GoreeCloud theme/icon/cursor directories are moved into timestamped recovery storage before replacement.
 
@@ -112,11 +113,11 @@ It is generated with Python standard-library code and does not require `xcursorg
 
 ## Wallpaper collection
 
-The repository defines **24 3840×2160 SVG wallpapers** across GoreeCloud, Glaze UI, Wardveil Security, and Privacy Shield.
+The repository defines **24 3840×2160 SVG wallpaper source derivatives** across GoreeCloud, Glaze UI, Wardveil Security, and Privacy Shield.
+
+The installed GNOME catalog is deliberately light-first: exactly **8 Light wallpapers are visible**, while the 16 Dark/Deep Dark compatibility derivatives remain installed as `deleted=true` catalog entries. This keeps source/recovery contracts complete without presenting dark wallpapers in Settings.
 
 The wallpaper source is identity-derived rather than generic abstract artwork. Canonical branding authority is `GoreeCloud/goreecloud-branding-assets`; `config/wallpaper-identities.json` pins the authority commit, source path, synchronized copy, SHA-256, and viewBox used by generation.
-
-The light variants are the primary desktop presentation. Wallpaper source is intentionally isolated from semantic interaction/status color tokens so focus, selection, warning, and destructive UI colors cannot silently recolor identity artwork.
 
 Install or refresh wallpapers:
 
@@ -124,13 +125,13 @@ Install or refresh wallpapers:
 ./scripts/wallpaper.sh install
 ```
 
-Apply the default light wallpaper:
+Apply the default Light wallpaper:
 
 ```bash
 ./scripts/wallpaper.sh apply default
 ```
 
-List the collection:
+List the visible Light collection:
 
 ```bash
 ./scripts/wallpaper.sh list
@@ -163,14 +164,15 @@ Run the complete source validation set with:
 ```bash
 ./scripts/validate.sh --gtk
 python3 ./scripts/validate_wallpapers.py
+python3 ./scripts/validate_light_catalog.py
 python3 ./scripts/validate_desktop_assets.py
 python3 ./scripts/validate_v12_preview.py
 python3 ./scripts/validate_system_wallpapers.py
 ```
 
-Desktop-asset validation builds the icon and cursor themes in a temporary directory, validates generated SVG safety and minimum icon coverage, verifies canonical `start-here` identity preservation, parses the generated Xcursor binary format, checks all required cursor aliases, frame sizes, dimensions, and hotspots, and confirms the light-first contract.
+The light-catalog gate verifies that all 24 compatibility entries remain valid while only the exact 8 Light wallpaper IDs are visible in the GNOME catalog.
 
-CI runs ShellCheck plus wallpaper, icon/cursor, V1.2 preview, stock-wallpaper safety, and generated GTK theme validation.
+CI runs ShellCheck plus wallpaper source/rendering, light-first catalog visibility, icon/cursor, V1.2 preview, stock-wallpaper safety, and generated GTK theme validation.
 
 ## Target diagnostics
 
