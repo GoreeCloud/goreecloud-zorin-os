@@ -7,6 +7,7 @@ THEME_DEST="$DATA_HOME/themes"
 ICON_DEST="$DATA_HOME/icons"
 LEGACY_ICON_DEST="$HOME/.icons"
 PALETTE_CONFIG="$ROOT/config/palettes-v1.2.json"
+DESKTOP_ASSET_CONFIG="$ROOT/config/desktop-assets.json"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 THEME_RECOVERY_ROOT="$THEME_DEST/.goreecloud-zorin-recovery/$STAMP"
 ASSET_RECOVERY_ROOT="$ICON_DEST/.goreecloud-zorin-recovery/$STAMP"
@@ -19,6 +20,10 @@ THEMES=(
 )
 ICON_THEME="GoreeCloud-Zorin"
 CURSOR_THEME="GoreeCloud-Zorin-Cursors"
+CURSOR_RUNTIME_THEME="$(
+  python3 -c 'import json,sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["cursor_theme"]["runtime_id"])' \
+    "$DESKTOP_ASSET_CONFIG"
+)"
 LIGHT_THEME="GoreeCloud-Zorin-Light"
 
 usage() {
@@ -102,15 +107,40 @@ done
 cp -a -- "$TEMP_ROOT/icons/$ICON_THEME" "$ICON_DEST/$ICON_THEME"
 cp -a -- "$TEMP_ROOT/cursors/$CURSOR_THEME" "$ICON_DEST/$CURSOR_THEME"
 
+# Mutter/Xcursor consumers can keep the bytes for a cursor theme cached by
+# theme identifier even after that directory is replaced in place. The cursor
+# design contract therefore carries a revisioned runtime identifier while the
+# canonical product asset remains GoreeCloud-Zorin-Cursors. Point the runtime
+# identifier at the canonical installed bytes so a design-revision change is a
+# real settings identity change without duplicating the cursor payload.
+if [[ "$CURSOR_RUNTIME_THEME" != "$CURSOR_THEME" ]]; then
+  runtime_target="$ICON_DEST/$CURSOR_RUNTIME_THEME"
+  if [[ -e "$runtime_target" || -L "$runtime_target" ]]; then
+    if [[ -L "$runtime_target" && "$(readlink -- "$runtime_target")" == "$ICON_DEST/$CURSOR_THEME" ]]; then
+      rm -f -- "$runtime_target"
+    else
+      mkdir -p -- "$ASSET_RECOVERY_ROOT"
+      mv -- "$runtime_target" "$ASSET_RECOVERY_ROOT/$CURSOR_RUNTIME_THEME"
+      asset_backed_up=1
+    fi
+  fi
+  ln -s -- "$ICON_DEST/$CURSOR_THEME" "$runtime_target"
+fi
+
 # Zorin's documented third-party icon/cursor location is
 # ~/.local/share/icons. Some GTK/theme enumeration paths and older tools also
-# consult ~/.icons. Keep a compatibility link there so Zorin Appearance and
+# consult ~/.icons. Keep compatibility links there so Zorin Appearance and
 # legacy consumers resolve the same canonical installation without duplicating
-# theme bytes.
+# theme bytes. The revisioned cursor runtime identity is included for the same
+# discovery reason.
 legacy_backed_up=0
 if [[ "$LEGACY_ICON_DEST" != "$ICON_DEST" ]]; then
   mkdir -p -- "$LEGACY_ICON_DEST"
-  for asset in "$ICON_THEME" "$CURSOR_THEME"; do
+  legacy_assets=("$ICON_THEME" "$CURSOR_THEME")
+  if [[ "$CURSOR_RUNTIME_THEME" != "$CURSOR_THEME" ]]; then
+    legacy_assets+=("$CURSOR_RUNTIME_THEME")
+  fi
+  for asset in "${legacy_assets[@]}"; do
     legacy="$LEGACY_ICON_DEST/$asset"
     if [[ -e "$legacy" || -L "$legacy" ]]; then
       if [[ -L "$legacy" && "$(readlink -- "$legacy")" == "$ICON_DEST/$asset" ]]; then
@@ -128,7 +158,8 @@ fi
 for required in \
   "$ICON_DEST/$ICON_THEME/index.theme" \
   "$ICON_DEST/$CURSOR_THEME/index.theme" \
-  "$ICON_DEST/$CURSOR_THEME/cursors/left_ptr"; do
+  "$ICON_DEST/$CURSOR_THEME/cursors/left_ptr" \
+  "$ICON_DEST/$CURSOR_RUNTIME_THEME/cursors/left_ptr"; do
   if [[ ! -e "$required" ]]; then
     echo "Installed desktop asset is missing: $required" >&2
     exit 1
@@ -149,6 +180,10 @@ cycle_setting_if_same() {
   current="$(gsettings get "$schema" "$key" 2>/dev/null | tr -d "'" || true)"
   if [[ "$current" == "$target" ]]; then
     gsettings set "$schema" "$key" "'$fallback'"
+    # Do not immediately overwrite the fallback. GNOME settings observers can
+    # coalesce back-to-back dconf changes and never process the intermediate
+    # identity, leaving an old in-memory theme or cursor payload resident.
+    sleep 0.35
   fi
   gsettings set "$schema" "$key" "'$target'"
 }
@@ -161,11 +196,12 @@ activate_light_experience() {
   # Reinstalling a theme under the same name does not reliably make already
   # running GTK/Shell consumers reload the changed CSS or icons. Cycle through
   # a safe fallback only when the target is already selected, then restore the
-  # GoreeCloud values. This makes iterative target-device visual review show
-  # the newly installed bytes instead of a stale in-memory stylesheet.
+  # GoreeCloud values. Cursor design revisions use a revisioned runtime theme
+  # identity so Mutter/Xcursor cannot resolve the new design through the prior
+  # GoreeCloud cursor cache key.
   cycle_setting_if_same org.gnome.desktop.interface gtk-theme "$LIGHT_THEME" "Adwaita"
   cycle_setting_if_same org.gnome.desktop.interface icon-theme "$ICON_THEME" "Adwaita"
-  cycle_setting_if_same org.gnome.desktop.interface cursor-theme "$CURSOR_THEME" "Adwaita"
+  cycle_setting_if_same org.gnome.desktop.interface cursor-theme "$CURSOR_RUNTIME_THEME" "Adwaita"
 
   if gsettings list-schemas | grep -Fxq 'org.gnome.shell.extensions.user-theme'; then
     current_shell_theme="$(gsettings get org.gnome.shell.extensions.user-theme name 2>/dev/null | tr -d "'" || true)"
@@ -194,8 +230,8 @@ activate_light_experience() {
     echo "Failed to activate icon theme: expected $ICON_THEME, got $active_icons" >&2
     exit 1
   fi
-  if [[ "$active_cursor" != "$CURSOR_THEME" ]]; then
-    echo "Failed to activate cursor theme: expected $CURSOR_THEME, got $active_cursor" >&2
+  if [[ "$active_cursor" != "$CURSOR_RUNTIME_THEME" ]]; then
+    echo "Failed to activate cursor theme: expected $CURSOR_RUNTIME_THEME, got $active_cursor" >&2
     exit 1
   fi
 }
@@ -210,14 +246,15 @@ fi
 
 echo
 echo "Installed and activated GoreeCloud desktop assets:"
-echo "  Design:       Glaze UI V1.2 Development"
-echo "  Applications: $LIGHT_THEME"
-echo "  Shell:        $LIGHT_THEME"
-echo "  Icons:        $ICON_THEME"
-echo "  Cursor:       $CURSOR_THEME"
-echo "  Wallpaper:    primary GoreeCloud light wallpaper"
-echo "  Gallery:      24 visible (8 Light / 8 Dark / 8 Deep Dark)"
-echo "  Live refresh: GTK, icons, cursor, and Shell settings were re-emitted when already selected"
+echo "  Design:         Glaze UI V1.2 Development"
+echo "  Applications:   $LIGHT_THEME"
+echo "  Shell:          $LIGHT_THEME"
+echo "  Icons:          $ICON_THEME"
+echo "  Cursor asset:   $CURSOR_THEME"
+echo "  Cursor runtime: $CURSOR_RUNTIME_THEME"
+echo "  Wallpaper:      primary GoreeCloud light wallpaper"
+echo "  Gallery:        24 visible (8 Light / 8 Dark / 8 Deep Dark)"
+echo "  Live refresh:   GTK, icons, cursor, and Shell settings were re-emitted; cursor revisions use a cache-busting runtime identity"
 echo
 echo "Theme directory:"
 echo "  $THEME_DEST"
@@ -227,6 +264,9 @@ if [[ "$LEGACY_ICON_DEST" != "$ICON_DEST" ]]; then
   echo "Compatibility discovery links:"
   echo "  $LEGACY_ICON_DEST/$ICON_THEME"
   echo "  $LEGACY_ICON_DEST/$CURSOR_THEME"
+  if [[ "$CURSOR_RUNTIME_THEME" != "$CURSOR_THEME" ]]; then
+    echo "  $LEGACY_ICON_DEST/$CURSOR_RUNTIME_THEME"
+  fi
 fi
 
 if [[ "$theme_backed_up" -eq 1 ]]; then
