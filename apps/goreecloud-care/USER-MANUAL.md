@@ -18,7 +18,7 @@ Choose **Reclaim file cache…** only when you deliberately want Linux to releas
 ## Keyboard and accessibility
 Use **Tab** and **Shift+Tab** to move through interactive controls. The current Development build provides a visible focus treatment, accessible names/descriptions for maintenance actions and cleanup selectors, and a status region whose accessible name is updated as maintenance state changes.
 
-GoreeCloud Care is designed to remain vertically scrollable when text is enlarged or the window becomes shorter. In compact windows, category amounts move below their category description and the bottom action buttons stack vertically so the primary workflow does not depend on horizontal scrolling. The compact HeaderBar may omit the Development subtitle when space is constrained; the GoreeCloud Care title and **Scan** action remain available.
+GoreeCloud Care is designed to remain vertically scrollable when text is enlarged or the window becomes shorter. In compact windows, category amounts move below their category description and the bottom action buttons stack vertically so the primary workflow does not depend on horizontal scrolling. For the Development 200%-text acceptance path, the compact decision accounts for the GTK `GDK_DPI_SCALE` text scale rather than relying only on the raw allocated width. The compact HeaderBar may omit the Development subtitle when space is constrained; the GoreeCloud Care title and **Scan** action remain available.
 
 The application opens in a light appearance by default. When a GTK HighContrast theme is active, the Development color mapping is suppressed so the system high-contrast presentation can take priority.
 

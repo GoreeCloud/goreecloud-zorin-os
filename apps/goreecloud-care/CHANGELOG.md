@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-dev8 — 2026-09-05
+- Recorded representative-device dev7 revalidation at exact head `6e81f119372cc0aa3eb5a9098266340d8bca540c`: 20 local tests, XML/source validation, dev7 Debian build, upgrade/install to `0.1.0~dev7`, and all three exact-head GitHub workflow families passed.
+- Direct `GDK_DPI_SCALE=2` screenshots nevertheless prove the dev7 combined large-text/compact remediation did not activate at the narrowest reachable target-device window. The HeaderBar subtitle remains visible, category amounts remain right-aligned, and `Clean selected`, `Empty Trash…`, and `Clean APT cache…` remain horizontal. Text wrapping, vertical scrolling, and visible keyboard focus remain positive.
+- Classified the dev7 result as a target-runtime adaptive-layout failure rather than a missing-evidence condition: raising the raw allocation breakpoint alone does not account for the GTK text-scale environment used by the 200%-text acceptance run.
+- Added a pure text-scale-aware effective-width contract. When `GDK_DPI_SCALE` is greater than 1, the raw allocated width is divided by that scale before the 820-logical-pixel compact breakpoint is evaluated; normal-text behavior keeps the existing 820 threshold.
+- Added regression coverage for explicit 200% effective width, default `GDK_DPI_SCALE=2` environment behavior, and invalid/subnormal scale fallback.
+- Dev8 remains Development/nonconformant until exact-head CI and fresh representative-device rendered acceptance verify that the combined 200%-text/compact path now reflows category counts, vertically stacks the three bottom actions, removes the compact HeaderBar subtitle, preserves scrolling, and retains visible focus.
+
 ## 0.1.0-dev7 — 2026-09-05
 - Recorded direct representative-device negative evidence for the dev6 combined 200%-text/compact path: at the narrowest reachable `GDK_DPI_SCALE=2` window, the regular horizontal composition remained active, category amounts stayed right-aligned, and the bottom action group could not transition to the previously accepted compact stack.
 - Raised the Development compact transition from 680 to 820 logical pixels so compact composition activates before the observed enlarged-text minimum-width floor.
@@ -21,8 +29,8 @@
 ## 0.1.0-dev5 — 2026-09-05
 - Fixed post-action status replacement that could hide successful privileged-action feedback behind the automatic refresh scan.
 - Added an explicit completion notice after successful PolicyKit-authorized APT cache cleanup and Memory Refresh.
-- Added a post-action refresh path that updates scan values without overwriting the final success/attention result.
-- Applied the same status-preservation behavior to normal selected cleanup and Trash cleanup so their final result remains visible after values refresh.
+- Added a post-action refresh path that updates category/system values without overwriting the final success/attention result.
+- Applied the same status-preservation behavior to normal selected cleanup and Trash refreshes so their final result remains visible after values refresh.
 - If a maintenance action completes but the follow-up scan fails, GoreeCloud Care now preserves the completed-action fact while reporting the refresh failure as an attention state instead of falsely claiming a fully refreshed result.
 - Repository validation is green; representative-device successful privileged-action execution remains a required acceptance gate before success is treated as verified.
 

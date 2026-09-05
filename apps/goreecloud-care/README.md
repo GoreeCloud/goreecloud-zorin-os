@@ -1,7 +1,7 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev7`  
+**Version:** `0.1.0-dev8`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
@@ -25,7 +25,8 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 - Explicit completion notice for successful privileged APT cache cleanup and Memory Refresh.
 - Post-action refresh that updates scan values without replacing the final completion/exception status.
 - Adaptive desktop composition: category amounts move below their content and primary actions stack vertically before constrained or enlarged-text layouts become horizontally compressed.
-- Compact HeaderBar behavior that omits the Development subtitle when space is constrained instead of relying on visible ellipsis.
+- Dev8 large-text-aware compact selection: the GTK `GDK_DPI_SCALE` used by the 200%-text acceptance harness is converted into an effective layout width before the 820-logical-pixel compact contract is evaluated, preventing the text-scaled allocation from hiding a physically narrow window.
+- Compact HeaderBar behavior that omits the Development subtitle when the compact composition is active instead of relying on visible ellipsis.
 - GTK/ATK status semantics: the maintenance status surface exposes a status role and updated accessible name, category counts expose descriptive accessible names, and action controls include clearer assistive descriptions.
 - High-contrast resilience: common GTK HighContrast theme names suppress the application color provider so the system high-contrast presentation can take precedence.
 - A minimum supported Development window size plus vertical scrolling and wrapping for long/status/system text to improve large-text and constrained-window behavior.
@@ -39,14 +40,14 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-Representative Zorin OS 17.3 testing through dev5 verifies light-default rendering, visible keyboard focus, both first-stage and PolicyKit cancellation paths, successful privileged Memory Refresh and APT cleanup, nonzero APT archive removal, controlled application-cache deletion, thumbnail-cache deletion, stale user-owned `/tmp` deletion, permanent Trash deletion, completion reporting, and post-action refresh behavior. Dev6 target testing verified the normal-text compact/minimum-window composition but exposed a combined 200%-text defect: the window reached its enlarged-text minimum before the old 680-pixel compact breakpoint. Dev7 raises the Development compact transition to 820 logical pixels and removes the compact HeaderBar subtitle so the compact composition can be reached before that large-text floor. Dev7 still requires representative-device rendered revalidation before combined 200%-text acceptance is claimed.
+Representative Zorin OS 17.3 testing through dev5 verifies light-default rendering, visible keyboard focus, both first-stage and PolicyKit cancellation paths, successful privileged Memory Refresh and APT cleanup, nonzero APT archive removal, controlled application-cache deletion, thumbnail-cache deletion, stale user-owned `/tmp` deletion, permanent Trash deletion, completion reporting, and post-action refresh behavior. Dev6 target testing verified the normal-text compact/minimum-window composition but exposed a combined 200%-text defect. Dev7 raised the normal-text compact threshold to 820 logical pixels and passed exact-head CI plus local dev7 source/package validation on the representative laptop, yet direct `GDK_DPI_SCALE=2` screenshots still showed the regular composition at the narrowest reachable window: the HeaderBar subtitle remained visible, category amounts stayed right-aligned, and the bottom actions remained horizontal. Dev8 addresses that verified target-device failure by evaluating an effective width adjusted for the 200%-text DPI scale. Dev8 still requires fresh repository validation and representative-device rendered acceptance before combined 200%-text/compact acceptance is claimed.
 
 The generated Debian package is Development software. Package rollback, official GoreeCloud Care visual assets, HighContrast/assistive-technology acceptance, full current-Stable Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev7_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev8_all.deb
 ```
 
 Uninstall with:

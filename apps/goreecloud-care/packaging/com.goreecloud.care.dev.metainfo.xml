@@ -8,6 +8,7 @@
   <description><p>Preview and clean stale user cache, thumbnails, temporary files and Trash, with separately authorized package-cache and Linux file-cache maintenance.</p></description>
   <launchable type="desktop-id">com.goreecloud.care.dev.desktop</launchable>
   <releases>
+    <release version="0.1.0-dev8" date="2026-09-05" type="development"/>
     <release version="0.1.0-dev7" date="2026-09-05" type="development"/>
     <release version="0.1.0-dev6" date="2026-09-05" type="development"/>
   </releases>
