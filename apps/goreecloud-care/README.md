@@ -34,7 +34,7 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-The generated Debian package is Development software. Representative Zorin OS 17.3 source validation, build, installation, launch, light-default rendering, keyboard-focus visibility, first-stage cancellation feedback, and both PolicyKit authentication-cancellation paths have been exercised through dev4. Dev5 fixes the success-status overwrite found during privileged-success testing and passes repository CI, but successful APT/Memory Refresh execution must be revalidated on the representative laptop before it is treated as verified. Actual cleanup acceptance, package rollback, official GoreeCloud Care visual assets, full Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+The generated Debian package is Development software. Representative Zorin OS 17.3 source validation, build, installation, launch, light-default rendering, keyboard-focus visibility, first-stage cancellation feedback, and both PolicyKit authentication-cancellation paths have been exercised through dev4. Dev5 fixes the success-status overwrite found during privileged-success testing. Exact-head repository validation for dev5 is green, but successful APT/Memory Refresh execution must be revalidated on the representative laptop before it is treated as verified. Actual cleanup acceptance, package rollback, official GoreeCloud Care visual assets, full Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
