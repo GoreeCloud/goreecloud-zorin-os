@@ -1,7 +1,7 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev5`  
+**Version:** `0.1.0-dev6`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
@@ -24,6 +24,10 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 - Explicit PolicyKit cancellation/error reporting, including the observed Zorin OS `Request dismissed` result, so a dismissed authentication request is never presented as success.
 - Explicit completion notice for successful privileged APT cache cleanup and Memory Refresh.
 - Post-action refresh that updates scan values without replacing the final completion/exception status.
+- Dev6 adaptive desktop composition: category amounts move below their content and primary actions stack vertically in compact windows rather than relying on horizontal compression.
+- Dev6 accessibility semantics: the maintenance status surface exposes a status role and updated accessible name, category counts expose descriptive accessible names, and action controls include clearer assistive descriptions.
+- Dev6 high-contrast resilience: common GTK HighContrast theme names suppress the application color provider so the system high-contrast presentation can take precedence.
+- A minimum supported Development window size plus vertical scrolling and wrapping for long/status/system text to improve large-text and constrained-window behavior.
 - No telemetry, advertising, cloud upload, or network requirement.
 - Symlink-safe user cleanup: links are unlinked, never traversed.
 
@@ -34,12 +38,14 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-The generated Debian package is Development software. Representative Zorin OS 17.3 source validation, build, installation, launch, light-default rendering, keyboard-focus visibility, first-stage cancellation feedback, and both PolicyKit authentication-cancellation paths have been exercised through dev4. Dev5 fixes the success-status overwrite found during privileged-success testing. Exact-head repository validation for dev5 is green, but successful APT/Memory Refresh execution must be revalidated on the representative laptop before it is treated as verified. Actual cleanup acceptance, package rollback, official GoreeCloud Care visual assets, full Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+Representative Zorin OS 17.3 testing through dev5 verifies light-default rendering, visible keyboard focus, both first-stage and PolicyKit cancellation paths, successful privileged Memory Refresh and APT cleanup, nonzero APT archive removal, controlled application-cache deletion, thumbnail-cache deletion, stale user-owned `/tmp` deletion, permanent Trash deletion, completion reporting, and post-action refresh behavior. Dev6 adds adaptive-window and accessibility/resilience work; its rendered compact-window, large-text, high-contrast, and assistive-technology behavior still requires target-device acceptance before those areas are treated as verified.
+
+The generated Debian package is Development software. Package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev5_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev6_all.deb
 ```
 
 Uninstall with:
