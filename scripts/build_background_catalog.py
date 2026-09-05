@@ -6,6 +6,8 @@ import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+MODE_ORDER = {"light": 0, "dark": 1, "deep-dark": 2}
+
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Build a GNOME Background Properties catalog for GoreeCloud wallpapers.")
@@ -18,7 +20,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "optionally expose only one wallpaper mode in GNOME Settings; "
-            "other source entries remain in the XML as deleted=true compatibility entries"
+            "without this option all Light, Dark, and Deep Dark wallpapers are visible"
         ),
     )
     return p.parse_args()
@@ -27,12 +29,26 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     data = json.loads(args.manifest.read_text(encoding="utf-8"))
-    catalog = data.get("catalog", [])
-    if len(catalog) < 20:
+    source_catalog = data.get("catalog", [])
+    if len(source_catalog) < 20:
         raise SystemExit("Wallpaper source catalog must contain at least 20 entries")
 
-    if args.mode is not None and not any(item.get("mode") == args.mode for item in catalog):
+    if args.mode is not None and not any(item.get("mode") == args.mode for item in source_catalog):
         raise SystemExit(f"Wallpaper catalog contains no {args.mode} entries")
+
+    category_order = {
+        category: index
+        for index, category in enumerate(data.get("collection", {}).get("categories", []))
+    }
+    catalog = sorted(
+        source_catalog,
+        key=lambda item: (
+            MODE_ORDER.get(item.get("mode"), 99),
+            category_order.get(item.get("category"), 99),
+            item.get("family", ""),
+            item.get("id", ""),
+        ),
+    )
 
     root = ET.Element("wallpapers")
     visible = 0
