@@ -11,6 +11,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
 from .core import CareEngine, CategoryScan, human_bytes, read_disk_stats, read_memory_stats
+from .privilege import interpret_pkexec_result
 
 APP_ID = "com.goreecloud.care.dev"
 HELPER = "/usr/lib/goreecloud-care/goreecloud-care-helper"
@@ -19,10 +20,18 @@ CSS = b"""
 window { background: #101a20; color: #f3f7f8; }
 headerbar { background: #18252b; color: #f3f7f8; }
 .card { background: #18252b; border-radius: 14px; padding: 14px; }
+.status-banner { background: #132c35; border-radius: 12px; padding: 10px 12px; }
 .title { font-weight: 700; font-size: 18px; }
 .muted { color: #9fb2bc; }
 .warning { color: #f1c75b; }
 button.suggested-action { background: #1c8a8d; color: #ffffff; }
+button:focus, checkbutton:focus {
+  outline-color: #7fe6ff;
+  outline-style: solid;
+  outline-width: 3px;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(127, 230, 255, 0.35);
+}
 """
 
 
@@ -48,6 +57,7 @@ class CareWindow(Gtk.ApplicationWindow):
         self.set_titlebar(header)
 
         scan_btn = Gtk.Button(label="Scan")
+        scan_btn.set_can_focus(True)
         scan_btn.set_tooltip_text("Scan safe maintenance categories without deleting anything")
         scan_btn.connect("clicked", self.on_scan)
         header.pack_end(scan_btn)
@@ -72,6 +82,15 @@ class CareWindow(Gtk.ApplicationWindow):
         self.system_label = Gtk.Label(xalign=0)
         self.system_label.get_style_context().add_class("muted")
         root.pack_start(self.system_label, False, False, 0)
+
+        status_frame = Gtk.Frame()
+        status_frame.set_shadow_type(Gtk.ShadowType.NONE)
+        status_frame.get_style_context().add_class("status-banner")
+        self.status = Gtk.Label(xalign=0)
+        self.status.set_line_wrap(True)
+        self.status.set_text("Ready. Scan to preview reclaimable space.")
+        status_frame.add(self.status)
+        root.pack_start(status_frame, False, False, 0)
 
         for key, title, desc, selectable in (
             ("cache", "Application cache", "Cache files older than 7 days in ~/.cache, excluding thumbnails.", True),
@@ -98,30 +117,29 @@ class CareWindow(Gtk.ApplicationWindow):
         explain.get_style_context().add_class("muted")
         memory_box.pack_start(explain, False, False, 0)
         memory_btn = Gtk.Button(label="Reclaim file cache…")
-        memory_btn.set_halign(Gtk.Align.START)
+        memory_btn.set_can_focus(True)
         memory_btn.connect("clicked", self.on_reclaim_memory)
         memory_box.pack_start(memory_btn, False, False, 0)
         root.pack_start(memory, False, False, 0)
 
         controls = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         clean = Gtk.Button(label="Clean selected")
+        clean.set_can_focus(True)
         clean.get_style_context().add_class("suggested-action")
         clean.connect("clicked", self.on_clean_selected)
         controls.pack_start(clean, False, False, 0)
 
         trash = Gtk.Button(label="Empty Trash…")
+        trash.set_can_focus(True)
         trash.connect("clicked", self.on_empty_trash)
         controls.pack_start(trash, False, False, 0)
 
         apt = Gtk.Button(label="Clean APT cache…")
+        apt.set_can_focus(True)
         apt.connect("clicked", self.on_apt_clean)
         controls.pack_start(apt, False, False, 0)
         root.pack_start(controls, False, False, 0)
 
-        self.status = Gtk.Label(xalign=0)
-        self.status.set_line_wrap(True)
-        self.status.set_text("Ready. Scan to preview reclaimable space.")
-        root.pack_start(self.status, False, False, 0)
         self.refresh_system_status()
         GLib.idle_add(lambda: (self.on_scan(None), False)[1])
 
@@ -138,8 +156,10 @@ class CareWindow(Gtk.ApplicationWindow):
         selector: Gtk.CheckButton | None = None
         if selectable:
             selector = Gtk.CheckButton()
+            selector.set_can_focus(True)
             selector.set_active(True)
             selector.set_tooltip_text(f"Include {title.lower()} in Clean selected")
+            selector.get_accessible().set_name(f"Include {title} in Clean selected")
             box.pack_start(selector, False, False, 0)
         text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         heading = Gtk.Label(xalign=0)
@@ -205,9 +225,25 @@ class CareWindow(Gtk.ApplicationWindow):
         label = "Delete permanently" if destructive else "Continue"
         response_id = Gtk.ResponseType.ACCEPT
         dialog.add_button(label, response_id)
+        dialog.set_default_response(Gtk.ResponseType.CANCEL)
+        cancel = dialog.get_widget_for_response(Gtk.ResponseType.CANCEL)
+        if cancel is not None:
+            cancel.grab_focus()
         response = dialog.run()
         dialog.destroy()
         return response == response_id
+
+    def _show_notice(self, primary: str, secondary: str, message_type=Gtk.MessageType.INFO) -> None:
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            modal=True,
+            message_type=message_type,
+            buttons=Gtk.ButtonsType.CLOSE,
+            text=primary,
+        )
+        dialog.format_secondary_text(secondary)
+        dialog.run()
+        dialog.destroy()
 
     def on_clean_selected(self, _button) -> None:
         selected: list[str] = []
@@ -292,7 +328,10 @@ class CareWindow(Gtk.ApplicationWindow):
         ):
             return
         self.set_status("Requesting administrator authorization for APT cache cleanup…")
-        self.run_thread(lambda: self._run_privileged("apt-clean"), self._privileged_done)
+        self.run_thread(
+            lambda: self._run_privileged("apt-clean"),
+            lambda result, error: self._privileged_done("APT cache cleanup", result, error),
+        )
 
     def on_reclaim_memory(self, _button) -> None:
         if not self._confirm(
@@ -303,19 +342,38 @@ class CareWindow(Gtk.ApplicationWindow):
         ):
             return
         self.set_status("Requesting administrator authorization for memory-cache reclaim…")
-        self.run_thread(lambda: self._run_privileged("reclaim-memory"), self._privileged_done)
+        self.run_thread(
+            lambda: self._run_privileged("reclaim-memory"),
+            lambda result, error: self._privileged_done("Memory-cache reclaim", result, error),
+        )
 
-    def _privileged_done(self, result, error) -> bool:
+    def _privileged_done(self, action_label: str, result, error) -> bool:
         if error:
-            self.set_status(f"Privileged action failed: {error}")
+            message = f"{action_label} failed before completion: {error}. No successful privileged change is claimed."
+            self.set_status(message)
+            self._show_notice("Privileged maintenance failed", message, Gtk.MessageType.ERROR)
             return False
-        if result.returncode != 0:
-            detail = (result.stderr or "Authorization was cancelled or the action failed.").strip()
-            self.set_status(f"Privileged action did not complete: {detail}")
+
+        outcome = interpret_pkexec_result(result.returncode, result.stderr, action_label)
+        self.set_status(outcome.message)
+
+        if outcome.cancelled:
+            self._show_notice(
+                "Administrator authorization cancelled",
+                outcome.message,
+                Gtk.MessageType.INFO,
+            )
             return False
-        self.set_status("Privileged maintenance action completed successfully.")
+
+        if not outcome.completed:
+            self._show_notice(
+                "Privileged maintenance did not complete",
+                outcome.message,
+                Gtk.MessageType.ERROR,
+            )
+            return False
+
         self.refresh_system_status()
-        self.on_scan(None)
         return False
 
 
