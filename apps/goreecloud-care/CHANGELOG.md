@@ -6,6 +6,7 @@
 - Added a post-action refresh path that updates scan values without overwriting the final success/attention result.
 - Applied the same status-preservation behavior to normal selected cleanup and Trash cleanup so their final result remains visible after values refresh.
 - If a maintenance action completes but the follow-up scan fails, GoreeCloud Care now preserves the completed-action fact while reporting the refresh failure as an attention state instead of falsely claiming a fully refreshed result.
+- Repository validation is green; representative-device successful privileged-action execution remains a required acceptance gate before success is treated as verified.
 
 ## 0.1.0-dev4 — 2026-09-05
 - Changed GoreeCloud Care to open in a light appearance by default without modifying the user's desktop-wide Zorin OS appearance setting.
