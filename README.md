@@ -14,7 +14,7 @@ The repository currently provides:
 - `GoreeCloud-Zorin` — light-first icon theme;
 - `GoreeCloud-Zorin-Cursors` — Frost White + GoreeCloud Blue Xcursor theme;
 - 24 identity-derived GoreeCloud wallpapers;
-- recovery-backed replacement of the audited Zorin OS 17.3 stock wallpaper set.
+- recovery-backed replacement of the audited Zorin OS 17.3 stock wallpaper set without removing Zorin desktop packages.
 
 The V1.1 palette remains the default compatibility build contract while the repository carries a parallel Glaze UI V1.2 Development preview in `config/palettes-v1.2.json`.
 
@@ -46,13 +46,17 @@ Existing GoreeCloud theme/icon/cursor directories are moved into timestamped rec
 
 ## Replace the stock Zorin wallpapers
 
-To install the GoreeCloud desktop experience and then remove the exact audited Zorin OS 17.3 stock wallpaper packages:
+To install the GoreeCloud desktop experience and replace the stock wallpaper gallery:
 
 ```bash
 ./scripts/install.sh --replace-stock
 ```
 
-The replacement path verifies the target OS, exact stock wallpaper package versions, exact package-owned wallpaper/catalog paths, the complete GoreeCloud replacement catalog, and an `apt-get --simulate purge` removal set containing only the audited wallpaper packages. It creates recovery material and downloads the exact recovery `.deb` set before performing the purge.
+The target audit showed that directly purging the four Zorin wallpaper packages would also remove `zorin-os-artwork` and `zorin-os-desktop` and would pull in Ubuntu wallpaper packages. The project therefore **does not purge those packages**.
+
+Instead, the replacement workflow keeps all Zorin packages installed and uses local `dpkg-divert` entries for the exact audited stock wallpaper images and GNOME background catalog files. Those files are moved under `/var/lib/goreecloud-zorin/stock-wallpaper-diversions`, outside normal GNOME wallpaper discovery paths. Package ownership remains intact, package upgrades continue to respect the diversions, and the GoreeCloud user catalog remains the visible replacement collection.
+
+The workflow first verifies the target OS, exact wallpaper package versions, protected Zorin desktop/artwork package versions, exact package ownership for every audited file, and the complete GoreeCloud replacement catalog. It also records the unsafe `apt-get --simulate purge` result as diagnostic evidence but never executes that purge.
 
 The same workflow is available independently:
 
@@ -64,7 +68,7 @@ The same workflow is available independently:
 ./scripts/wallpaper.sh replace-stock finalize
 ```
 
-`restore` reinstalls the archived exact packages/fileset. `finalize` removes recovery material only after the stock set remains absent and the GoreeCloud replacement catalog remains valid.
+`restore` removes the local diversions and returns the stock files to their original paths. `finalize` discards the temporary transaction archive while leaving the package-safe diversions active; restore remains possible from the active diverted package files while the target package versions remain compatible.
 
 ## Icon theme
 
@@ -150,7 +154,7 @@ The generated GNOME background catalog is installed at:
 ./scripts/uninstall.sh
 ```
 
-If the GoreeCloud GTK, Shell, icon, or cursor themes are currently selected, uninstall resets the corresponding GNOME setting to its distro default before moving the GoreeCloud files into timestamped recovery storage. Wallpaper package recovery is managed separately through `wallpaper.sh replace-stock restore` when stock wallpapers were removed.
+If the GoreeCloud GTK, Shell, icon, or cursor themes are currently selected, uninstall resets the corresponding GNOME setting to its distro default before moving the GoreeCloud files into timestamped recovery storage. Stock wallpaper replacement is managed separately through `wallpaper.sh replace-stock restore` when diversions are active.
 
 ## Validation
 
