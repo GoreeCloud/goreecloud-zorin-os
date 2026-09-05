@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev6
+version: 0.1.0-dev7
 
 supported_platforms:
   - linux
@@ -44,7 +44,7 @@ platform_systems:
     result: applicable-blocked
     version: "1.1.0"
     evidence: []
-    notes: Current Stable consumer target is 1.1.0. Dev6 preserves the representative-device-verified light appearance, visible focus, semantic status treatment, and completed core maintenance workflows while adding adaptive desktop composition, ATK status/control semantics, text-wrap resilience, and high-contrast fallback behavior. Final native rendered, large-text, assistive-technology, resilience, and application conformance acceptance remain incomplete.
+    notes: Current Stable consumer target is 1.1.0. Dev6 preserved the representative-device-verified light appearance, focus, semantic status treatment, maintenance workflows, and normal-text compact composition, but target testing proved its 680-pixel compact transition was unreachable at the narrowest GDK_DPI_SCALE=2 window. Dev7 moves the compact transition to 820 logical pixels and omits the compact HeaderBar subtitle to remediate that specific large-text/adaptive defect. Target dev7 rendering, HighContrast, assistive-technology, resilience, and final application conformance acceptance remain incomplete.
   mesh:
     result: applicable-blocked
     version: null
@@ -124,7 +124,7 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, keyboard-focus, cancellation, privileged-success, and all present cleanup functions are representative-device verified through dev5; dev6 compact-window, large-text, high-contrast, and assistive-technology behavior still requires target-device acceptance.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, keyboard-focus, cancellation, privileged-success, and all present cleanup functions are representative-device verified through dev5; dev6 normal-text compact behavior is target-verified, while dev7 combined 200%-text compact reachability, HighContrast, and assistive-technology behavior still require target-device acceptance.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
