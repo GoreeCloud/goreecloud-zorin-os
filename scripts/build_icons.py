@@ -81,6 +81,61 @@ def symbolic_folder_icon(opened: bool = False) -> str:
     return svg(body)
 
 
+def symbolic_special_folder_icon(kind: str) -> str:
+    """Small-place folder symbolics with distinct XDG-directory semantics.
+
+    Nautilus asks for the *-symbolic names in its sidebar. Keep both the folder
+    silhouette and the inner semantic glyph line-only so GTK cannot flatten a
+    closed shape into a filled block, while Documents/Downloads/Music/Pictures/
+    Videos stop looking like five copies of the generic folder.
+    """
+    glyphs = {
+        "documents": (
+            '    <line x1="25" y1="35" x2="40" y2="35" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="25" y1="40" x2="40" y2="40" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="25" y1="45" x2="35" y2="45" stroke="#174EA6" stroke-width="2.5"/>\n'
+        ),
+        "download": (
+            '    <line x1="32" y1="34" x2="32" y2="46" stroke="#174EA6" stroke-width="3"/>\n'
+            '    <line x1="26" y1="41" x2="32" y2="47" stroke="#174EA6" stroke-width="3"/>\n'
+            '    <line x1="38" y1="41" x2="32" y2="47" stroke="#174EA6" stroke-width="3"/>\n'
+        ),
+        "music": (
+            '    <line x1="36" y1="34" x2="36" y2="45" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="36" y1="34" x2="44" y2="32" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="44" y1="32" x2="44" y2="42" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="30" y1="47" x2="36" y2="45" stroke="#174EA6" stroke-width="3"/>\n'
+            '    <line x1="38" y1="44" x2="44" y2="42" stroke="#174EA6" stroke-width="3"/>\n'
+        ),
+        "pictures": (
+            '    <line x1="23" y1="46" x2="29" y2="39" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="29" y1="39" x2="34" y2="44" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="34" y1="44" x2="39" y2="38" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="39" y1="38" x2="45" y2="46" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="42" y1="34" x2="45" y2="34" stroke="#8FC4E8" stroke-width="3"/>\n'
+        ),
+        "videos": (
+            '    <line x1="28" y1="35" x2="28" y2="47" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="28" y1="35" x2="40" y2="41" stroke="#174EA6" stroke-width="2.5"/>\n'
+            '    <line x1="40" y1="41" x2="28" y2="47" stroke="#174EA6" stroke-width="2.5"/>\n'
+        ),
+    }
+    if kind not in glyphs:
+        raise ValueError(f"unsupported symbolic special folder kind: {kind}")
+    return svg(
+        '  <g fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
+        '    <line x1="10" y1="51" x2="10" y2="19" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="10" y1="19" x2="27" y2="19" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="27" y1="19" x2="34" y2="26" stroke="#8FC4E8" stroke-width="3"/>\n'
+        '    <line x1="34" y1="26" x2="54" y2="26" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="54" y1="26" x2="54" y2="51" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="10" y1="51" x2="54" y2="51" stroke="#3B82F6" stroke-width="3"/>\n'
+        '    <line x1="10" y1="30" x2="54" y2="30" stroke="#8FC4E8" stroke-width="2.5"/>\n'
+        + glyphs[kind]
+        + '  </g>\n'
+    )
+
+
 def symbolic_star_icon() -> str:
     """Nautilus Starred empty-state icon using the same line-only contract."""
     return svg(
@@ -189,6 +244,11 @@ def main() -> int:
         "folder": folder_icon(),
         "folder-symbolic": symbolic_folder_icon(),
         "folder-open-symbolic": symbolic_folder_icon(opened=True),
+        "folder-documents-symbolic": symbolic_special_folder_icon("documents"),
+        "folder-download-symbolic": symbolic_special_folder_icon("download"),
+        "folder-music-symbolic": symbolic_special_folder_icon("music"),
+        "folder-pictures-symbolic": symbolic_special_folder_icon("pictures"),
+        "folder-videos-symbolic": symbolic_special_folder_icon("videos"),
         "starred-symbolic": symbolic_star_icon(),
         "user-home-symbolic": symbolic_home_icon(),
         "document-open-recent-symbolic": symbolic_recent_icon(),
@@ -200,7 +260,7 @@ def main() -> int:
         "folder-pictures": folder_icon('  <rect x="23" y="31" width="22" height="16" rx="2" fill="#FFFFFF" stroke="#174EA6" stroke-width="1.5"/><circle cx="39" cy="35" r="2" fill="#3B82F6"/><path d="m25 44 6-6 4 4 3-3 5 5" fill="none" stroke="#3B82F6" stroke-width="2"/>'),
         "folder-videos": folder_icon('  <rect x="24" y="32" width="20" height="15" rx="3" fill="#FFFFFF" stroke="#174EA6" stroke-width="1.5"/><path d="m32 36 7 4-7 4Z" fill="#3B82F6"/>'),
         "user-home": svg('  <path d="M10 31 32 12l22 19v21a5 5 0 0 1-5 5H15a5 5 0 0 1-5-5Z" fill="url(#frost)" stroke="#3B82F6" stroke-width="2"/><path d="M25 57V39h14v18" fill="#DCECF6" stroke="#174EA6" stroke-width="2"/>'),
-        "user-desktop": svg('  <rect x="7" y="10" width="50" height="35" rx="5" fill="url(#frost)" stroke="#3B82F6" stroke-width="2"/><path d="M23 54h18M28 45v9m8-9v9" stroke="#174EA6" stroke-width="2.5" stroke-linecap="round"/>'),
+        "user-desktop": svg('  <rect x="7" y="10" width="50" height="35" rx="5" fill="url(#frost)" stroke="#3B82F6" stroke-width="2"/><path d="M23 54h18M28 43v9m8-9v9" stroke="#174EA6" stroke-width="2.5" stroke-linecap="round"/>'),
         "user-trash": svg('  <path d="M18 20h28l-2 36H20Z" fill="url(#frost)" stroke="#3B82F6" stroke-width="2"/><path d="M15 17h34M26 12h12" stroke="#174EA6" stroke-width="3" stroke-linecap="round"/>'),
         "user-trash-full": svg('  <path d="M18 20h28l-2 36H20Z" fill="#DCECF6" stroke="#3B82F6" stroke-width="2"/><path d="M15 17h34M26 12h12" stroke="#174EA6" stroke-width="3" stroke-linecap="round"/><path d="m25 29 14 17M39 29 25 46" stroke="#3B82F6" stroke-width="2.5"/>'),
     }
