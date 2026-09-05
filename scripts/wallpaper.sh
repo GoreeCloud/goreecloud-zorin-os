@@ -25,8 +25,9 @@ writes a GNOME Background Properties catalog under the current user's data
 directory. Light is the primary/default GoreeCloud wallpaper mode.
 
 replace-stock exposes the recovery-backed Zorin OS 17.3 stock-wallpaper
-replacement workflow. The apply/restore/finalize actions invoke sudo when
-needed and remain fail-closed on package/version/path drift.
+replacement workflow. The package-safe workflow keeps Zorin packages installed
+and diverts only the exact audited stock wallpaper/catalog files out of GNOME
+discovery paths. apply/restore/finalize invoke sudo when needed.
 EOF
 }
 
@@ -216,8 +217,8 @@ replace_stock() {
       "$ROOT/scripts/system_wallpapers.sh" "$action"
       ;;
     apply)
-      # Ensure the complete GoreeCloud catalog exists and make the light
-      # GoreeCloud wallpaper active before the system stock set is removed.
+      # Ensure the complete GoreeCloud catalog exists and make the primary
+      # light wallpaper active before diverting the audited stock set.
       apply_wallpaper default
       sudo "$ROOT/scripts/system_wallpapers.sh" apply
       ;;
