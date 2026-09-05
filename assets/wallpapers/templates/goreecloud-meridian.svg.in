@@ -1,24 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160" role="img" aria-labelledby="title desc">
   <title id="title">GoreeCloud Unified Clean Meridian {{mode_label}}</title>
-  <desc id="desc">GoreeCloud wallpaper preserving the approved Unified Clean platform mark while extending its open-boundary and deliberate-connection visual meaning across a Glaze UI field.</desc>
+  <desc id="desc">Quiet GoreeCloud wallpaper extending the approved Unified Clean open-boundary and intentional-connection meaning with canonical blue light, low-frequency geometry, and generous negative space.</desc>
   <defs>
-    <linearGradient id="wpGcMerBg" x1="0" y1="0" x2="1" y2="0"><stop stop-color="{{canvas}}"/><stop offset="0.52" stop-color="{{deep}}"/><stop offset="1" stop-color="{{surface}}"/></linearGradient>
-    <linearGradient id="wpGcRoute" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3B82F6" stop-opacity="0.08"/><stop offset="0.50" stop-color="#3B82F6" stop-opacity="0.52"/><stop offset="1" stop-color="#174EA6" stop-opacity="0.12"/></linearGradient>
-    <radialGradient id="wpGcMerGlow" cx="0.72" cy="0.50" r="0.48"><stop stop-color="#3B82F6" stop-opacity="0.20"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/></radialGradient>
+    <linearGradient id="gcMeridianBg" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="{{canvas}}"/>
+      <stop offset="0.58" stop-color="{{deep}}"/>
+      <stop offset="1" stop-color="{{surface}}"/>
+    </linearGradient>
+    <radialGradient id="gcMeridianLight" cx="0.74" cy="0.47" r="0.52">
+      <stop stop-color="#3B82F6" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gcMeridianRoute" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#3B82F6" stop-opacity="0.02"/>
+      <stop offset="0.58" stop-color="#3B82F6" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#174EA6" stop-opacity="0.08"/>
+    </linearGradient>
   </defs>
-  <rect width="3840" height="2160" fill="url(#wpGcMerBg)"/>
-  <rect width="3840" height="2160" fill="url(#wpGcMerGlow)"/>
-  <path d="M-200 1160C480 930 1090 920 1580 1060S2570 1330 4100 850" fill="none" stroke="url(#wpGcRoute)" stroke-width="28" stroke-linecap="round"/>
-  <path d="M-180 1310C590 1110 1170 1130 1650 1260S2690 1450 4050 1040" fill="none" stroke="{{accent_soft}}" stroke-opacity="0.10" stroke-width="5"/>
-  <g fill="#3B82F6" opacity="0.30">
-    <circle cx="520" cy="1010" r="10"/><circle cx="1040" cy="1000" r="8"/><circle cx="1490" cy="1040" r="11"/><circle cx="3070" cy="1090" r="9"/><circle cx="3470" cy="950" r="7"/>
+  <rect width="3840" height="2160" fill="url(#gcMeridianBg)"/>
+  <rect width="3840" height="2160" fill="url(#gcMeridianLight)"/>
+
+  <path d="M-240 1400C690 1180 1370 1210 1940 1320C2510 1430 3090 1360 4090 1030" fill="none" stroke="url(#gcMeridianRoute)" stroke-width="24" stroke-linecap="round"/>
+  <path d="M-220 1510C760 1320 1450 1350 2020 1450C2700 1570 3290 1430 4050 1200" fill="none" stroke="#8FC4E8" stroke-opacity="0.08" stroke-width="4"/>
+
+  <g fill="none" stroke="{{border}}" stroke-opacity="0.18" stroke-width="3">
+    <circle cx="2920" cy="1040" r="520"/>
+    <circle cx="2920" cy="1040" r="680"/>
   </g>
-  <rect x="2380" y="420" width="1040" height="1040" rx="260" fill="{{surface}}" opacity="0.22" stroke="{{border}}" stroke-opacity="0.48" stroke-width="3"/>
-  <svg x="2500" y="540" width="800" height="800" viewBox="{{identity_viewbox}}" aria-hidden="true">
+  <path d="M2920 1040H3600" fill="none" stroke="#174EA6" stroke-opacity="0.14" stroke-width="10" stroke-linecap="round"/>
+
+  <rect x="2470" y="590" width="900" height="900" rx="250" fill="{{surface}}" opacity="0.11" stroke="{{border}}" stroke-opacity="0.20" stroke-width="3"/>
+  <svg x="2540" y="660" width="760" height="760" viewBox="{{identity_viewbox}}" aria-hidden="true">
 {{identity_inner}}
   </svg>
-  <g fill="none" stroke="{{border}}" stroke-opacity="0.32" stroke-width="3">
-    <circle cx="820" cy="1080" r="340"/><circle cx="820" cy="1080" r="470"/><circle cx="820" cy="1080" r="600"/>
-  </g>
-  <circle cx="820" cy="1080" r="26" fill="{{accent}}"/>
 </svg>
