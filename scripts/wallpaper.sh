@@ -2,7 +2,6 @@
 set -euo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE_DIR="$ROOT/assets/wallpapers"
 MANIFEST="$ROOT/config/wallpapers.json"
 DEST_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/backgrounds/GoreeCloud-Zorin"
 CATALOG_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-background-properties"
