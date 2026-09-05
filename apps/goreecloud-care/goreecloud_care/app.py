@@ -6,11 +6,20 @@ import threading
 
 import gi
 
+gi.require_version("Atk", "1.0")
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Atk, Gio, GLib, Gtk  # noqa: E402
 
 from .core import CareEngine, CategoryScan, human_bytes, read_disk_stats, read_memory_stats
 from .privilege import interpret_pkexec_result
+from .ui_contract import (
+    COMPACT_BORDER,
+    COMPACT_WIDTH,
+    MIN_WINDOW_HEIGHT,
+    MIN_WINDOW_WIDTH,
+    REGULAR_BORDER,
+    is_high_contrast_theme,
+)
 
 APP_ID = "com.goreecloud.care.dev"
 HELPER = "/usr/lib/goreecloud-care/goreecloud-care-helper"
@@ -101,23 +110,28 @@ class CareWindow(Gtk.ApplicationWindow):
     def __init__(self, app: Gtk.Application) -> None:
         super().__init__(application=app, title="GoreeCloud Care — Development")
         self.set_default_size(900, 680)
+        self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         self.set_border_width(0)
         self.engine = CareEngine()
         self.scans: dict[str, CategoryScan] = {}
         self.rows: dict[str, tuple[Gtk.CheckButton | None, Gtk.Label]] = {}
+        self.category_layouts: dict[str, tuple[Gtk.Box, Gtk.Label]] = {}
+        self._compact_layout: bool | None = None
 
         # GoreeCloud Care intentionally opens in a light appearance by default.
-        # This preference is local to the application process and does not alter
-        # the user's Zorin OS desktop appearance.
-        settings = Gtk.Settings.get_default()
-        if settings is not None:
-            settings.set_property("gtk-application-prefer-dark-theme", False)
+        # High-contrast system themes take priority over this Development mapping.
+        self.settings = Gtk.Settings.get_default()
+        if self.settings is not None:
+            theme_name = self.settings.get_property("gtk-theme-name")
+            if not is_high_contrast_theme(theme_name):
+                self.settings.set_property("gtk-application-prefer-dark-theme", False)
 
-        provider = Gtk.CssProvider()
-        provider.load_from_data(CSS)
-        Gtk.StyleContext.add_provider_for_screen(
-            self.get_screen(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
+        self.css_provider = Gtk.CssProvider()
+        self.css_provider.load_from_data(CSS)
+        self.css_provider_attached = False
+        self._sync_css_for_theme()
+        if self.settings is not None:
+            self.settings.connect("notify::gtk-theme-name", self._on_theme_name_changed)
 
         header = Gtk.HeaderBar()
         header.set_show_close_button(True)
@@ -128,14 +142,17 @@ class CareWindow(Gtk.ApplicationWindow):
         scan_btn = Gtk.Button(label="Scan")
         scan_btn.set_can_focus(True)
         scan_btn.set_tooltip_text("Scan safe maintenance categories without deleting anything")
+        scan_btn.get_accessible().set_description(
+            "Preview maintenance categories. Scanning does not delete files."
+        )
         scan_btn.connect("clicked", self.on_scan)
         header.pack_end(scan_btn)
 
-        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
-        root.set_border_width(18)
+        self.root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
+        self.root.set_border_width(REGULAR_BORDER)
         scroll = Gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        scroll.add(root)
+        scroll.add(self.root)
         self.add(scroll)
 
         intro = Gtk.Label()
@@ -146,17 +163,23 @@ class CareWindow(Gtk.ApplicationWindow):
             "GoreeCloud Care scans local files only. It does not send telemetry. "
             "Routine cache and temporary-file cleanup runs as your user account."
         )
-        root.pack_start(intro, False, False, 0)
+        self.root.pack_start(intro, False, False, 0)
 
         self.system_label = Gtk.Label(xalign=0)
+        self.system_label.set_line_wrap(True)
         self.system_label.get_style_context().add_class("muted")
-        root.pack_start(self.system_label, False, False, 0)
+        self.root.pack_start(self.system_label, False, False, 0)
 
         self.status_frame = Gtk.Frame()
         self.status_frame.set_shadow_type(Gtk.ShadowType.NONE)
         self.status_frame.get_style_context().add_class("status-banner")
         self.status_frame.get_style_context().add_class("status-info")
-        self.status_frame.get_accessible().set_name("GoreeCloud Care maintenance status")
+        self.status_accessible = self.status_frame.get_accessible()
+        self.status_accessible.set_role(Atk.Role.STATUSBAR)
+        self.status_accessible.set_name("Ready. Scan to preview reclaimable space.")
+        self.status_accessible.set_description(
+            "GoreeCloud Care maintenance status and operation results."
+        )
 
         status_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=11)
         self.status_frame.add(status_box)
@@ -166,6 +189,7 @@ class CareWindow(Gtk.ApplicationWindow):
 
         status_text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         self.status_title = Gtk.Label(xalign=0)
+        self.status_title.set_line_wrap(True)
         self.status_title.get_style_context().add_class("status-title")
         self.status_title.set_text("Ready")
         status_text.pack_start(self.status_title, False, False, 0)
@@ -174,7 +198,7 @@ class CareWindow(Gtk.ApplicationWindow):
         self.status.set_text("Scan to preview reclaimable space.")
         status_text.pack_start(self.status, False, False, 0)
         status_box.pack_start(status_text, True, True, 0)
-        root.pack_start(self.status_frame, False, False, 0)
+        self.root.pack_start(self.status_frame, False, False, 0)
 
         for key, title, desc, selectable in (
             ("cache", "Application cache", "Cache files older than 7 days in ~/.cache, excluding thumbnails.", True),
@@ -183,7 +207,7 @@ class CareWindow(Gtk.ApplicationWindow):
             ("trash", "Trash", "Items currently in your desktop Trash. Emptying is permanent and separately confirmed.", False),
             ("apt", "APT package cache", "Downloaded .deb package archives. Cleaning requires administrator authentication.", False),
         ):
-            root.pack_start(self._category_card(key, title, desc, selectable), False, False, 0)
+            self.root.pack_start(self._category_card(key, title, desc, selectable), False, False, 0)
 
         memory = self._card()
         memory_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
@@ -202,27 +226,43 @@ class CareWindow(Gtk.ApplicationWindow):
         memory_box.pack_start(explain, False, False, 0)
         memory_btn = Gtk.Button(label="Reclaim file cache…")
         memory_btn.set_can_focus(True)
+        memory_btn.get_accessible().set_description(
+            "Temporarily reclaim Linux file caches. Administrator authentication is required."
+        )
         memory_btn.connect("clicked", self.on_reclaim_memory)
         memory_box.pack_start(memory_btn, False, False, 0)
-        root.pack_start(memory, False, False, 0)
+        self.root.pack_start(memory, False, False, 0)
 
-        controls = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.controls = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         clean = Gtk.Button(label="Clean selected")
         clean.set_can_focus(True)
         clean.get_style_context().add_class("suggested-action")
+        clean.get_accessible().set_description(
+            "Clean only the selected application-cache, thumbnail-cache, and temporary-file categories."
+        )
         clean.connect("clicked", self.on_clean_selected)
-        controls.pack_start(clean, False, False, 0)
+        self.controls.pack_start(clean, False, False, 0)
 
         trash = Gtk.Button(label="Empty Trash…")
         trash.set_can_focus(True)
+        trash.get_accessible().set_description(
+            "Permanently empty the desktop Trash after a separate confirmation."
+        )
         trash.connect("clicked", self.on_empty_trash)
-        controls.pack_start(trash, False, False, 0)
+        self.controls.pack_start(trash, False, False, 0)
 
         apt = Gtk.Button(label="Clean APT cache…")
         apt.set_can_focus(True)
+        apt.get_accessible().set_description(
+            "Remove downloaded APT package archives after administrator authentication."
+        )
         apt.connect("clicked", self.on_apt_clean)
-        controls.pack_start(apt, False, False, 0)
-        root.pack_start(controls, False, False, 0)
+        self.controls.pack_start(apt, False, False, 0)
+        self.root.pack_start(self.controls, False, False, 0)
+
+        self.action_buttons = (clean, trash, apt)
+        self.connect("size-allocate", self._on_size_allocate)
+        self._apply_layout(900)
 
         self.refresh_system_status()
         GLib.idle_add(lambda: (self.on_scan(None), False)[1])
@@ -235,8 +275,12 @@ class CareWindow(Gtk.ApplicationWindow):
 
     def _category_card(self, key: str, title: str, desc: str, selectable: bool) -> Gtk.Widget:
         frame = self._card()
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        frame.add(box)
+        outer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        frame.add(outer)
+
+        body = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        outer.pack_start(body, True, True, 0)
+
         selector: Gtk.CheckButton | None = None
         if selectable:
             selector = Gtk.CheckButton()
@@ -244,20 +288,73 @@ class CareWindow(Gtk.ApplicationWindow):
             selector.set_active(True)
             selector.set_tooltip_text(f"Include {title.lower()} in Clean selected")
             selector.get_accessible().set_name(f"Include {title} in Clean selected")
-            box.pack_start(selector, False, False, 0)
+            selector.get_accessible().set_description(desc)
+            body.pack_start(selector, False, False, 0)
+
         text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         heading = Gtk.Label(xalign=0)
+        heading.set_line_wrap(True)
         heading.set_markup(f"<span weight='bold' size='large'>{GLib.markup_escape_text(title)}</span>")
         text.pack_start(heading, False, False, 0)
         description = Gtk.Label(label=desc, xalign=0)
         description.set_line_wrap(True)
         description.get_style_context().add_class("muted")
         text.pack_start(description, False, False, 0)
-        box.pack_start(text, True, True, 0)
+        body.pack_start(text, True, True, 0)
+
         amount = Gtk.Label(label="Not scanned", xalign=1)
-        box.pack_end(amount, False, False, 0)
+        amount.get_accessible().set_name(f"{title}: not scanned")
+        outer.pack_end(amount, False, False, 0)
+
         self.rows[key] = (selector, amount)
+        self.category_layouts[key] = (outer, amount)
         return frame
+
+    def _on_size_allocate(self, _widget, allocation) -> None:
+        self._apply_layout(allocation.width)
+
+    def _apply_layout(self, width: int) -> None:
+        compact = width < COMPACT_WIDTH
+        if compact == self._compact_layout:
+            return
+        self._compact_layout = compact
+        self.root.set_border_width(COMPACT_BORDER if compact else REGULAR_BORDER)
+        self.controls.set_orientation(
+            Gtk.Orientation.VERTICAL if compact else Gtk.Orientation.HORIZONTAL
+        )
+        for button in self.action_buttons:
+            button.set_hexpand(compact)
+            button.set_halign(Gtk.Align.FILL if compact else Gtk.Align.START)
+        for outer, amount in self.category_layouts.values():
+            outer.set_orientation(
+                Gtk.Orientation.VERTICAL if compact else Gtk.Orientation.HORIZONTAL
+            )
+            amount.set_xalign(0 if compact else 1)
+            amount.set_halign(Gtk.Align.START if compact else Gtk.Align.END)
+
+    def _on_theme_name_changed(self, *_args) -> None:
+        self._sync_css_for_theme()
+
+    def _sync_css_for_theme(self) -> None:
+        screen = self.get_screen()
+        if screen is None:
+            return
+        theme_name = (
+            self.settings.get_property("gtk-theme-name")
+            if self.settings is not None
+            else None
+        )
+        high_contrast = is_high_contrast_theme(theme_name)
+        if high_contrast and self.css_provider_attached:
+            Gtk.StyleContext.remove_provider_for_screen(screen, self.css_provider)
+            self.css_provider_attached = False
+        elif not high_contrast and not self.css_provider_attached:
+            Gtk.StyleContext.add_provider_for_screen(
+                screen, self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
+            self.css_provider_attached = True
+        if self.settings is not None and not high_contrast:
+            self.settings.set_property("gtk-application-prefer-dark-theme", False)
 
     def refresh_system_status(self) -> None:
         mem = read_memory_stats()
@@ -271,13 +368,19 @@ class CareWindow(Gtk.ApplicationWindow):
     def set_status(self, text: str, state: str = "info", title: str | None = None) -> None:
         if state not in STATUS_ICONS:
             state = "info"
+        resolved_title = title or STATUS_TITLES[state]
         context = self.status_frame.get_style_context()
         for class_name in STATUS_STYLES:
             context.remove_class(class_name)
         context.add_class(f"status-{state}")
         self.status_icon.set_from_icon_name(STATUS_ICONS[state], Gtk.IconSize.BUTTON)
-        self.status_title.set_text(title or STATUS_TITLES[state])
+        self.status_title.set_text(resolved_title)
         self.status.set_text(text)
+        self.status_accessible.set_name(f"{resolved_title}. {text}")
+        try:
+            self.status_accessible.emit("visible-data-changed")
+        except (TypeError, RuntimeError):
+            pass
 
     def run_thread(self, fn, done) -> None:
         def worker() -> None:
@@ -293,7 +396,11 @@ class CareWindow(Gtk.ApplicationWindow):
         total = 0
         for key, scan in scans.items():
             total += scan.bytes
-            self.rows[key][1].set_text(f"{human_bytes(scan.bytes)} • {scan.count} items")
+            amount_text = f"{human_bytes(scan.bytes)} • {scan.count} items"
+            self.rows[key][1].set_text(amount_text)
+            self.rows[key][1].get_accessible().set_name(
+                f"{scan.label}: {human_bytes(scan.bytes)}, {scan.count} items"
+            )
         self.refresh_system_status()
         return total
 
