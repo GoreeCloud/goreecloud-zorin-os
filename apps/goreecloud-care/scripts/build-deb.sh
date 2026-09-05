@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-VERSION="0.1.0~dev5"
+VERSION="0.1.0~dev6"
 ARCH="all"
 PKG="goreecloud-care"
 OUT=${1:-"$ROOT/dist"}
@@ -23,7 +23,7 @@ Section: utils
 Priority: optional
 Architecture: $ARCH
 Maintainer: GoreeCloud <support@goreecloud.com>
-Depends: python3, python3-gi, gir1.2-gtk-3.0, policykit-1
+Depends: python3, python3-gi, gir1.2-gtk-3.0, gir1.2-atk-1.0, policykit-1
 Homepage: https://goreecloud.com/
 Description: GoreeCloud Care Development maintenance utility
  Local-first GTK maintenance utility for Zorin OS and compatible Linux systems.
