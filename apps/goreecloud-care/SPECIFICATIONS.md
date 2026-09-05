@@ -29,6 +29,8 @@ Primary user: a person maintaining their own GoreeCloud/Zorin OS workstation.
 - Category counts must remain associated with understandable category text for visual and assistive-technology users.
 - Long status, system, description, and heading text must wrap instead of clipping.
 - The desktop window must support a compact composition below the Development breakpoint: category amounts move below category content and the bottom action row becomes a vertical action stack.
+- The compact transition must occur early enough that supported enlarged-text layouts can reach the compact composition before intrinsic widget sizing prevents further narrowing.
+- The compact HeaderBar may omit the Development subtitle while retaining the application title and primary Scan action when necessary to reduce horizontal pressure.
 - The compact composition must preserve action availability, focus order, reading order, and vertical scrolling rather than depending on horizontal scrolling.
 - The Development window has a defined minimum supported size of 480 × 420 logical pixels; narrower or shorter unsupported sizes are not claimed.
 - Current Stable Glaze UI V1.1 / 1.1.0 remains the governing design target; these Development mappings do not establish conformance until rendered, accessibility, resilience, and platform-native evidence is accepted.
@@ -50,4 +52,4 @@ Python 3 + GTK 3/PyGObject, selected to match the verified Zorin OS 17.3 desktop
 - No GoreeCloud cloud account requirement or remote management.
 
 ## Release status
-Development / nonconformant. Core maintenance execution is representative-device verified through dev5. Dev6 adaptive-window, large-text, high-contrast, and assistive-technology acceptance plus remaining Integral Platform System evidence remain open.
+Development / nonconformant. Core maintenance execution is representative-device verified through dev5. Dev6 normal-text compact/minimum-window acceptance is verified, but representative-device testing found that its 680-pixel compact transition was unreachable at the narrowest supported `GDK_DPI_SCALE=2` window. Dev7 remediates that specific combined large-text/adaptive defect by moving the compact transition to 820 logical pixels and reducing compact HeaderBar width pressure; target-device dev7 revalidation, HighContrast, assistive-technology acceptance, and remaining Integral Platform System evidence remain open.
