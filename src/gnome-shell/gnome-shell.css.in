@@ -137,19 +137,19 @@ stage {
   color: {{TEXT}};
 }
 
-/* The stock date menu leaves a very large undifferentiated white field when
- * there are no notifications. Turn the notification side into a deliberate
- * frost card and give the calendar side its own quiet visual boundary. */
+/* Keep the empty-notification side intentional without letting it dominate
+ * the entire date menu. The narrower frost card leaves more visual weight for
+ * the calendar while preserving enough width for real notifications. */
 #calendarArea {
   padding: 10px;
   spacing: 10px;
 }
 
 .message-list {
-  width: 28em;
-  padding: 12px;
+  width: 24em;
+  padding: 10px;
   border: 1px solid {{SHELL_BORDER}};
-  border-radius: 20px;
+  border-radius: 18px;
   background-color: {{SHELL_ELEVATED}};
   box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
@@ -160,12 +160,12 @@ stage {
 
 .message-list-placeholder {
   color: {{MUTED}};
-  spacing: 14px;
+  spacing: 12px;
 }
 
 .message-list-placeholder StIcon {
   color: {{ACCENT_SOFT}};
-  icon-size: 44px;
+  icon-size: 40px;
 }
 
 .datemenu-calendar-column {
@@ -173,12 +173,12 @@ stage {
 }
 
 .datemenu-calendar-column:ltr {
-  padding-left: 12px;
+  padding-left: 10px;
   border-left: 1px solid {{SHELL_BORDER}};
 }
 
 .datemenu-calendar-column:rtl {
-  padding-right: 12px;
+  padding-right: 10px;
   border-right: 1px solid {{SHELL_BORDER}};
 }
 
@@ -288,6 +288,9 @@ stage {
   box-shadow: 0 12px 38px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
+/* Zorin's Shell base uses St background-gradient properties for quick tiles.
+ * background-image:none alone does not clear them. Pin equal gradient endpoints
+ * so every base/hover/checked state renders as the intended flat frost color. */
 .quick-toggle,
 .quick-menu-toggle .quick-toggle,
 .quick-settings .quick-toggle,
@@ -297,6 +300,9 @@ stage {
   border-radius: 16px;
   background-image: none;
   background-color: {{SHELL_ELEVATED}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_ELEVATED}};
+  background-gradient-end: {{SHELL_ELEVATED}};
   color: {{TEXT}};
   box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
@@ -309,12 +315,15 @@ stage {
   border-color: {{ACCENT_SOFT}};
   background-image: none;
   background-color: {{SHELL_HOVER}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_HOVER}};
+  background-gradient-end: {{SHELL_HOVER}};
   color: {{TEXT}};
 }
 
 /* Checked toggles use an icy selected surface with a strong blue foreground
- * instead of the stock Zorin cyan gradient. This keeps state obvious while
- * matching the light Frost/Blue GoreeCloud identity shown by the wallpaper. */
+ * instead of the stock Zorin cyan gradient. Equal St gradient endpoints are
+ * intentional: they override Zorin's inherited cyan start/end values. */
 .quick-toggle:checked,
 .quick-menu-toggle .quick-toggle:checked,
 .quick-settings .quick-toggle:checked,
@@ -323,6 +332,9 @@ stage {
   border-color: {{ACCENT}};
   background-image: none;
   background-color: {{SELECTION}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SELECTION}};
+  background-gradient-end: {{SELECTION}};
   color: {{ACCENT}};
   box-shadow: inset 0 0 0 1px {{SHELL_ACTIVE}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
@@ -335,6 +347,9 @@ stage {
   border-color: {{ACCENT_HOVER}};
   background-image: none;
   background-color: {{SHELL_ACTIVE}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_ACTIVE}};
+  background-gradient-end: {{SHELL_ACTIVE}};
   color: {{ACCENT}};
 }
 
@@ -342,6 +357,9 @@ stage {
   border: 1px solid {{SHELL_BORDER}};
   background-image: none;
   background-color: {{SHELL_ELEVATED}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_ELEVATED}};
+  background-gradient-end: {{SHELL_ELEVATED}};
   color: {{TEXT}};
   box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
@@ -351,6 +369,9 @@ stage {
   border-color: {{ACCENT_SOFT}};
   background-image: none;
   background-color: {{SHELL_HOVER}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SHELL_HOVER}};
+  background-gradient-end: {{SHELL_HOVER}};
   color: {{TEXT}};
 }
 
@@ -359,6 +380,9 @@ stage {
   border-color: {{ACCENT}};
   background-image: none;
   background-color: {{SELECTION}};
+  background-gradient-direction: horizontal;
+  background-gradient-start: {{SELECTION}};
+  background-gradient-end: {{SELECTION}};
   color: {{ACCENT}};
 }
 
