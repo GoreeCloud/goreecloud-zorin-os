@@ -34,5 +34,5 @@ jobs:
 
       - name: Inspect Development Debian package
         run: |
-          dpkg-deb -I dist/goreecloud-care_0.1.0~dev9_all.deb
-          dpkg-deb -c dist/goreecloud-care_0.1.0~dev9_all.deb
+          dpkg-deb -I dist/goreecloud-care_0.1.0~dev10_all.deb
+          dpkg-deb -c dist/goreecloud-care_0.1.0~dev10_all.deb
