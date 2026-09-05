@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-dev9 — 2026-09-05
+- Recorded the first representative-device HighContrast acceptance pass from an isolated `GTK_THEME=HighContrast goreecloud-care` launch. Screenshots verify clearly visible keyboard focus on Scan, a category checkbox, and Memory Refresh, plus readable unclipped normal-width layout.
+- Classified HighContrast rendering itself as failed/open: the application still displayed the GoreeCloud light Development palette instead of yielding to the system HighContrast presentation.
+- Source inspection identified the exact contract gap: Care detected HighContrast only from `Gtk.Settings:gtk-theme-name`, while the acceptance harness applies a process-local `GTK_THEME` override that is not guaranteed to be reflected by that settings property.
+- Expanded the pure HighContrast contract so the effective state accepts either a HighContrast `Gtk.Settings` theme name or a HighContrast `GTK_THEME` override, including `HighContrast:dark`-style variants.
+- Added unit coverage for explicit override values and live process-environment detection, and strengthened source validation so future Development changes cannot silently drop the override path.
+- Advanced runtime/package/AppStream Development metadata to dev9. This is source remediation only; HighContrast target rendering remains unverified until dev9 is built, installed, and the representative-device acceptance pass is repeated.
+
 ## 0.1.0-dev8 — 2026-09-05
 - Recorded representative-device dev7 revalidation at exact head `6e81f119372cc0aa3eb5a9098266340d8bca540c`: 20 local tests, XML/source validation, dev7 Debian build, upgrade/install to `0.1.0~dev7`, and all three exact-head GitHub workflow families passed.
 - Direct `GDK_DPI_SCALE=2` screenshots nevertheless proved the dev7 combined large-text/compact remediation did not activate at the narrowest reachable target-device window. The HeaderBar subtitle remained visible, category amounts remained right-aligned, and `Clean selected`, `Empty Trash…`, and `Clean APT cache…` remained horizontal. Text wrapping, vertical scrolling, and visible keyboard focus remained positive.
