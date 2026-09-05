@@ -57,12 +57,26 @@ class UIContractTests(unittest.TestCase):
             "High Contrast",
         ):
             with self.subTest(name=name):
-                self.assertTrue(is_high_contrast_theme(name))
+                self.assertTrue(is_high_contrast_theme(name, gtk_theme_override=""))
+
+    def test_gtk_theme_override_is_part_of_effective_high_contrast_state(self):
+        for override in ("HighContrast", "HighContrast:dark", "high-contrast"):
+            with self.subTest(override=override):
+                self.assertTrue(
+                    is_high_contrast_theme(
+                        "GoreeCloud-Zorin-Light",
+                        gtk_theme_override=override,
+                    )
+                )
+
+    def test_process_environment_high_contrast_override_is_detected(self):
+        with patch.dict(os.environ, {"GTK_THEME": "HighContrast"}, clear=False):
+            self.assertTrue(is_high_contrast_theme("GoreeCloud-Zorin-Light"))
 
     def test_normal_themes_are_not_high_contrast(self):
         for name in (None, "", "ZorinBlue-Light", "Adwaita", "Adwaita-dark"):
             with self.subTest(name=name):
-                self.assertFalse(is_high_contrast_theme(name))
+                self.assertFalse(is_high_contrast_theme(name, gtk_theme_override=""))
 
 
 if __name__ == "__main__":
