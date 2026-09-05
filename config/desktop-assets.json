@@ -29,6 +29,9 @@
     "id": "GoreeCloud-Zorin-Cursors",
     "name": "GoreeCloud Zorin Cursors",
     "comment": "Frost White and Graphite cursors with GoreeCloud Blue activity accents",
+    "design_revision": 2,
+    "visual_direction": "neutral-familiar",
+    "accent_policy": "activity-and-action-only",
     "inherits": [
       "Adwaita"
     ],
