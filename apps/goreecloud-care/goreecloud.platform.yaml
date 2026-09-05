@@ -43,8 +43,10 @@ platform_systems:
   glaze_ui:
     result: applicable-blocked
     version: "1.1.0"
-    evidence: []
-    notes: Current Stable consumer target is 1.1.0. Dev6 preserved representative-device-verified light appearance, focus, semantic status treatment, maintenance workflows, and normal-text compact composition. Dev7 passed exact-head CI and representative-device source/package validation but direct GDK_DPI_SCALE=2 rendering proved its raw 820-pixel breakpoint still failed to enter compact mode at the narrowest reachable large-text window. Dev8 evaluates the same compact contract against a GDK_DPI_SCALE-adjusted effective width. Target dev8 rendering, HighContrast, assistive-technology, resilience, and final application conformance acceptance remain incomplete.
+    evidence:
+      - tests/test_ui_contract.py
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
+    notes: Current Stable consumer target is 1.1.0. Dev6 established normal-text compact/minimum-window behavior. Dev7 passed exact-head CI and representative-device source/package validation but failed the combined GDK_DPI_SCALE=2 compact-rendering gate. Dev8 exact head 45b5f11a49f363ebcaf753c892245a31109bc9bb passed all three workflow families and representative-device source/package validation, and fresh GDK_DPI_SCALE=2 wide/narrow screenshots accept the combined 200%-text + compact/minimum-width adaptive-layout slice: compact HeaderBar subtitle omission, category-amount reflow, content wrapping, complete vertical scrolling, and a vertical full-width bottom action stack are verified. HighContrast, full keyboard-under-resilience, assistive-technology, broader appearance/resilience, and final application conformance acceptance remain incomplete.
   mesh:
     result: applicable-blocked
     version: null
@@ -111,7 +113,8 @@ compatibility:
     - goreecloud-care-local-maintenance
 
 evidence:
-  acceptance_tests: []
+  acceptance_tests:
+    - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
   release: []
 
 conformance:
@@ -124,7 +127,7 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, keyboard-focus, cancellation, privileged-success, and all present cleanup functions are representative-device verified through dev5; dev6 normal-text compact behavior is target-verified; dev7 combined 200%-text compact behavior failed on target despite green source/package validation; dev8 effective-width remediation still requires exact-head repository validation and target-device acceptance, followed by HighContrast and assistive-technology evidence.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, keyboard-focus, cancellation, privileged-success, and all present cleanup functions are representative-device verified through dev5; dev6 normal-text compact behavior is target-verified; dev8 closes the combined 200%-text compact adaptive-layout blocker after dev7's target failure. HighContrast, full keyboard-under-resilience, assistive-technology, broader appearance/resilience, and final current-Stable consumer acceptance remain open.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.

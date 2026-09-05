@@ -27,9 +27,9 @@
 - Dev6 negative evidence: at the narrowest `GDK_DPI_SCALE=2` window, the old 680-pixel compact transition was not reachable; the regular count/action composition remained active.
 - Dev7 source/package validation: exact branch head `6e81f119372cc0aa3eb5a9098266340d8bca540c` passed 20 local tests, XML/source validation, package build, upgrade/install to `0.1.0~dev7`, and all three exact-head GitHub workflow families.
 - Dev7 target rendering is negative for the combined 200%-text/compact slice: at the narrowest reachable `GDK_DPI_SCALE=2` window, the HeaderBar subtitle remains visible, category amounts remain right-aligned, and the bottom action group remains horizontal. Text wrapping, vertical scrolling, and visible focus on `Clean selected` remain positive.
+- Dev8 combined 200%-text/compact acceptance: exact head `45b5f11a49f363ebcaf753c892245a31109bc9bb` passed all three GitHub workflow families; the representative laptop passed 24 local tests plus XML/source validation, built and installed `0.1.0~dev8`, and fresh `GDK_DPI_SCALE=2` screenshots verify the regular wide composition and the compact narrow composition. At the narrowest reachable enlarged-text width the Development subtitle is omitted, category amounts reflow below descriptions, content wraps without horizontal clipping, scrolling reaches the bottom, and the three maintenance actions form a full-width vertical stack.
 
 ## Planned before RC
-- Target-device dev8 revalidation proving combined 200%-text + compact/minimum-window behavior after effective-width text-scale remediation.
 - Target-device HighContrast and assistive-technology acceptance, including keyboard focus through the full resilience-mode control path.
 - Additional supported appearance/resilience decisions and evidence, including dark/system appearance where applicable.
 - Package uninstall/downgrade/rollback validation.
