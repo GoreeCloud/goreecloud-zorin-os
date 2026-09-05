@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +30,9 @@ def validate_svg(path: Path) -> None:
         if node.tag.rsplit("}", 1)[-1].lower() == "script":
             fail(f"{path}: scripts are prohibited")
         for attr, value in node.attrib.items():
-            if attr.rsplit("}", 1)[-1].lower() == "href" and value.startswith(("http:", "https:", "file:", "data:")):
+            if attr.rsplit("}", 1)[-1].lower() == "href" and value.startswith(
+                ("http:", "https:", "file:", "data:")
+            ):
                 fail(f"{path}: external resources are prohibited")
 
 
@@ -43,41 +46,146 @@ def validate_line_only_symbolic(path: Path) -> None:
             geometry.append(tag)
     if not geometry or any(tag != "line" for tag in geometry):
         fail(f"{path}: symbolic geometry must use line elements only, found {geometry}")
-    if any(node.attrib.get("fill", "").lower() not in {"", "none"} for node in root.iter()):
+    if any(
+        node.attrib.get("fill", "").lower() not in {"", "none"}
+        for node in root.iter()
+    ):
         fail(f"{path}: symbolic icon must not contain painted fill geometry")
 
 
-def validate_xcursor(path: Path, expected_sizes: set[int]) -> None:
+def read_xcursor_frames(path: Path) -> list[dict[str, object]]:
     data = path.read_bytes()
     if len(data) < 16:
         fail(f"{path}: cursor file is too small")
     magic, header_size, version, ntoc = struct.unpack_from("<4sIII", data, 0)
     if magic != b"Xcur" or header_size != 16 or version != 0x00010000:
         fail(f"{path}: invalid Xcursor header")
-    if ntoc != len(expected_sizes):
-        fail(f"{path}: expected {len(expected_sizes)} cursor frames, found {ntoc}")
-    observed: set[int] = set()
+
+    frames: list[dict[str, object]] = []
     for index in range(ntoc):
         offset = 16 + index * 12
+        if offset + 12 > len(data):
+            fail(f"{path}: cursor TOC escapes file")
         type_id, subtype, position = struct.unpack_from("<III", data, offset)
         if type_id != IMAGE_TYPE:
             fail(f"{path}: unsupported cursor TOC type {type_id:#x}")
         if position + 36 > len(data):
             fail(f"{path}: cursor frame position escapes file")
         chunk = struct.unpack_from("<IIIIIIIII", data, position)
-        chunk_header, chunk_type, chunk_subtype, chunk_version, width, height, xhot, yhot, _delay = chunk
+        (
+            chunk_header,
+            chunk_type,
+            chunk_subtype,
+            chunk_version,
+            width,
+            height,
+            xhot,
+            yhot,
+            delay,
+        ) = chunk
         if chunk_header != 36 or chunk_type != IMAGE_TYPE or chunk_version != 1:
             fail(f"{path}: invalid Xcursor image chunk")
         if chunk_subtype != subtype or width != subtype or height != subtype:
             fail(f"{path}: Xcursor frame dimensions/subtype mismatch")
         if xhot >= width or yhot >= height:
             fail(f"{path}: Xcursor hotspot lies outside image")
-        end = position + 36 + width * height * 4
+        pixel_count = width * height
+        end = position + 36 + pixel_count * 4
         if end > len(data):
             fail(f"{path}: cursor pixel payload escapes file")
-        observed.add(subtype)
-    if observed != expected_sizes:
-        fail(f"{path}: cursor frame sizes differ: {sorted(observed)}")
+        pixels = struct.unpack_from(f"<{pixel_count}I", data, position + 36)
+        if not any((pixel >> 24) & 0xFF for pixel in pixels):
+            fail(f"{path}: cursor frame is fully transparent")
+        frames.append(
+            {
+                "size": subtype,
+                "xhot": xhot,
+                "yhot": yhot,
+                "delay": delay,
+                "pixels": pixels,
+            }
+        )
+    return frames
+
+
+def validate_xcursor(
+    path: Path,
+    expected_sizes: set[int],
+    frames_per_size: int = 1,
+    animated: bool = False,
+) -> None:
+    frames = read_xcursor_frames(path)
+    expected_count = len(expected_sizes) * frames_per_size
+    if len(frames) != expected_count:
+        fail(
+            f"{path}: expected {expected_count} cursor frames, "
+            f"found {len(frames)}"
+        )
+
+    counts = Counter(int(frame["size"]) for frame in frames)
+    if set(counts) != expected_sizes:
+        fail(f"{path}: cursor frame sizes differ: {sorted(counts)}")
+    for size in expected_sizes:
+        if counts[size] != frames_per_size:
+            fail(
+                f"{path}: expected {frames_per_size} frame(s) at {size}px, "
+                f"found {counts[size]}"
+            )
+
+    for frame in frames:
+        delay = int(frame["delay"])
+        if animated and delay <= 0:
+            fail(f"{path}: animated cursor frame is missing a positive delay")
+        if not animated and delay != 0:
+            fail(f"{path}: static cursor frame unexpectedly has delay {delay}")
+
+
+def rgb(value: str) -> tuple[int, int, int]:
+    value = value.lstrip("#")
+    return tuple(int(value[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def validate_primary_pointer_palette(
+    path: Path,
+    frost: tuple[int, int, int],
+    graphite: tuple[int, int, int],
+    blue: tuple[int, int, int],
+) -> None:
+    frames = read_xcursor_frames(path)
+    frame = min(frames, key=lambda item: int(item["size"]))
+    frost_count = 0
+    graphite_count = 0
+    blue_count = 0
+    visible = 0
+    for pixel in frame["pixels"]:
+        alpha = (int(pixel) >> 24) & 0xFF
+        if alpha < 160:
+            continue
+        visible += 1
+        color = (
+            (int(pixel) >> 16) & 0xFF,
+            (int(pixel) >> 8) & 0xFF,
+            int(pixel) & 0xFF,
+        )
+        if color == frost:
+            frost_count += 1
+        elif color == graphite:
+            graphite_count += 1
+        elif color == blue:
+            blue_count += 1
+
+    if visible < 20:
+        fail(f"{path}: primary pointer has too little visible geometry")
+    if frost_count < 8 or graphite_count < 8:
+        fail(
+            f"{path}: primary pointer must retain both Frost fill and "
+            "Graphite outline"
+        )
+    if blue_count:
+        fail(
+            f"{path}: primary pointer must stay neutral; GoreeCloud Blue is "
+            "reserved for activity/action accents"
+        )
 
 
 def main() -> int:
@@ -94,12 +202,42 @@ def main() -> int:
     if cursors["id"] != "GoreeCloud-Zorin-Cursors":
         fail("cursor theme ID changed unexpectedly")
 
+    supersample = int(cursors.get("supersample", 1))
+    if supersample < 4:
+        fail("cursor rendering must use at least 4x supersampling")
+    animation_frames = int(cursors.get("animation_frames", 1))
+    animation_delay = int(cursors.get("animation_delay_ms", 0))
+    if animation_frames < 6:
+        fail("cursor activity animation must contain at least 6 frames")
+    if not 35 <= animation_delay <= 100:
+        fail("cursor activity animation delay must remain between 35ms and 100ms")
+
+    expected_sizes = {int(value) for value in cursors["sizes"]}
+    if not {24, 32, 48, 64}.issubset(expected_sizes):
+        fail("cursor size ladder must cover 24px, 32px, 48px, and 64px")
+
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         icon_out = tmp_path / "icons"
         cursor_out = tmp_path / "cursors"
-        subprocess.run([sys.executable, str(ROOT / "scripts" / "build_icons.py"), "--output", str(icon_out)], check=True)
-        subprocess.run([sys.executable, str(ROOT / "scripts" / "build_cursors.py"), "--output", str(cursor_out)], check=True)
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "build_icons.py"),
+                "--output",
+                str(icon_out),
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "build_cursors.py"),
+                "--output",
+                str(cursor_out),
+            ],
+            check=True,
+        )
 
         icon_root = icon_out / icons["id"]
         cursor_root = cursor_out / cursors["id"]
@@ -133,22 +271,40 @@ def main() -> int:
             "user-trash-symbolic.svg",
             "user-trash-full-symbolic.svg",
         ):
-            symbolic_path = icon_root / "scalable" / "places" / required_symbolic
+            symbolic_path = (
+                icon_root / "scalable" / "places" / required_symbolic
+            )
             if not symbolic_path.is_file():
                 fail(f"generated icon theme is missing {required_symbolic}")
             validate_line_only_symbolic(symbolic_path)
 
         identity = ROOT / icons["identity_source"]
-        if (icon_root / "scalable" / "apps" / "start-here.svg").read_bytes() != identity.read_bytes():
+        if (
+            icon_root / "scalable" / "apps" / "start-here.svg"
+        ).read_bytes() != identity.read_bytes():
             fail("start-here icon does not preserve the canonical GoreeCloud mark")
 
-        expected_sizes = {int(value) for value in cursors["sizes"]}
+        animated_names = set(cursors.get("animated_cursor_names", []))
         cursor_dir = cursor_root / "cursors"
         for name in cursors["required_cursor_names"]:
             path = cursor_dir / name
             if not path.is_file():
                 fail(f"generated cursor theme is missing required cursor: {name}")
-            validate_xcursor(path, expected_sizes)
+            animated = name in animated_names
+            validate_xcursor(
+                path,
+                expected_sizes,
+                frames_per_size=animation_frames if animated else 1,
+                animated=animated,
+            )
+
+        palette = cursors["palette"]
+        validate_primary_pointer_palette(
+            cursor_dir / "left_ptr",
+            frost=rgb(palette["frost"]),
+            graphite=rgb(palette["graphite"]),
+            blue=rgb(palette["primary_blue"]),
+        )
 
     print("GoreeCloud icon and cursor theme validation passed")
     return 0
