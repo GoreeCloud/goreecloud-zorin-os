@@ -77,21 +77,29 @@ stage {
 
 .app-well-app .overview-icon,
 .show-apps .overview-icon {
+  border: 1px solid transparent;
   border-radius: 16px;
+  background-image: none;
 }
 
 .app-well-app:hover .overview-icon,
 .app-well-app:focus .overview-icon,
 .show-apps:hover .overview-icon,
 .show-apps:focus .overview-icon {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
   background-color: {{SHELL_HOVER}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .app-well-app:active .overview-icon,
 .app-well-app:checked .overview-icon,
 .show-apps:active .overview-icon,
 .show-apps:checked .overview-icon {
+  border-color: {{ACCENT_SOFT}};
+  background-image: none;
   background-color: {{SHELL_ACTIVE}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .search-entry {
@@ -137,35 +145,35 @@ stage {
   color: {{TEXT}};
 }
 
-/* Keep the empty-notification side intentional without letting it dominate
- * the entire date menu. The compact frost card leaves more visual weight for
- * the calendar while preserving enough width for real notifications. */
+/* Empty notification space should feel airy, not like a second giant card.
+ * Real notification sections retain their own surfaces above, while the list
+ * itself stays transparent and narrower beside the calendar. */
 #calendarArea {
   padding: 8px;
   spacing: 8px;
 }
 
 .message-list {
-  width: 21em;
-  padding: 8px;
-  border: 1px solid {{SHELL_BORDER}};
+  width: 18em;
+  padding: 6px;
+  border: 0;
   border-radius: 18px;
-  background-color: {{SHELL_ELEVATED}};
-  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+  background-color: transparent;
+  box-shadow: none;
 }
 
 .message-list-sections {
-  spacing: 7px;
+  spacing: 8px;
 }
 
 .message-list-placeholder {
   color: {{MUTED}};
-  spacing: 10px;
+  spacing: 8px;
 }
 
 .message-list-placeholder StIcon {
   color: {{ACCENT_SOFT}};
-  icon-size: 36px;
+  icon-size: 28px;
 }
 
 .datemenu-calendar-column {
@@ -292,16 +300,6 @@ stage {
   box-shadow: 0 12px 38px {{SHELL_SHADOW}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
-/* The split-menu wrapper can carry Zorin's own gradient independently of the
- * child toggle/menu button. Clear it so the two halves read as one frost tile. */
-.quick-menu-toggle {
-  background-image: none;
-  background-color: transparent;
-  background-gradient-direction: horizontal;
-  background-gradient-start: transparent;
-  background-gradient-end: transparent;
-}
-
 /* Zorin's Shell base uses St background-gradient properties for quick tiles.
  * background-image:none alone does not clear them. Pin equal gradient endpoints
  * so every base/hover/checked state renders as the intended flat frost color. */
@@ -321,16 +319,20 @@ stage {
   box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
+.quick-menu-toggle,
+.quick-settings .quick-menu-toggle {
+  background-image: none;
+  background-color: transparent;
+  background-gradient-direction: horizontal;
+  background-gradient-start: transparent;
+  background-gradient-end: transparent;
+}
+
 .quick-toggle:hover,
-.quick-toggle:focus,
 .quick-menu-toggle .quick-toggle:hover,
-.quick-menu-toggle .quick-toggle:focus,
 .quick-settings .quick-toggle:hover,
-.quick-settings .quick-toggle:focus,
 .quick-settings .quick-menu-toggle .quick-toggle:hover,
-.quick-settings .quick-menu-toggle .quick-toggle:focus,
-.quick-settings .quick-toggle-menu-button:hover,
-.quick-settings .quick-toggle-menu-button:focus {
+.quick-settings .quick-toggle-menu-button:hover {
   border-color: {{ACCENT_SOFT}};
   background-image: none;
   background-color: {{SHELL_HOVER}};
@@ -340,9 +342,9 @@ stage {
   color: {{TEXT}};
 }
 
-/* Checked toggles use a quiet Ice Blue frost surface. The lighter Glacier
- * border keeps the state polished on the light-first desktop while blue text
- * and icons carry the strong interaction cue. */
+/* Checked toggles use an icy selected surface with a strong blue foreground
+ * instead of the stock Zorin cyan gradient. Equal St gradient endpoints are
+ * intentional: they override Zorin's inherited cyan start/end values. */
 .quick-toggle:checked,
 .quick-menu-toggle .quick-toggle:checked,
 .quick-settings .quick-toggle:checked,
@@ -355,20 +357,15 @@ stage {
   background-gradient-start: {{SELECTION}};
   background-gradient-end: {{SELECTION}};
   color: {{ACCENT}};
-  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+  box-shadow: inset 0 0 0 1px {{SHELL_ACTIVE}}, inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .quick-toggle:checked:hover,
-.quick-toggle:checked:focus,
 .quick-menu-toggle .quick-toggle:checked:hover,
-.quick-menu-toggle .quick-toggle:checked:focus,
 .quick-settings .quick-toggle:checked:hover,
-.quick-settings .quick-toggle:checked:focus,
 .quick-settings .quick-menu-toggle .quick-toggle:checked:hover,
-.quick-settings .quick-menu-toggle .quick-toggle:checked:focus,
-.quick-settings .quick-toggle-menu-button:checked:hover,
-.quick-settings .quick-toggle-menu-button:checked:focus {
-  border-color: {{ACCENT}};
+.quick-settings .quick-toggle-menu-button:checked:hover {
+  border-color: {{ACCENT_SOFT}};
   background-image: none;
   background-color: {{SHELL_ACTIVE}};
   background-gradient-direction: horizontal;
