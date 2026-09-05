@@ -122,6 +122,11 @@ def main() -> int:
         for required_symbolic in (
             "folder-symbolic.svg",
             "folder-open-symbolic.svg",
+            "folder-documents-symbolic.svg",
+            "folder-download-symbolic.svg",
+            "folder-music-symbolic.svg",
+            "folder-pictures-symbolic.svg",
+            "folder-videos-symbolic.svg",
             "starred-symbolic.svg",
             "user-home-symbolic.svg",
             "document-open-recent-symbolic.svg",
