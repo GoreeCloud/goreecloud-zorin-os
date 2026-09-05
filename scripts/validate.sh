@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -204,11 +205,24 @@ if wallpaper_config.get("design_system", {}).get("version") != config["design_sy
 wallpapers = wallpaper_config.get("wallpapers", [])
 if len(wallpapers) != 3:
     raise SystemExit("Expected exactly three GoreeCloud Horizon wallpaper variants")
+
+wallpaper_rendered = generated / "_wallpapers"
+subprocess.run(
+    [
+        sys.executable,
+        str(root / "scripts" / "build_wallpapers.py"),
+        "--output",
+        str(wallpaper_rendered),
+    ],
+    check=True,
+)
+
 wallpaper_ids = set()
 wallpaper_modes = set()
 for wallpaper in wallpapers:
     required_wallpaper_keys = {
-        "id", "mode", "theme_id", "file", "canvas", "accent", "accent_soft", "atmosphere_amber"
+        "id", "mode", "theme_id", "file", "canvas", "accent", "accent_soft",
+        "atmosphere_amber", "identity", "source", "generated",
     }
     missing = required_wallpaper_keys - set(wallpaper)
     if missing:
@@ -232,12 +246,23 @@ for wallpaper in wallpapers:
                 f"Wallpaper {wallpaper['id']} {key} does not match {theme_id} palette"
             )
 
+    if wallpaper["generated"] is not True:
+        raise SystemExit(f"Primary wallpaper must be generated from canonical identity source: {wallpaper['id']}")
     relative = Path(wallpaper["file"])
-    if relative.suffix.lower() != ".svg" or relative.parts[:2] != ("assets", "wallpapers"):
-        raise SystemExit(f"Wallpaper file must be an SVG under assets/wallpapers: {relative}")
-    path = root / relative
+    expected_relative = Path("generated") / f"{wallpaper['id']}.svg"
+    if relative != expected_relative:
+        raise SystemExit(
+            f"Wallpaper generated path mismatch for {wallpaper['id']}: {relative}"
+        )
+    source = root / wallpaper["source"]
+    if not source.is_file() or source.suffix != ".in":
+        raise SystemExit(
+            f"Wallpaper canonical-identity template is missing or invalid: {wallpaper['source']}"
+        )
+
+    path = wallpaper_rendered / f"{wallpaper['id']}.svg"
     if not path.is_file():
-        raise SystemExit(f"Missing wallpaper artwork: {relative}")
+        raise SystemExit(f"Missing generated wallpaper artwork: {relative}")
 
     try:
         svg_root = ET.parse(path).getroot()
