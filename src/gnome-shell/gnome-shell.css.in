@@ -137,14 +137,63 @@ stage {
   color: {{TEXT}};
 }
 
+/* The stock date menu leaves a very large undifferentiated white field when
+ * there are no notifications. Turn the notification side into a deliberate
+ * frost card and give the calendar side its own quiet visual boundary. */
+#calendarArea {
+  padding: 10px;
+  spacing: 10px;
+}
+
+.message-list {
+  width: 28em;
+  padding: 12px;
+  border: 1px solid {{SHELL_BORDER}};
+  border-radius: 20px;
+  background-color: {{SHELL_ELEVATED}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
+}
+
+.message-list-sections {
+  spacing: 8px;
+}
+
+.message-list-placeholder {
+  color: {{MUTED}};
+  spacing: 14px;
+}
+
+.message-list-placeholder StIcon {
+  color: {{ACCENT_SOFT}};
+  icon-size: 44px;
+}
+
+.datemenu-calendar-column {
+  spacing: 10px;
+}
+
+.datemenu-calendar-column:ltr {
+  padding-left: 12px;
+  border-left: 1px solid {{SHELL_BORDER}};
+}
+
+.datemenu-calendar-column:rtl {
+  padding-right: 12px;
+  border-right: 1px solid {{SHELL_BORDER}};
+}
+
 .datemenu-today-button {
+  padding: 8px 12px;
+  border: 1px solid transparent;
   border-radius: 16px;
-  background-color: transparent;
+  background-color: {{SHELL_ELEVATED}};
   color: {{TEXT}};
+  box-shadow: inset 0 1px 0 {{EDGE_LIGHT}};
 }
 
 .datemenu-today-button:hover,
 .datemenu-today-button:focus {
+  border-color: {{ACCENT_SOFT}};
   background-color: {{SHELL_HOVER}};
   color: {{TEXT}};
 }
@@ -155,6 +204,11 @@ stage {
 .calendar-day-heading,
 .calendar-week-number {
   color: {{TEXT}};
+}
+
+.calendar {
+  padding: 6px 8px;
+  border-radius: 16px;
 }
 
 .calendar-day-base {
@@ -171,6 +225,7 @@ stage {
 .calendar-day-base:selected {
   background-color: {{ACCENT}};
   color: {{ON_ACCENT}};
+  box-shadow: inset 0 0 0 1px {{ACCENT_HOVER}};
 }
 
 .events-button,
