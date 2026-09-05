@@ -20,7 +20,7 @@ Use **Tab** and **Shift+Tab** to move through interactive controls. The current 
 
 GoreeCloud Care is designed to remain vertically scrollable when text is enlarged or the window becomes shorter. In compact windows, category amounts move below their category description and the bottom action buttons stack vertically so the primary workflow does not depend on horizontal scrolling. For the Development 200%-text acceptance path, the compact decision accounts for the GTK `GDK_DPI_SCALE` text scale rather than relying only on the raw allocated width. The compact HeaderBar may omit the Development subtitle when space is constrained; the GoreeCloud Care title and **Scan** action remain available.
 
-The application opens in a light appearance by default. When a GTK HighContrast theme is active, the Development color mapping is suppressed so the system high-contrast presentation can take priority.
+The application opens in a light appearance by default. In dev9, effective HighContrast detection honors both the desktop GTK theme state and an explicit process-local `GTK_THEME` override. When either selects a GTK HighContrast theme, the Development color mapping is suppressed so the system high-contrast presentation can take priority. This source behavior still requires representative-device rendered acceptance before HighContrast support is considered verified.
 
 ## If an action fails
 GoreeCloud Care reports failure instead of treating it as success. Re-scan to see current state. No automatic retry performs a destructive action without another user invocation.
