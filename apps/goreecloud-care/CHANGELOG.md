@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-dev7 — 2026-09-05
+- Recorded direct representative-device negative evidence for the dev6 combined 200%-text/compact path: at the narrowest reachable `GDK_DPI_SCALE=2` window, the regular horizontal composition remained active, category amounts stayed right-aligned, and the bottom action group could not transition to the previously accepted compact stack.
+- Raised the Development compact transition from 680 to 820 logical pixels so compact composition activates before the observed enlarged-text minimum-width floor.
+- Reused the pure `is_compact_width()` contract in the GTK layout path and added regression coverage for the observed approximately 800-pixel enlarged-text range.
+- Compact HeaderBar presentation now omits the Development subtitle instead of leaving it visibly ellipsized, reducing width pressure while preserving the product title and Scan action.
+- This is a Development remediation candidate. Combined 200%-text/compact rendering remains unaccepted until the dev7 package is rebuilt, installed, and revalidated on the representative Zorin OS laptop.
+
 ## 0.1.0-dev6 — 2026-09-05
 - Started the accessibility and adaptive-window acceptance phase after representative-device dev5 testing verified every current maintenance function, including controlled nonzero APT archive removal.
 - Added a compact desktop composition below 680 logical pixels: category amounts move below their category content and the primary bottom actions stack vertically instead of compressing horizontally.
