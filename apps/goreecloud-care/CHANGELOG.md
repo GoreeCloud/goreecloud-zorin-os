@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.0-dev6 — 2026-09-05
+- Started the accessibility and adaptive-window acceptance phase after representative-device dev5 testing verified every current maintenance function, including controlled nonzero APT archive removal.
+- Added a compact desktop composition below 680 logical pixels: category amounts move below their category content and the primary bottom actions stack vertically instead of compressing horizontally.
+- Defined a 480 × 420 logical-pixel minimum Development window and retained vertical scrolling so constrained-height and larger-text layouts remain reachable.
+- Added text wrapping for system status and category headings to reduce clipping risk under constrained width or large text.
+- Added GTK/ATK status semantics, dynamic accessible status names, action descriptions, selector descriptions, and descriptive accessible names for scanned category amounts.
+- Added high-contrast resilience: common GTK HighContrast theme names suppress the application color provider so the system high-contrast theme can take precedence over GoreeCloud Care's light Development mapping.
+- Added pure adaptive/high-contrast UI contract helpers and unit coverage without importing GTK into the test boundary.
+- Added an explicit `gir1.2-atk-1.0` package dependency for the new ATK accessibility mapping.
+- Dev6 source work does not establish rendered, large-text, high-contrast, screen-reader, or current-Stable Glaze UI acceptance until target-device evidence is completed.
+
 ## 0.1.0-dev5 — 2026-09-05
 - Fixed post-action status replacement that could hide successful privileged-action feedback behind the automatic refresh scan.
 - Added an explicit completion notice after successful PolicyKit-authorized APT cache cleanup and Memory Refresh.
