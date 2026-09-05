@@ -6,6 +6,8 @@ Development. Source implementation is identity-derived; target-device visual acc
 
 The earlier 24-wallpaper abstract collection was rejected during target review because its compositions did not match the current approved GoreeCloud, Glaze UI, Wardveil Security, and Privacy Shield artwork closely enough. That visual direction is superseded by the current identity-derived source and must not be treated as accepted wallpaper artwork.
 
+The installed/default theme path remains the Glaze UI V1.1-compatible path while the repository carries a parallel **Glaze UI V1.2 development preview**. V1.2 is not Stable and does not inherit V1.1 acceptance automatically.
+
 ## Scope
 
 The repository defines **24 3840×2160 SVG wallpapers** across four balanced categories:
@@ -18,7 +20,22 @@ The repository defines **24 3840×2160 SVG wallpapers** across four balanced cat
 | Privacy Shield | Approved Privacy Shield — Bands, Filter | 6 |
 | **Total** | 8 families × Light/Dark/Deep Dark | **24** |
 
-Every wallpaper preserves the canonical identity geometry and identity colors from the current unified branding authority while using the Zorin theme's Glaze UI V1.1 Light/Dark/Deep Dark palette for the surrounding presentation field.
+Every wallpaper preserves the canonical identity geometry and identity colors from the current unified branding authority. The surrounding field is intentionally environmental: neutral structure, low-frequency depth, restrained cold light, and generous quiet regions rather than a second brand mark or a semantic UI surface.
+
+## Wallpaper visual contract
+
+The redesigned source follows these rules:
+
+- canonical marks keep their approved geometry and identity colors;
+- GoreeCloud environmental light uses the approved platform blues rather than the theme's former Mineral Teal accent;
+- Glaze UI, Wardveil Security, and Privacy Shield keep their own canonical identity color families;
+- marks are subordinate to desktop work rather than oversized hero artwork;
+- composition favors large calm regions, low-frequency detail, and restrained optical depth;
+- wallpaper does not consume focus, selection, destructive, warning, or other semantic UI color tokens;
+- changing the interactive theme accent must not silently recolor wallpaper identity artwork;
+- wallpaper remains non-semantic and must not imply security, privacy, compliance, or runtime state.
+
+This keeps family resemblance in the optical grammar while allowing every GoreeCloud identity to remain distinct.
 
 ## Branding authority and synchronization
 
@@ -61,13 +78,33 @@ Wallpaper definitions are recorded in `config/wallpapers.json`. All 24 are gener
 assets/wallpapers/templates/
 ```
 
-Build the collection with:
+Build the current V1.1-compatible collection with:
 
 ```bash
 python3 ./scripts/build_wallpapers.py --output /tmp/goreecloud-wallpapers
 ```
 
+Build the same identity-derived source against the V1.2 development environmental palette with:
+
+```bash
+python3 ./scripts/build_wallpapers.py \
+  --palette-config config/palettes-v1.2.json \
+  --output /tmp/goreecloud-wallpapers-v1.2
+```
+
 The builder injects the verified canonical SVG interior into a nested SVG using the original canonical viewBox. It does not trace, approximate, recolor, or regenerate the logo geometry.
+
+## V1.2 preview boundary
+
+`config/palettes-v1.2.json` is a development contract, not a replacement for the accepted predecessor. It introduces the proposed Frost White, Ice Blue, Clear Translucency, Cool Graphite, and Blue-Black environment while preserving the current theme IDs so the same Zorin integration can be exercised in a controlled preview build.
+
+Validate the preview contract with:
+
+```bash
+python3 ./scripts/validate_v12_preview.py
+```
+
+That check validates the V1.2 lifecycle/version metadata, the Light/Dark/Deep Dark signature colors, baseline contrast gates, and successful rendering of all theme and wallpaper variants from the preview palette. It is a source gate only; target-device visual/accessibility acceptance remains required.
 
 ## User-local install and catalog
 
@@ -120,11 +157,12 @@ The read-only audit/plan paths remain available for inspection without changing 
 
 - exactly 24 catalog entries across the four required categories;
 - Light, Dark, and Deep Dark mappings;
-- exact Glaze UI palette-role mapping for the surrounding wallpaper field;
+- V1.1 manifest compatibility metadata;
 - pinned branding authority and synchronized canonical SVG SHA-256 values;
 - canonical identity viewBoxes;
 - identity/category mapping for every wallpaper;
 - presence of canonical geometry in every rendered derivative;
+- wallpaper source does not consume semantic interaction/status color tokens;
 - 3840×2160 rendered dimensions and viewBox;
 - no script elements or remote/file/data href resources;
 - generated GNOME background catalog count and filenames.
@@ -133,4 +171,6 @@ Source validation proves reproducibility and identity-source integrity. It does 
 
 ## Remaining target acceptance
 
-Install the redesigned collection on the Zorin OS 17.3 laptop, reopen Settings → Background, review the 24 thumbnails and representative full-desktop renders, and verify that Unified Clean, Facet, Sentinel Fold, and Privacy Shield are visibly faithful to their canonical artwork in Light/Dark/Deep Dark contexts. Only after that acceptance should stock wallpaper removal resume.
+Install the redesigned collection on the Zorin OS 17.3 laptop, reopen Settings → Background, review the 24 thumbnails and representative full-desktop renders, and verify that Unified Clean, Facet, Sentinel Fold, and Privacy Shield are visibly faithful to their canonical artwork in Light/Dark/Deep Dark contexts.
+
+For V1.2, review the same representative set against the Frost/Graphite preview and include bright, dark, saturated, and detailed wallpaper stress cases, increased contrast, reduced transparency where applicable, and 200% text before promoting the preview. Only after the redesigned collection is accepted should stock wallpaper removal resume.
