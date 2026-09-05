@@ -100,6 +100,7 @@ def main() -> int:
         "def apply(",
         "def restore(",
         "def finalize(",
+        "def status(",
         "def simulate_purge_diagnostic(",
         "def verify_replacement_ready(",
         "def verify_stock_paths_diverted(",
@@ -115,6 +116,9 @@ def main() -> int:
         "apt-purge-simulation.txt",
         "stock-files.sha256.tsv",
         "verify_packages_exact()",
+        "except PermissionError:",
+        "recovery/finalization metadata is root-owned",
+        "transaction details: sudo ./scripts/system_wallpapers.sh status",
     ):
         if token not in text:
             fail(f"System wallpaper workflow is missing required safety mechanism: {token}")
