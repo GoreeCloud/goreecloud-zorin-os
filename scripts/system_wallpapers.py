@@ -218,16 +218,33 @@ class Workflow:
         return result.stdout, removed, installed
 
     def current_recovery(self, *, required: bool = True) -> Path | None:
-        if not self.current_file.is_file():
+        try:
+            current_exists = self.current_file.is_file()
+        except PermissionError:
+            if required:
+                fail("recovery transaction metadata is root-owned; rerun this subcommand with sudo")
+            return None
+        if not current_exists:
             if required:
                 fail("no active GoreeCloud wallpaper recovery transaction exists")
             return None
-        recovery = Path(self.current_file.read_text(encoding="utf-8").strip())
+        try:
+            recovery = Path(self.current_file.read_text(encoding="utf-8").strip())
+        except PermissionError:
+            if required:
+                fail("recovery transaction metadata is root-owned; rerun this subcommand with sudo")
+            return None
         try:
             recovery.resolve().relative_to(self.recovery_root.resolve())
         except ValueError:
             fail(f"recovery pointer escaped the expected root: {recovery}")
-        if not recovery.is_dir():
+        try:
+            recovery_exists = recovery.is_dir()
+        except PermissionError:
+            if required:
+                fail("recovery transaction directory is root-owned; rerun this subcommand with sudo")
+            return None
+        if not recovery_exists:
             fail(f"recovery directory is missing: {recovery}")
         return recovery
 
@@ -518,6 +535,15 @@ class Workflow:
         self.verify_replacement_ready()
 
         print("\nRecovery transaction:")
+        if os.geteuid() != 0:
+            if active:
+                print("  package-safe diversions are active")
+                print("  recovery/finalization metadata is root-owned")
+                print("  transaction details: sudo ./scripts/system_wallpapers.sh status")
+            else:
+                print("  none")
+            return
+
         recovery = self.current_recovery(required=False)
         if recovery is not None:
             print(f"  {recovery}")
