@@ -45,6 +45,12 @@ assert 'restore_capability' in everkeep['dimensions']
 assert everkeep['status_schema'] == 'contracts/continuity.status.schema.json'
 print('Platform integration contract validation: passed')
 PY
+# Exact Development version alignment.
+grep -F '__version__ = "0.1.0-dev18"' goreecloud_care/__init__.py >/dev/null
+grep -F 'version = "0.1.0.dev18"' pyproject.toml >/dev/null
+grep -F 'VERSION="0.1.0~dev18"' scripts/build-deb.sh >/dev/null
+grep -F '<release version="0.1.0-dev18"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
+grep -F 'version: 0.1.0-dev18' goreecloud.platform.yaml >/dev/null
 # Security/source invariants for the privileged boundary.
 grep -F '["/usr/bin/apt-get", "clean"]' goreecloud_care/helper.py >/dev/null
 ! grep -R --line-number -E 'shell[[:space:]]*=[[:space:]]*True|os\.system\(' goreecloud_care packaging scripts
@@ -108,7 +114,7 @@ grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
 grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
 grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
 # Mandatory GoreeCloud component documentation and integration records.
-for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json; do
+for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json scripts/validate-installed.sh; do
   test -s "$f"
 done
 echo 'Local source validation: passed'
