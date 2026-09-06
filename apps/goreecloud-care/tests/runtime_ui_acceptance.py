@@ -1,0 +1,114 @@
+from __future__ import annotations
+
+import os
+import time
+
+os.environ.setdefault("GDK_DPI_SCALE", "2")
+
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gio, Gtk  # noqa: E402
+
+from goreecloud_care.app import CareWindow
+from goreecloud_care.insights import CacheGroupInsight, FileInsight, InsightsSnapshot
+import goreecloud_care.insights_window as insights_window
+
+
+def drain_events(limit: int = 500) -> None:
+    count = 0
+    while Gtk.events_pending() and count < limit:
+        Gtk.main_iteration_do(False)
+        count += 1
+
+
+def make_app(app_id: str) -> Gtk.Application:
+    app = Gtk.Application(
+        application_id=app_id,
+        flags=Gio.ApplicationFlags.NON_UNIQUE,
+    )
+    app.register(None)
+    return app
+
+
+def test_core_status_accessible_mutation() -> None:
+    app = make_app("com.goreecloud.care.runtime-core-test")
+    window = CareWindow(app)
+    window.set_status("Synthetic completion state.", "success", "Completed")
+    name = window.status_accessible.get_name()
+    assert name == "Completed. Synthetic completion state.", name
+    window.destroy()
+
+
+def test_insights_focus_resize_and_rendering() -> None:
+    snapshot = InsightsSnapshot(
+        cache_groups=(CacheGroupInsight("example-cache", 1024, 2),),
+        large_files=(
+            FileInsight(
+                "~/Pictures/a-very-long-path-component-without-synthetic-hyphenation/example-video.mp4",
+                512 * 1024 * 1024,
+                35,
+            ),
+        ),
+        stale_downloads=(),
+        scan_error_count=0,
+        visited_entries=42,
+        truncated=False,
+    )
+    insights_window.build_insights = lambda: snapshot
+
+    app = make_app("com.goreecloud.care.runtime-insights-test")
+    window = insights_window.InsightsWindow(app)
+    window.show_all()
+    drain_events()
+
+    window._set_results_text(insights_window.render_insights_text(snapshot))
+    assert window.results.get_selectable()
+    assert window.results.get_can_focus()
+    assert "example-video.mp4" in window.results.get_text()
+    assert "synthetic-hyphenation" in window.results.get_text()
+
+    window._apply_layout(480)
+    assert window.header.get_title() == "Insights"
+    assert window.header.get_subtitle() is None
+    window._apply_layout(1100)
+    assert window.header.get_title() == "Maintenance Insights"
+    assert window.header.get_subtitle() == window.header_subtitle
+
+    window.refresh.grab_focus()
+    drain_events()
+    assert window.get_focus() is window.refresh
+    moved_forward = window.child_focus(Gtk.DirectionType.TAB_FORWARD)
+    drain_events()
+    assert moved_forward
+    assert window.get_focus() is window.results, type(window.get_focus()).__name__
+
+    moved_backward = window.child_focus(Gtk.DirectionType.TAB_BACKWARD)
+    drain_events()
+    assert moved_backward
+    assert window.get_focus() is window.refresh, type(window.get_focus()).__name__
+
+    start = time.monotonic()
+    for _ in range(20):
+        window.resize(480, 620)
+        drain_events()
+        window.resize(1180, 720)
+        drain_events()
+    elapsed = time.monotonic() - start
+    assert elapsed < 5.0, f"synthetic continuous resize took {elapsed:.3f}s"
+
+    window.destroy()
+
+
+def main() -> int:
+    ok, _argv = Gtk.init_check(None)
+    if not ok:
+        raise SystemExit("GTK could not initialize; run this probe under Xvfb or a desktop session")
+    test_core_status_accessible_mutation()
+    test_insights_focus_resize_and_rendering()
+    print("Headless GTK runtime acceptance probe: passed")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
