@@ -1,6 +1,6 @@
 [project]
 name = "goreecloud-care"
-version = "0.1.0.dev13"
+version = "0.1.0.dev14"
 description = "Local-first GoreeCloud maintenance utility for Zorin OS"
 requires-python = ">=3.10"
 license = { text = "GPL-3.0-or-later" }
