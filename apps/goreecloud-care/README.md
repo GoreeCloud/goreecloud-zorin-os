@@ -1,7 +1,7 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev16`  
+**Version:** `0.1.0-dev17`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
@@ -39,7 +39,7 @@ Reports include disk headroom, memory/file-cache summary, total visible reclaima
 
 Representative-device dev13 validation is accepted at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`: 38 tests plus XML/source validation passed, `0.1.0~dev13` built and upgraded over dev12, `dpkg-query` reported `install ok installed 0.1.0~dev13`, `--version` returned `0.1.0-dev13`, and both human and JSON reports executed successfully on the Zorin OS laptop. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 maintenance items, and zero scan errors. These values are representative-device evidence from that run, not fixed product guarantees.
 
-## Maintenance Insights — dev14 foundation, dev16 large-text refinement
+## Maintenance Insights — dev14 foundation, dev17 large-text refinement
 
 Launch the Development review surface with:
 
@@ -60,9 +60,11 @@ Symlinks are not followed. The standard-folder crawl is capped at 50,000 visited
 
 Representative-device dev14 screenshots accepted the normal-width rendering/focus slice and the constrained normal-text HighContrast rendering/focus/scroll slice. A subsequent `GDK_DPI_SCALE=2` constrained-width run exposed a large-text defect: fixed explanatory/status content could consume the visible allocation so the nested results viewport could not be scrolled to its true bottom, and continuous resizing was reported as very slow.
 
-Dev15 introduced the whole-page vertical scroller, a 320-pixel minimum findings viewport, effective-width compact behavior, compact fixed copy, and `CHAR` result wrapping. Exact dev15 head `e36707264a62b4b66083c909b62b55041b909d12` then passed all 48 local tests plus XML/source validation on the representative laptop, built `0.1.0~dev15`, and upgraded successfully to `install ok installed 0.1.0~dev15`. A fresh constrained-width `GDK_DPI_SCALE=2` screenshot confirmed compact mode was active, but the HeaderBar title still ellipsized to `Insig…` beside the full text Refresh action. That visual slice therefore remains unaccepted. The submitted checkpoint did not include a complete true-bottom scroll or resize-responsiveness result, so those two behaviors remain open rather than inferred.
+Dev15 introduced the whole-page vertical scroller, a 320-pixel minimum findings viewport, effective-width compact behavior, compact fixed copy, and `CHAR` result wrapping. Exact dev15 head `e36707264a62b4b66083c909b62b55041b909d12` passed all 48 local tests plus XML/source validation on the representative laptop, built `0.1.0~dev15`, and upgraded successfully to `install ok installed 0.1.0~dev15`. A fresh constrained-width `GDK_DPI_SCALE=2` screenshot confirmed compact mode was active, but the HeaderBar title still ellipsized to `Insig…` beside the full text Refresh action.
 
-Dev16 is the next remediation candidate. It replaces the text-heavy HeaderBar Refresh button with a symbolic icon while preserving an explicit accessible `Refresh` name, description, tooltip, and keyboard focus; removes the extra `large` text role from the compact intro; shortens compact privacy/status copy; and reduces compact vertical spacing. The read-only, local-only, path-display, and no-automatic-change guarantees remain unchanged. Dev16 remains target-unaccepted until the exact package is rebuilt, installed, and the 200%-text constrained-width rendering, true-bottom reachability, and resize-responsiveness pass is repeated successfully.
+Dev16 replaced the text Refresh action with a symbolic button while preserving its accessible name, description, tooltip, and keyboard focus; reduced compact fixed-copy pressure; and retained the outer page/results scrolling contract. Representative-device dev16 screenshots now verify a fully readable `Insights` title, a clearly visible keyboard-focus ring on Refresh, and true-bottom findings reachability. The submitted evidence did not report continuous-resize responsiveness, so that performance checkpoint remains open rather than inferred. The same screenshots exposed a presentation defect from `CHAR` wrapping: Pango inserted synthetic hyphens at character breaks, producing fragments such as `da-` / `ys` and `in-` / `spected`.
+
+Dev17 replaces the findings `Gtk.TextView` character-wrap surface with a selectable Pango-backed label using `WORD_CHAR` wrapping and `insert_hyphens='false'`. This retains character fallback for long path-like strings without inserting synthetic hyphens, does not add zero-width break characters to displayed/copied paths, and preserves the independent findings scroller, 320-pixel minimum viewport, accessible result name/description, and read-only behavior. Dev17 remains a Development remediation candidate until exact-head repository validation and representative-device rendering/resizing acceptance are complete.
 
 See `CAPABILITIES.md` for the expanded current and planned capability set and `BENEFITS.md` for product/user benefits.
 
@@ -77,12 +79,12 @@ Representative Zorin OS testing through dev5 verifies the core cleanup and privi
 
 Dynamic assistive-technology event/announcement behavior remains open. A property-change listener did not receive status events in a session that also reported an unavailable/stale AT-SPI socket. A subsequent polling harness confirmed all three routine selectors were unchecked and successfully read the initial Care status, but the submitted output did not include a post-click status mutation result.
 
-The generated Debian package remains Development software. Dev16 Maintenance Insights large-text target revalidation, broader Maintenance Insights AT-SPI/Orca acceptance, dynamic core assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+The generated Debian package remains Development software. Dev17 Maintenance Insights target revalidation, the still-unreported continuous-resize checkpoint, broader Maintenance Insights AT-SPI/Orca acceptance, dynamic core assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev16_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev17_all.deb
 ```
 
 Uninstall with:
