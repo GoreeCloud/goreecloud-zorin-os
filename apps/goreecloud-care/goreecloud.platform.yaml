@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev11
+version: 0.1.0-dev12
 
 supported_platforms:
   - linux
@@ -60,9 +60,12 @@ platform_systems:
       compact rendering and complete requested forward/reverse keyboard traversal.
       The first AT-SPI semantic probe on dev10 enumerated the running Care process
       as __main__.py instead of GoreeCloud Care, causing product-name discovery to
-      fail. Dev11 sets the GLib application name before Gtk.Application startup and
-      adds a source-level regression guard. Dev11 AT-SPI runtime acceptance remains
-      open until the rebuilt package is tested on the representative laptop.
+      fail. Dev11 set the GLib application name before Gtk.Application startup,
+      but representative-device AT-SPI revalidation still exposed __main__.py.
+      Dev12 additionally sets the GLib program name before application startup,
+      retains the human-readable application name, and adds source-level regression
+      guards for both identities. Dev12 AT-SPI runtime acceptance remains open until
+      the rebuilt package is tested on the representative laptop.
   mesh:
     result: applicable-blocked
     version: null
@@ -157,7 +160,14 @@ evidence:
       revision: 3524a4a82da87ea51dcde08992a402190b54c130
       result: failed
       observed_at: "2026-09-06T13:04:00Z"
-      notes: AT-SPI desktop enumeration succeeded but exposed the running Care application as __main__.py rather than GoreeCloud Care, preventing product-name discovery. Dev11 remediates the application identity and requires target revalidation.
+      notes: AT-SPI desktop enumeration succeeded but exposed the running Care application as __main__.py rather than GoreeCloud Care, preventing product-name discovery. Dev11 attempted remediation by setting only the GLib application name.
+    - id: care-dev11-atspi-application-identity-target
+      category: accessibility
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
+      revision: c5582ab650ab41f76fed396e84851f3507a0e1b9
+      result: failed
+      observed_at: "2026-09-06T13:26:00Z"
+      notes: Representative-device dev11 validation/build/install succeeded, but the AT-SPI application root still appeared as __main__.py. Dev12 additionally sets the GLib program name before Gtk.Application startup and requires target revalidation.
   release: []
 
 conformance:
@@ -170,7 +180,7 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and cleanup functions are representative-device verified through dev5; dev8 closes the combined 200%-text compact adaptive-layout blocker; dev10 closes the HighContrast focus/traversal slice. Dev11 AT-SPI application identity and broader assistive-technology semantics remain target-unverified.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and cleanup functions are representative-device verified through dev5; dev8 closes the combined 200%-text compact adaptive-layout blocker; dev10 closes the HighContrast focus/traversal slice. Dev11 AT-SPI application identity failed target revalidation; dev12 program/application identity remediation and broader assistive-technology semantics remain target-unverified.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
