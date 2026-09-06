@@ -1,7 +1,7 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev11`  
+**Version:** `0.1.0-dev12`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
@@ -28,7 +28,7 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 - Large-text-aware compact selection: `GDK_DPI_SCALE` is converted into an effective layout width before the compact contract is evaluated.
 - Compact HeaderBar behavior that omits the Development subtitle when the compact composition is active.
 - GTK/ATK status semantics, category-count accessible names, and action/selector descriptions.
-- Explicit AT-SPI application identity: the module entry point sets the application name to `GoreeCloud Care` before the GTK application starts so assistive-technology clients do not receive the Python module basename as the product identity.
+- Explicit AT-SPI process identity: the module entry point sets both the GLib program name and human-readable application name to `GoreeCloud Care` before `Gtk.Application` startup so assistive-technology discovery does not inherit Python's `__main__.py` basename.
 - HighContrast takeover detection through both `Gtk.Settings:gtk-theme-name` and a process-local `GTK_THEME` override.
 - Theme-resilient keyboard-focus fallback: a focus-only GTK provider remains below Care's normal application CSS and uses the active theme foreground color, preserving the established normal Care focus treatment while ensuring HighContrast does not lose visible keyboard focus when the normal palette provider is suppressed.
 - A minimum supported Development window size plus vertical scrolling and wrapping for long/status/system text.
@@ -44,14 +44,14 @@ sh ./scripts/build-deb.sh
 
 Representative Zorin OS 17.3 testing through dev5 verifies the current maintenance functions, including controlled nonzero cache/temp/Trash/APT deletion and privileged success/cancellation reporting. Dev6 verified normal-text compact/minimum-window behavior; dev8 closed the combined 200%-text + compact/minimum-width adaptive-layout blocker on exact runtime head `45b5f11a49f363ebcaf753c892245a31109bc9bb`.
 
-HighContrast target work through dev10 verifies system HighContrast palette authority, clearly perceivable focus, constrained-width compact rendering, and complete requested forward/reverse keyboard traversal on the representative laptop. The first AT-SPI semantic probe then exposed a new Development identity defect: the application node was enumerated as `__main__.py` instead of `GoreeCloud Care`, causing product-name discovery to fail even though the AT-SPI desktop tree itself was readable. Dev11 sets the GLib application name before application startup and adds source-level regression coverage. This remediation remains target-unverified until a rebuilt dev11 package is inspected through AT-SPI on the representative laptop.
+HighContrast target work through dev10 verifies system HighContrast palette authority, clearly perceivable focus, constrained-width compact rendering, and complete requested forward/reverse keyboard traversal on the representative laptop. The first AT-SPI semantic probe exposed the running application as `__main__.py`. Dev11 set only the GLib application name, but representative-device revalidation still enumerated the AT-SPI application root as `__main__.py`. Dev12 now sets the GLib program name before application startup as well, while retaining the human-readable application name. This remediation remains target-unverified until a rebuilt dev12 package is inspected through AT-SPI on the representative laptop.
 
 The generated Debian package is Development software. Assistive-technology semantic acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev11_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev12_all.deb
 ```
 
 Uninstall with:
