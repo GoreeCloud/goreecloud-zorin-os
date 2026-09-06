@@ -22,7 +22,7 @@ grep -F 'gtk-application-prefer-dark-theme' goreecloud_care/app.py >/dev/null
 grep -F 'settings.set_property("gtk-application-prefer-dark-theme", False)' goreecloud_care/app.py >/dev/null
 grep -F '.status-banner.status-attention' goreecloud_care/app.py >/dev/null
 grep -F '"Action cancelled"' goreecloud_care/app.py >/dev/null
-# Adaptive/accessibility invariants for dev10.
+# Adaptive/accessibility invariants for dev11.
 grep -F 'self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)' goreecloud_care/app.py >/dev/null
 grep -F 'def _apply_layout(' goreecloud_care/app.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/app.py >/dev/null
@@ -35,6 +35,7 @@ grep -F 'visible-data-changed' goreecloud_care/app.py >/dev/null
 grep -F 'is_high_contrast_theme' goreecloud_care/app.py >/dev/null
 grep -F 'GTK_THEME' goreecloud_care/ui_contract.py >/dev/null
 grep -F 'gtk_theme_override' goreecloud_care/ui_contract.py >/dev/null
+grep -F 'GLib.set_application_name("GoreeCloud Care")' goreecloud_care/__main__.py >/dev/null
 grep -F 'install_focus_resilience_provider' goreecloud_care/__main__.py >/dev/null
 grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION - 1' goreecloud_care/focus_resilience.py >/dev/null
 grep -F '@theme_fg_color' goreecloud_care/focus_resilience.py >/dev/null
