@@ -205,7 +205,7 @@ evidence:
     - id: care-dev14-maintenance-insights-target
       category: supported-platform
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: null
+      revision: a3015ebc699965346dd9c37cebe4b1a747824753
       result: blocked
       observed_at: null
       notes: Dev14 Maintenance Insights is source/package implemented. Exact-head repository validation and representative-device build/install, rendered-result, keyboard/focus, HighContrast, large-text/constrained-window, and AT-SPI acceptance remain required.
