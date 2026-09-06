@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.0-dev12 — 2026-09-06
+- Recorded representative-device dev11 AT-SPI revalidation as failed for application-root identity: the AT-SPI desktop tree remained readable, but the running Care process was still exposed as `__main__.py` rather than `GoreeCloud Care`, so product-name discovery still failed.
+- Corrected the identity boundary by setting both `GLib.set_prgname("GoreeCloud Care")` and `GLib.set_application_name("GoreeCloud Care")` before `Gtk.Application` startup. The program identity is established first so `GApplication.run()` cannot inherit the Python module basename for assistive-technology discovery.
+- Expanded accessibility identity regression coverage to require the program name and human-readable application name before launch, and to require program identity establishment before application identity.
+- Strengthened local source validation to guard both GLib identity declarations.
+- Advanced runtime, Python project metadata, Debian package, AppStream metadata, README, Platform Contract, validation guards, and CI package inspection to dev12.
+- Dev12 is a Development remediation candidate only. AT-SPI runtime identity and downstream semantic roles/names/states remain target-unverified until the rebuilt package is installed and probed on the representative Zorin OS laptop.
+
+## 0.1.0-dev11 — 2026-09-06
+- Attempted to correct the first AT-SPI application-root naming defect by setting `GLib.set_application_name("GoreeCloud Care")` before `Gtk.Application` startup.
+- Added a source-level regression test and advanced Development package metadata to dev11.
+- Representative-device dev11 validation/build/install succeeded with 31 tests plus XML/source validation and `install ok installed 0.1.0~dev11`.
+- Fresh AT-SPI revalidation nevertheless still exposed the application root as `__main__.py`; dev11 therefore did not close the accessibility identity defect and must not be represented as accepted.
+
 ## 0.1.0-dev10 — 2026-09-05
 - Recorded fresh representative-device dev9 HighContrast evidence. The system HighContrast presentation now visibly replaces GoreeCloud Care's light Development palette, confirming that the dev9 `GTK_THEME` takeover remediation works on the target laptop.
 - Recorded a new blocking accessibility result from that same pass: pressing Tab produces no visibly perceivable focus response. This is negative keyboard-under-HighContrast evidence; it does not by itself prove whether logical GTK focus traversal stopped or whether focus merely became visually silent.
