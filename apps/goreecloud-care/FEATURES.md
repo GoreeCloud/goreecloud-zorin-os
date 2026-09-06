@@ -37,6 +37,18 @@
 - Report redaction that excludes candidate file paths, local filenames, and raw scan-error strings by default.
 - Report modes never authenticate, delete files, invoke PolicyKit, use telemetry, or access the network.
 
+### Maintenance Insights — dev14
+- Dedicated GTK review surface launched with `goreecloud-care --insights-ui`.
+- Desktop action named **Maintenance Insights (Read-only)**.
+- Read-only breakdown of stale (>7-day) application cache grouped by top-level cache namespace, excluding thumbnail cache.
+- Read-only discovery of files at least 250 MB in `Downloads`, `Desktop`, `Documents`, `Pictures`, `Videos`, and `Music`.
+- Read-only review of Downloads at least 30 days old.
+- Home-relative path presentation inside the explicitly opened local Insights view while default reports stay path-redacted.
+- No symlink following in user-folder discovery.
+- Bounded discovery capped at 50,000 visited entries per refresh, with partial-result disclosure when the limit is reached.
+- Read-only GTK result surface, refresh action, ATK status-bar role, accessible result name/description, and visible-data change signaling.
+- No deletion, PolicyKit, privileged helper, subprocess, or network path inside the Insights engine/window.
+
 ### Privacy and platform behavior
 - Local-only operation and zero telemetry.
 - No GoreeCloud account requirement.
@@ -49,19 +61,16 @@
 - Dev8: combined 200%-text/compact acceptance at exact runtime head `45b5f11a49f363ebcaf753c892245a31109bc9bb`.
 - Dev9: system HighContrast palette takeover accepted, but the first pass exposed a no-visible-Tab-response defect.
 - Dev10: exact runtime head `3524a4a82da87ea51dcde08992a402190b54c130` accepted system HighContrast palette authority, visible focus, constrained-width composition, and complete requested forward/reverse keyboard traversal.
-- Dev12: exact runtime head `09c3a6bcbec094dd3cb0c828de88d084fcbd5a22` is repository-validated; representative AT-SPI inspection accepts the `GoreeCloud Care` application root plus static roles, names, descriptions, checked state, and focused state for the current semantic slice.
-- Dev12 dynamic AT-SPI event delivery remains open. The first property-change listener emitted no Care status events in a session showing a stale/unavailable AT-SPI socket warning. A subsequent read-only polling harness confirmed all three routine selectors were safely unchecked and read the initial status value, but the submitted output did not yet contain the post-click status mutation result.
+- Dev12: exact runtime head `09c3a6bcbec094dd3cb0c828de88d084fcbd5a22` accepted the `GoreeCloud Care` AT-SPI application root plus static roles, names, descriptions, checked state, and focused state for the current semantic slice.
+- Dev13: exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee` passed 38 tests plus XML/source validation on the representative laptop, built and installed `0.1.0~dev13`, returned `0.1.0-dev13` from `--version`, and successfully produced both human and JSON read-only reports. The observed run reported 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 items, and zero scan errors. Treat the dev13 report-mode build/install/execution slice as accepted.
 
-## Dev13 source status
-- Privacy-safe reporting, disk-headroom classification, tests, documentation, version metadata, package metadata, and CI/package inspection have been advanced to dev13 in source.
-- Dev13 target-device package build/install/report execution is not yet accepted until the representative laptop updates to the exact dev13 head and runs the new report modes.
+## Dev14 source status
+- Maintenance Insights engine, bounded user-folder discovery, stale-cache grouping, large-file discovery, stale-Downloads review, GTK read-only review window, desktop action, tests, validation guards, documentation, package metadata, and CI package inspection are source-implemented.
+- Dev14 representative-device package build/install, GTK launch, discovery-result correctness, keyboard/focus, HighContrast, constrained-window, large-text, and AT-SPI acceptance remain open.
 
 ## Planned capability expansion
-- Maintenance Insights card with selected-vs-total reclaimable space, scan freshness, storage headroom, and privacy state.
-- Read-only large-file discovery with user-controlled scope.
-- Stale Downloads review without automatic deletion.
-- Duplicate-file discovery with manual review before any removal.
-- Per-application cache breakdown.
+- Duplicate-file discovery with conservative hashing and manual review before any removal.
+- Optional user-controlled discovery scopes beyond the current standard folders.
 - Flatpak/Snap cache and package inventory visibility where installed.
 - Package-manager health, stale archive, old-kernel, and orphan-package review without automatic removal.
 - SMART/NVMe, filesystem/mount, battery-health, startup/service, and crash-log insights where supported.
@@ -72,8 +81,8 @@
 - Optional governed integration with GoreeCloud Manager, Metrics, and Notify.
 
 ## Remaining before RC
+- Dev14 representative build/install and Maintenance Insights target acceptance.
 - Complete dynamic AT-SPI status-value/event verification and Orca announcement-quality acceptance.
-- Dev13 representative build/install/report-mode acceptance.
 - Additional supported appearance/resilience decisions and evidence, including dark/system appearance where applicable.
 - Package uninstall/downgrade/rollback validation.
 - Official GoreeCloud Care icon/branding from the canonical branding-assets source.
