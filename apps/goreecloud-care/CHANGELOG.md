@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.0-dev14 — 2026-09-06
+- Accepted the dev13 reporting slice on the representative Zorin OS laptop at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`: all 38 tests plus XML/source validation passed, `0.1.0~dev13` built and upgraded over dev12, `dpkg-query` reported `install ok installed 0.1.0~dev13`, `--version` returned `0.1.0-dev13`, and both human and JSON read-only reports executed successfully.
+- Recorded the dev13 representative report values as evidence rather than product guarantees: 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 maintenance items, and zero scan errors. The human/JSON outputs agreed on the maintenance totals and exposed no candidate paths or raw scan-error strings.
+- Added a read-only Maintenance Insights engine that groups stale (>7-day) application-cache candidates by top-level cache namespace while excluding thumbnails.
+- Added read-only large-file discovery for regular user-owned files at least 250 MB under `Downloads`, `Desktop`, `Documents`, `Pictures`, `Videos`, and `Music`.
+- Added read-only stale-Downloads review for regular user-owned files at least 30 days old.
+- Kept the discovery scope symlink-safe and bounded: links are not followed and each standard-folder refresh is capped at 50,000 visited entries, with an explicit partial-results flag if the limit is reached.
+- Added a dedicated GTK Maintenance Insights review window launched with `goreecloud-care --insights-ui`, plus a **Maintenance Insights (Read-only)** desktop action.
+- The Insights window shows home-relative paths only in the explicitly opened local review surface; default `--report` and `--report-json` output remains path-redacted.
+- Added a non-editable scrolling results view, accessible result name/description, ATK status-bar semantics, live accessible status-name updates, and a read-only Refresh action.
+- Added source-level guards proving the Insights engine/window contains no deletion, PolicyKit, privileged-helper, subprocess, or network execution path.
+- Added unit coverage for stale-cache grouping, large-file scope and symlink behavior, stale-Download age filtering, bounded discovery, home-relative rendering, and the read-only GTK source contract.
+- Advanced runtime, Python project metadata, Debian package metadata, AppStream metadata, source-validation guards, desktop integration, documentation, and CI package inspection to `0.1.0-dev14` / `0.1.0~dev14`.
+- Dev14 Maintenance Insights remains source/package-only until exact-head repository validation and representative-device build/install, rendered-result, keyboard/focus, HighContrast, large-text/constrained-window, and AT-SPI acceptance are completed.
+
 ## 0.1.0-dev13 — 2026-09-06
 - Added a privacy-safe, read-only maintenance-reporting layer over the existing Care scan engine.
 - Added `goreecloud-care --report` for human-readable local maintenance snapshots and `goreecloud-care --report-json` for schema-versioned machine-readable output.
@@ -12,7 +27,7 @@
 - Added `CAPABILITIES.md` and substantially expanded `BENEFITS.md`, `FEATURES.md`, the Development specification, README, and user manual with current and planned Care capabilities while preserving the preview-first/least-privilege boundaries.
 - Advanced Python runtime metadata, Debian package metadata, AppStream metadata, source-validation guards, and CI package inspection to `0.1.0-dev13` / `0.1.0~dev13`.
 - The latest representative dev12 AT-SPI polling output confirms all three routine cleanup selectors were unchecked and the live status bar could be read at its initial `Scan complete` value. The submitted output did not yet contain the post-click status mutation, so dynamic status-value/event delivery and Orca announcement quality remain open.
-- Dev13 target-device build/install/report execution remains unaccepted until the representative laptop updates to the exact dev13 head and runs the new report modes.
+- Representative-device dev13 build/install/report execution is accepted at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`; broader accessibility, rollback, branding, and Platform-System gates remain open.
 
 ## 0.1.0-dev12 — 2026-09-06
 - Recorded representative-device dev11 AT-SPI revalidation as failed for application-root identity: the AT-SPI desktop tree remained readable, but the running Care process was still exposed as `__main__.py` rather than `GoreeCloud Care`, so product-name discovery still failed.
