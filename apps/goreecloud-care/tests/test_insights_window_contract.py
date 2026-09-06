@@ -25,6 +25,21 @@ class InsightsWindowContractTests(unittest.TestCase):
         self.assertIn('Maintenance Insights results', source)
         self.assertIn('visible-data-changed', source)
 
+    def test_large_text_page_and_results_remain_vertically_reachable(self):
+        source = self._source()
+        self.assertIn('self.page_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)', source)
+        self.assertIn('self.results_scroll.set_min_content_height(RESULTS_MIN_HEIGHT)', source)
+        self.assertIn('RESULTS_MIN_HEIGHT = 320', source)
+        self.assertIn('self.text.set_wrap_mode(Gtk.WrapMode.CHAR)', source)
+
+    def test_compact_insights_layout_reduces_header_and_fixed_copy(self):
+        source = self._source()
+        self.assertIn('compact = is_compact_width(width)', source)
+        self.assertIn('self.header.set_title("Insights" if compact else "Maintenance Insights")', source)
+        self.assertIn('self.header.set_subtitle(None if compact else self.header_subtitle)', source)
+        self.assertIn('self.intro_compact_markup', source)
+        self.assertIn('self.privacy_compact_text', source)
+
     def test_entrypoint_has_dedicated_insights_ui_mode(self):
         entrypoint = (
             Path(__file__).resolve().parents[1]
