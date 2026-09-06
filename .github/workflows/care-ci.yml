@@ -44,3 +44,18 @@ jobs:
         run: |
           dpkg-deb -I dist/goreecloud-care_0.1.0~dev18_all.deb
           dpkg-deb -c dist/goreecloud-care_0.1.0~dev18_all.deb
+
+      - name: Record Development package checksum
+        run: |
+          cd dist
+          sha256sum goreecloud-care_0.1.0~dev18_all.deb | tee SHA256SUMS
+
+      - name: Preserve Development package evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: goreecloud-care-dev18-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            apps/goreecloud-care/dist/goreecloud-care_0.1.0~dev18_all.deb
+            apps/goreecloud-care/dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 14
