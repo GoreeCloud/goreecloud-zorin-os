@@ -1,12 +1,12 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev12`  
+**Version:** `0.1.0-dev13`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
 
-GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance application. It previews reclaimable storage before deletion and keeps normal cache/temp cleanup unprivileged.
+GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance application. It previews reclaimable storage before deletion, keeps routine cache/temp cleanup unprivileged, and now includes privacy-safe read-only maintenance reporting for local diagnostics and future governed GoreeCloud integrations.
 
 ## Current Development features
 
@@ -17,23 +17,27 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 - Preview APT `.deb` cache and clean it through PolicyKit authorization.
 - Display disk, available-memory, and file-cache status.
 - “Memory Refresh” action that truthfully reclaims Linux file caches after a warning and PolicyKit authorization. It does **not** claim a lasting RAM/performance boost.
-- Explicit keyboard-focus presentation for interactive controls and fail-safe Cancel-first confirmation dialogs.
-- Explicit cancellation status for GoreeCloud Care confirmation dialogs so cancelling an operation never fails silently.
-- More prominent semantic status presentation with a symbol, bold state label, stronger surface/border treatment, and text so changed state does not depend on color alone.
-- Light appearance by default inside GoreeCloud Care without changing the user's Zorin OS desktop-wide appearance setting.
-- Explicit PolicyKit cancellation/error reporting, including the observed Zorin OS `Request dismissed` result, so a dismissed authentication request is never presented as success.
-- Explicit completion notice for successful privileged APT cache cleanup and Memory Refresh.
+- Explicit cancellation, failure, partial-success, and completion reporting.
 - Post-action refresh that updates scan values without replacing the final completion/exception status.
-- Adaptive desktop composition: category amounts move below their content and primary actions stack vertically before constrained or enlarged-text layouts become horizontally compressed.
-- Large-text-aware compact selection: `GDK_DPI_SCALE` is converted into an effective layout width before the compact contract is evaluated.
-- Compact HeaderBar behavior that omits the Development subtitle when the compact composition is active.
-- GTK/ATK status semantics, category-count accessible names, and action/selector descriptions.
-- Explicit AT-SPI process identity: the module entry point sets both the GLib program name and human-readable application name to `GoreeCloud Care` before `Gtk.Application` startup so assistive-technology discovery does not inherit Python's `__main__.py` basename.
-- HighContrast takeover detection through both `Gtk.Settings:gtk-theme-name` and a process-local `GTK_THEME` override.
-- Theme-resilient keyboard-focus fallback: a focus-only GTK provider remains below Care's normal application CSS and uses the active theme foreground color, preserving the established normal Care focus treatment while ensuring HighContrast does not lose visible keyboard focus when the normal palette provider is suppressed.
-- A minimum supported Development window size plus vertical scrolling and wrapping for long/status/system text.
-- No telemetry, advertising, cloud upload, or network requirement.
-- Symlink-safe user cleanup: links are unlinked, never traversed.
+- Light appearance by default inside Care without changing the desktop-wide appearance setting.
+- Adaptive compact layout, 200%-text effective-width behavior, vertical scrolling, and compact HeaderBar reduction.
+- GTK/ATK/AT-SPI accessibility semantics, explicit Care application identity, visible focus, and HighContrast palette authority.
+- No telemetry, advertising, cloud upload, remote service, or GoreeCloud account requirement.
+- Symlink-safe user cleanup and fixed privileged-action boundaries.
+
+## New in dev13: privacy-safe read-only reports
+
+```sh
+goreecloud-care --report
+goreecloud-care --report-json
+goreecloud-care --version
+```
+
+`--report` produces a human-readable local maintenance snapshot. `--report-json` produces schema-versioned machine-readable JSON. Both modes are read-only: they scan the same maintenance categories but never delete files, authenticate, invoke PolicyKit, or access the network.
+
+Reports include disk headroom, memory/file-cache summary, total visible reclaimable bytes/items, per-category byte/item counts, and scan-error counts. Candidate paths, filenames, and raw scan-error strings are deliberately omitted by default so the output is safer to copy into troubleshooting or local automation workflows.
+
+See `CAPABILITIES.md` for the expanded current and planned capability set and `BENEFITS.md` for product/user benefits.
 
 ## Build and test
 
@@ -42,16 +46,18 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-Representative Zorin OS 17.3 testing through dev5 verifies the current maintenance functions, including controlled nonzero cache/temp/Trash/APT deletion and privileged success/cancellation reporting. Dev6 verified normal-text compact/minimum-window behavior; dev8 closed the combined 200%-text + compact/minimum-width adaptive-layout blocker on exact runtime head `45b5f11a49f363ebcaf753c892245a31109bc9bb`.
+Representative Zorin OS testing through dev5 verifies the core cleanup and privileged-maintenance functions. Dev8 accepted the combined 200%-text + compact/minimum-width adaptive-layout slice. Dev10 accepted system HighContrast palette authority, visible focus, constrained-width composition, and complete requested forward/reverse keyboard traversal. Dev12 accepted the AT-SPI `GoreeCloud Care` application-root identity and the current static roles/names/descriptions/checked/focused-state semantic slice on exact runtime head `09c3a6bcbec094dd3cb0c828de88d084fcbd5a22`.
 
-HighContrast target work through dev10 verifies system HighContrast palette authority, clearly perceivable focus, constrained-width compact rendering, and complete requested forward/reverse keyboard traversal on the representative laptop. The first AT-SPI semantic probe exposed the running application as `__main__.py`. Dev11 set only the GLib application name, but representative-device revalidation still enumerated the AT-SPI application root as `__main__.py`. Dev12 now sets the GLib program name before application startup as well, while retaining the human-readable application name. Representative-device dev12 AT-SPI revalidation now discovers `GoreeCloud Care` correctly and the static semantic tree exposes the expected status bar, cleanup selectors, action controls, useful names/descriptions, and live focus/checked states. A first dynamic accessible-name event-listener attempt produced no status events while the session again reported a stale/unavailable AT-SPI socket path; because static reads remain functional and `set_status()` updates the accessible name directly, dynamic event delivery remains inconclusive pending read-only polling during a manual Scan.
+Dynamic assistive-technology event/announcement behavior remains open. A property-change listener did not receive status events in a session that also reported an unavailable/stale AT-SPI socket. The subsequent polling harness confirmed all three routine selectors were unchecked and successfully read the initial Care status, but the submitted output did not yet include a post-click status mutation result.
 
-The generated Debian package is Development software. Dynamic assistive-technology event/announcement acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+Dev13 adds the read-only reporting layer, report CLI modes, disk-headroom classification, privacy-redaction tests, capability documentation, and aligned Development package metadata. Dev13 target-device build/install/report execution is not accepted until the representative laptop updates to the exact dev13 head and runs the report modes.
+
+The generated Debian package remains Development software. Dynamic assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev12_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev13_all.deb
 ```
 
 Uninstall with:
@@ -60,4 +66,4 @@ Uninstall with:
 sudo apt remove goreecloud-care
 ```
 
-The canonical source-control authority is `GoreeCloud/goreecloud-zorin-os`. GoreeCloud Care is maintained as the `apps/goreecloud-care/` component so its Zorin OS packaging, desktop integration, and target-device acceptance remain coupled to the GoreeCloud Zorin OS development surface while preserving a distinct application boundary.
+The canonical source-control authority is `GoreeCloud/goreecloud-zorin-os`. GoreeCloud Care is maintained as the `apps/goreecloud-care/` component so its Zorin OS packaging, desktop integration, target-device acceptance, and Platform Contract evidence remain coupled to the GoreeCloud Zorin OS development surface while preserving a distinct application boundary.
