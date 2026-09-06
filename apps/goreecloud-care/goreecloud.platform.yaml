@@ -186,7 +186,7 @@ evidence:
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
-      result: inconclusive
+      result: blocked
       observed_at: "2026-09-06T14:40:00Z"
       notes: A property-change accessible-name listener produced no Care status events and the session again reported a stale/unavailable AT-SPI socket path. Static AT-SPI reads remain successful and Care set_status() updates the accessible name and emits visible-data-changed, so read-only polling is required to distinguish application semantic mutation from event-subscription transport failure.
   release: []
