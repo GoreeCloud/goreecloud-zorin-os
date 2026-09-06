@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.0-dev17 — 2026-09-06
+- Recorded the representative-device dev16 enlarged-text screenshots at exact runtime/source head `02b7df9eb7543e7147dd7e81212d465daa15086e` as positive evidence for three previously open visual checkpoints: the compact HeaderBar fully displays `Insights`, the symbolic Refresh control shows a clearly perceivable keyboard-focus outline, and the findings viewport reaches its true bottom.
+- The dev16 true-bottom screenshot showed 24,238 inspected user-folder entries with 0 scan errors. This is representative-device evidence, not a fixed product guarantee.
+- Kept continuous-resize responsiveness open because the submitted dev16 evidence did not report how resizing behaved; no performance pass is inferred from screenshots.
+- Identified a new presentation defect in the dev16 `Gtk.WrapMode.CHAR` findings surface: Pango inserted synthetic hyphens at character breaks under `GDK_DPI_SCALE=2`, producing fragments such as `da-` / `ys` and `in-` / `spected`.
+- Replaced the findings `Gtk.TextView` with a selectable Pango-backed `Gtk.Label` using `Pango.WrapMode.WORD_CHAR` and `insert_hyphens='false'`. Long path-like strings can still fall back to character wrapping, but synthetic line-break hyphens are disabled.
+- The dev17 rendering path escapes dynamic findings before inserting Pango markup and does not add zero-width break characters, so displayed/copied paths are not intentionally mutated to obtain wrapping.
+- Preserved the independent findings scroller, 320-pixel minimum findings viewport, accessible result name/description, compact HeaderBar behavior, read-only semantics, local-only boundary, path-display boundary, and no-automatic-deletion guarantees.
+- Added source-contract coverage and validation guards for the selectable results surface, Pango wrapping mode, hyphen suppression, markup escaping, and absence of the prior `Gtk.WrapMode.CHAR` path.
+- Advanced runtime, Python project metadata, Debian package metadata, AppStream metadata, README, Platform Contract, validation guards, and CI package inspection to `0.1.0-dev17` / `0.1.0~dev17`.
+- Dev17 remains Development and target-unaccepted until exact-head repository validation plus representative-device enlarged-text rendering and continuous-resize testing are complete.
+
+## 0.1.0-dev16 — 2026-09-06
+- Recorded representative-device dev15 validation/build/install success at exact head `e36707264a62b4b66083c909b62b55041b909d12`: all 48 local tests plus XML/source validation passed, `goreecloud-care_0.1.0~dev15_all.deb` built, the package upgraded from dev14, and `dpkg-query` reported `install ok installed 0.1.0~dev15`.
+- Classified the dev15 constrained `GDK_DPI_SCALE=2` visual gate as failed/open because the compact HeaderBar title still ellipsized to `Insig…` beside the full text Refresh button. True-bottom findings reachability and continuous-resize responsiveness were not demonstrated in that checkpoint and remained open rather than inferred.
+- Replaced the text-heavy HeaderBar Refresh button with the `view-refresh-symbolic` control while preserving an explicit accessible `Refresh` name, accessible description, tooltip, keyboard focusability, and unchanged read-only refresh behavior.
+- Removed the extra `large` text role from the compact introductory heading while retaining bold hierarchy, shortened compact privacy/status copy, and reduced compact vertical spacing.
+- Preserved the whole-page scroller, 320-pixel findings viewport, effective-width compact contract, local-only/no-network/no-telemetry guarantees, and no automatic file changes.
+- Added/strengthened source-contract coverage and validation guards for the compact symbolic Refresh control and retained large-text reachability invariants.
+- Exact dev16 repository validation passed before representative-device testing: GoreeCloud Care Development run `34045639862`, GoreeCloud Care Platform Contract run `34045640367`, and Validate theme source run `34045639856` were green for exact head `02b7df9eb7543e7147dd7e81212d465daa15086e`.
+- Subsequent representative-device dev16 screenshots verified the fully readable `Insights` title, visible Refresh keyboard focus, and true-bottom findings reachability. Continuous-resize responsiveness remained unreported, and the screenshots exposed synthetic mid-word hyphenation in the `CHAR`-wrapped findings surface; dev17 addresses that presentation defect.
+
+## 0.1.0-dev15 — 2026-09-06
+- Recorded representative-device dev14 Maintenance Insights evidence: normal-width rendering/focus and constrained normal-text HighContrast rendering/focus/scroll reachability were positive, including true-bottom findings access with 24,225 inspected entries and 0 scan errors.
+- Classified the constrained `GDK_DPI_SCALE=2` dev14 run as failed/open because the findings viewport could not reach its true bottom, continuous resizing was reported as very slow, and HeaderBar title/subtitle text visibly truncated under width pressure.
+- Wrapped the whole Insights page in a vertical scroller so enlarged fixed explanatory/status content cannot permanently push findings below the physical window.
+- Guaranteed a 320-pixel minimum findings viewport while retaining its independent scroll position.
+- Reused the shared `GDK_DPI_SCALE`-aware effective-width compact contract; compact mode shortens the HeaderBar title to `Insights`, removes the subtitle, and uses concise explanatory/privacy/status copy.
+- Changed findings wrapping from `WORD_CHAR` to deterministic `CHAR` in an attempt to reduce continuous-resize relayout cost for long path-like strings.
+- Added source-contract tests and validation guards for outer-page scrolling, minimum findings height, compact rendering, and deterministic wrapping.
+- Advanced runtime/package/AppStream/README/CI metadata to `0.1.0-dev15` / `0.1.0~dev15`.
+- Dev15 remained Development until exact-head target validation; its later representative-device pass confirmed package success but still showed compact HeaderBar title truncation.
+
 ## 0.1.0-dev14 — 2026-09-06
 - Accepted the dev13 reporting slice on the representative Zorin OS laptop at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`: all 38 tests plus XML/source validation passed, `0.1.0~dev13` built and upgraded over dev12, `dpkg-query` reported `install ok installed 0.1.0~dev13`, `--version` returned `0.1.0-dev13`, and both human and JSON read-only reports executed successfully.
 - Recorded the dev13 representative report values as evidence rather than product guarantees: 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 maintenance items, and zero scan errors. The human/JSON outputs agreed on the maintenance totals and exposed no candidate paths or raw scan-error strings.
