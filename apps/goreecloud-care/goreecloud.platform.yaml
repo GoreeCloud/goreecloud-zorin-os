@@ -196,14 +196,14 @@ evidence:
       observed_at: "2026-09-06T14:40:00Z"
       notes: A property-change accessible-name listener produced no Care status events and the session reported a stale/unavailable AT-SPI socket path. Static AT-SPI reads remain successful. A later polling harness safely verified all three routine selectors were unchecked and read the initial live status but did not include the post-click mutation result, so dynamic status-value/event delivery remains open.
     - id: care-dev13-read-only-report-target
-      category: functionality
+      category: supported-platform
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: 48049b6f634a05300e01bb0e85d718284b79d7ee
       result: passed
       observed_at: "2026-09-06T15:15:49Z"
       notes: Representative Zorin OS laptop passed 38 local tests plus XML/source validation, built and installed 0.1.0~dev13, returned 0.1.0-dev13 from --version, and successfully produced both human and JSON read-only maintenance reports. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 items, and zero scan errors; default report output remained path/raw-error redacted.
     - id: care-dev14-maintenance-insights-target
-      category: functionality
+      category: supported-platform
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: null
       result: blocked
