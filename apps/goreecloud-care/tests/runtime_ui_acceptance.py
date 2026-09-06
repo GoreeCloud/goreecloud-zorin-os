@@ -20,6 +20,8 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, Gtk  # noqa: E402
 
 from goreecloud_care.app import CareWindow
+from goreecloud_care.glaze_v12 import GLAZE_UI_VERSION
+from goreecloud_care.glaze_v12_global import install_glaze_v12_global_style
 from goreecloud_care.insights import CacheGroupInsight, FileInsight, InsightsSnapshot
 import goreecloud_care.insights_window as insights_window
 
@@ -116,10 +118,15 @@ def main() -> int:
     ok, _argv = Gtk.init_check(None)
     if not ok:
         raise SystemExit("GTK could not initialize; run this probe under Xvfb or a desktop session")
+
+    glaze = install_glaze_v12_global_style()
+    assert GLAZE_UI_VERSION == "1.2.0"
+    assert glaze.provider_attached, "GLAZE UI V1.2 provider was not attached"
+
     app = make_app()
     test_core_status_accessible_mutation(app)
     test_insights_focus_resize_and_rendering(app)
-    print("Headless GTK runtime acceptance probe: passed")
+    print("Headless GTK runtime acceptance probe: passed (GLAZE UI V1.2 native fallback)")
     return 0
 
 
