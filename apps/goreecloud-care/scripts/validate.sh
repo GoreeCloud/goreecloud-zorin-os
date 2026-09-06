@@ -56,6 +56,11 @@ grep -F 'self.results_scroll.set_min_content_height(RESULTS_MIN_HEIGHT)' goreecl
 grep -F 'self.text.set_wrap_mode(Gtk.WrapMode.CHAR)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.header.set_subtitle(None if compact else self.header_subtitle)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.root.set_spacing(COMPACT_SPACING if compact else REGULAR_SPACING)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'view-refresh-symbolic' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.refresh.get_accessible().set_name("Refresh")' goreecloud_care/insights_window.py >/dev/null
+grep -F "<span weight='bold'>Review storage safely</span>" goreecloud_care/insights_window.py >/dev/null
+grep -F 'Refreshing read-only insights…' goreecloud_care/insights_window.py >/dev/null
 grep -F 'Maintenance Insights (Read-only)' packaging/com.goreecloud.care.dev.desktop >/dev/null
 ! grep -R --line-number -E '\.unlink\(|shutil\.rmtree|os\.remove|subprocess|pkexec' goreecloud_care/insights.py goreecloud_care/insights_window.py
 # Post-action completion must survive the automatic values refresh.
