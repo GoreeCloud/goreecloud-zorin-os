@@ -35,10 +35,21 @@ class InsightsWindowContractTests(unittest.TestCase):
     def test_compact_insights_layout_reduces_header_and_fixed_copy(self):
         source = self._source()
         self.assertIn('compact = is_compact_width(width)', source)
+        self.assertIn('self.root.set_spacing(COMPACT_SPACING if compact else REGULAR_SPACING)', source)
         self.assertIn('self.header.set_title("Insights" if compact else "Maintenance Insights")', source)
         self.assertIn('self.header.set_subtitle(None if compact else self.header_subtitle)', source)
-        self.assertIn('self.intro_compact_markup', source)
+        self.assertIn("<span weight='bold'>Review storage safely</span>", source)
         self.assertIn('self.privacy_compact_text', source)
+        self.assertIn('Refreshing read-only insights…', source)
+        self.assertIn('No files changed.', source)
+
+    def test_refresh_control_is_icon_only_and_explicitly_accessible(self):
+        source = self._source()
+        self.assertIn('self.refresh = Gtk.Button()', source)
+        self.assertIn('"view-refresh-symbolic", Gtk.IconSize.BUTTON', source)
+        self.assertIn('self.refresh.get_accessible().set_name("Refresh")', source)
+        self.assertIn('Refresh read-only maintenance insights', source)
+        self.assertNotIn('self.refresh = Gtk.Button(label="Refresh")', source)
 
     def test_entrypoint_has_dedicated_insights_ui_mode(self):
         entrypoint = (
