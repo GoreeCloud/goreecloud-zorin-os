@@ -7,6 +7,11 @@ Exec=goreecloud-care
 Icon=preferences-system-symbolic
 Terminal=false
 Categories=System;Utility;
-Keywords=cleaner;cache;temporary;trash;memory;maintenance;
+Keywords=cleaner;cache;temporary;trash;memory;maintenance;storage;insights;
+Actions=Insights;
 StartupNotify=true
 StartupWMClass=com.goreecloud.care.dev
+
+[Desktop Action Insights]
+Name=Maintenance Insights (Read-only)
+Exec=goreecloud-care --insights-ui
