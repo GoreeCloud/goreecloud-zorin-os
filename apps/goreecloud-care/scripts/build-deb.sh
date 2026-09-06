@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-VERSION="0.1.0~dev17"
+VERSION="0.1.0~dev18"
 ARCH="all"
 PKG="goreecloud-care"
 OUT=${1:-"$ROOT/dist"}
@@ -35,6 +35,8 @@ install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.desktop" "$STAGE/usr/sh
 install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.metainfo.xml" "$STAGE/usr/share/metainfo/"
 install -m 0644 "$ROOT/packaging/com.goreecloud.care.policy" "$STAGE/usr/share/polkit-1/actions/"
 install -m 0644 "$ROOT/LICENSE" "$STAGE/usr/share/doc/goreecloud-care/copyright"
+install -m 0644 "$ROOT/API.md" "$STAGE/usr/share/doc/goreecloud-care/API.md"
+install -m 0644 "$ROOT/WARDVEIL-INTEGRATION.md" "$STAGE/usr/share/doc/goreecloud-care/WARDVEIL-INTEGRATION.md"
 cat > "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth" <<'PTH'
 /usr/lib/goreecloud-care
 PTH
