@@ -22,9 +22,21 @@
 - Reports omit candidate file paths, local filenames, and raw scan-error strings by default.
 - Reports do not authenticate, delete files, invoke PolicyKit, use telemetry, or access the network.
 - `goreecloud-care --version` exposes the installed Development version for support and package verification.
+- Representative-device dev13 build/install/report execution is accepted at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`.
+
+### Maintenance Insights review — dev14
+- `goreecloud-care --insights-ui` opens a dedicated GTK read-only review surface; the desktop entry also exposes **Maintenance Insights (Read-only)** as a desktop action.
+- Per-application stale-cache breakdown groups >7-day application-cache candidates by top-level cache namespace and excludes thumbnails.
+- Large-file discovery identifies files of at least 250 MB in the standard local user folders `Downloads`, `Desktop`, `Documents`, `Pictures`, `Videos`, and `Music`.
+- Stale Downloads review identifies files at least 30 days old without selecting or deleting them.
+- User-folder discovery never follows symlinks and is bounded to 50,000 visited entries per refresh.
+- Results show home-relative paths only inside the explicitly opened local Insights window; the default report modes remain path-redacted.
+- The Insights engine/window has no deletion, PolicyKit, privileged-helper, or network execution path.
+- Scan status is exposed as an ATK status-bar role and result text is read-only.
+- Dev14 source/package implementation does **not** establish representative-device UI/accessibility acceptance until target validation is completed.
 
 ### Accessibility and resilience
-- Keyboard-only forward and reverse traversal.
+- Keyboard-only forward and reverse traversal for the accepted core Care control path.
 - Theme-resilient focus treatment under system HighContrast.
 - Compact-window and 200%-text adaptive composition.
 - AT-SPI product identity, roles, names, descriptions, checked state, and focused state for the current representative semantic slice.
@@ -42,11 +54,10 @@
 The following are planned directions, not current implementation or release claims.
 
 ### Storage intelligence
-- Read-only large-file discovery with user-controlled scope and explicit path visibility only when requested.
-- Stale Downloads review without automatic deletion.
 - Duplicate-file discovery using conservative hashing and manual review before deletion.
-- Per-application cache breakdown so users can understand which applications contribute most reclaimable data.
+- Optional user-controlled scope expansion beyond the current standard-folder Maintenance Insights set.
 - Storage-pressure trends and capacity forecasting from local historical snapshots when a governed persistence design is approved.
+- Filesystem/mount-aware exclusion and removable/network-volume controls for broader future discovery scopes.
 
 ### Application and package maintenance
 - Flatpak and Snap cache/inventory visibility where installed.
@@ -75,13 +86,14 @@ The following are planned directions, not current implementation or release clai
 - Optional local integration with GoreeCloud Manager, Metrics, and Notify after their applicable Platform Contract gates are satisfied.
 
 ### Accessibility
+- Representative-device keyboard, HighContrast, constrained-window, and large-text acceptance for the new dev14 Maintenance Insights window.
 - Verified dynamic AT-SPI status-event delivery.
 - Orca announcement-quality acceptance for status changes, confirmations, errors, and completion.
 - Continued HighContrast, large-text, keyboard-only, and constrained-window regression coverage as capabilities expand.
 
 ## Capability boundaries
 
-GoreeCloud Care is not intended to become a generic “optimizer.” Planned features must preserve these boundaries:
+GoreeCloud Care is not intended to become a generic “optimizer.” Planned and implemented features must preserve these boundaries:
 
 - no automatic destructive cleanup by default;
 - no browser-history, cookie, password, or credential deletion;
@@ -89,4 +101,5 @@ GoreeCloud Care is not intended to become a generic “optimizer.” Planned fea
 - no arbitrary root shell execution;
 - no package autoremove without explicit reviewed scope and governed acceptance;
 - no remote maintenance or cloud account requirement unless separately specified, governed, and accepted;
-- no telemetry requirement for core maintenance.
+- no telemetry requirement for core maintenance;
+- no unbounded filesystem crawling disguised as a lightweight maintenance scan.
