@@ -66,9 +66,12 @@ PY
 test -f /usr/lib/goreecloud-care/goreecloud-care-helper
 test -f /usr/share/polkit-1/actions/com.goreecloud.care.policy
 test -f /usr/share/applications/com.goreecloud.care.dev.desktop
+test -f /usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg
 test -f /usr/share/metainfo/com.goreecloud.care.dev.metainfo.xml
 test -f /usr/share/doc/goreecloud-care/API.md
 test -f /usr/share/doc/goreecloud-care/WARDVEIL-INTEGRATION.md
+grep -F 'Icon=com.goreecloud.care' /usr/share/applications/com.goreecloud.care.dev.desktop >/dev/null
 
 printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe acceptance probe: passed"
+printf '%s\n' "Canonical Care icon derivative is installed and referenced by the desktop entry."
 printf '%s\n' "Continuity remains attention until destructive package lifecycle rollback testing is separately completed."
