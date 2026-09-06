@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev14
+version: 0.1.0-dev16
 
 supported_platforms:
   - linux
@@ -24,7 +24,7 @@ platform_systems:
       - CAPABILITIES.md
       - goreecloud_care/reporting.py
       - goreecloud_care/insights.py
-    notes: Dev13 provides a local schema-versioned read-only maintenance report and dev14 adds local Maintenance Insights, but no Manager discovery, transport, authorization, or acceptance is implemented.
+    notes: Dev13 provides a local schema-versioned read-only maintenance report and Maintenance Insights remains a local review surface, but no Manager discovery, transport, authorization, or acceptance is implemented.
   privacy_shield:
     result: applicable-blocked
     version: null
@@ -34,7 +34,7 @@ platform_systems:
       - tests/test_insights.py
       - goreecloud_care/reporting.py
       - goreecloud_care/insights.py
-    notes: Default reports omit candidate paths, filenames, and raw scan-error strings. Dev14 may show home-relative paths only inside the explicitly opened local Insights review surface. No network or telemetry path is present; formal Privacy Shield acceptance is not claimed.
+    notes: Default reports omit candidate paths, filenames, and raw scan-error strings. Maintenance Insights may show home-relative paths only inside the explicitly opened local review surface. No network or telemetry path is present; formal Privacy Shield acceptance is not claimed.
   wardveil_security:
     result: applicable-blocked
     version: null
@@ -43,7 +43,7 @@ platform_systems:
       - tests/test_reporting.py
       - tests/test_insights.py
       - tests/test_insights_window_contract.py
-    notes: Least-privilege controls and read-only reporting/Insights boundaries are present. Dev14 guards prohibit deletion, PolicyKit, privileged-helper, subprocess, and network execution in the Insights engine/window; formal Wardveil Security acceptance is not claimed.
+    notes: Least-privilege controls and read-only reporting/Insights boundaries are present. Source guards prohibit deletion, PolicyKit, privileged-helper, subprocess, and network execution in the Insights engine/window; formal Wardveil Security acceptance is not claimed.
   everkeep:
     result: applicable-blocked
     version: null
@@ -61,25 +61,28 @@ platform_systems:
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560572070
     notes: >-
       Current Stable consumer target is 1.1.0. Dev8 accepted the combined
-      200%-text plus compact/minimum-width adaptive-layout slice. Dev10 accepted
-      HighContrast palette authority, visible focus, constrained-width rendering,
-      and complete requested forward/reverse keyboard traversal. Dev12 accepted
-      the GoreeCloud Care AT-SPI application identity and static semantic-tree
-      roles/names/descriptions/checked/focused-state slice. Dynamic accessible
-      status mutation/event delivery and screen-reader announcement quality remain
-      open. Dev14 adds a read-only Maintenance Insights GTK surface with a
-      non-editable scrolling result view, Refresh action, result accessible
-      name/description, ATK status-bar semantics, and live accessible status-name
-      mutation. That new window remains target-unaccepted.
+      200%-text plus compact/minimum-width adaptive-layout slice for the core Care
+      window. Dev10 accepted HighContrast palette authority, visible focus,
+      constrained-width rendering, and complete requested forward/reverse keyboard
+      traversal. Dev12 accepted the GoreeCloud Care AT-SPI application identity
+      and static semantic-tree roles/names/descriptions/checked/focused-state slice.
+      Dynamic accessible status mutation/event delivery and screen-reader
+      announcement quality remain open. Dev14 added the read-only Maintenance
+      Insights GTK surface. Dev15 representative-device build/install passed, but
+      the constrained GDK_DPI_SCALE=2 screenshot still showed a truncated compact
+      HeaderBar title, so large-text visual acceptance remains failed/open. Dev16
+      reduces compact HeaderBar and fixed-copy pressure and requires a fresh target
+      rendering, true-bottom reachability, and resize-responsiveness pass.
   mesh:
     result: applicable-blocked
     version: null
     evidence:
       - CAPABILITIES.md
       - goreecloud_care/reporting.py
-    notes: Dev13's local JSON report creates a potential future capability payload, but Mesh registration, capability discovery, transport, runtime integration, and acceptance are not implemented. Dev14 Maintenance Insights remains local-only.
+    notes: Dev13's local JSON report creates a potential future capability payload, but Mesh registration, capability discovery, transport, runtime integration, and acceptance are not implemented. Maintenance Insights remains local-only.
     capabilities: []
     dependencies: []
     published_events: []
@@ -200,6 +203,13 @@ evidence:
       result: passed
       observed_at: "2026-09-06T15:15:49Z"
       notes: Representative Zorin OS laptop passed 38 tests plus XML/source validation, built and installed 0.1.0~dev13, returned 0.1.0-dev13 from --version, and successfully produced both human and JSON read-only reports. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 items, and zero scan errors; default report output remained path/raw-error redacted.
+    - id: care-dev15-large-text-insights-target
+      category: accessibility
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560572070
+      revision: e36707264a62b4b66083c909b62b55041b909d12
+      result: failed
+      observed_at: "2026-09-06T16:22:00Z"
+      notes: Representative-device dev15 validation passed 48 tests plus XML/source validation and the package built/installed successfully, but the constrained GDK_DPI_SCALE=2 compact HeaderBar still ellipsized the title. Complete true-bottom and resize-responsiveness evidence was not supplied, so those behaviors remain open.
   release: []
 
 conformance:
@@ -212,9 +222,9 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete; dynamic status-value/event delivery and screen-reader announcement quality remain open, and the dev14 Maintenance Insights window requires its own rendered/accessibility acceptance.
+    - Final Glaze UI current-Stable native acceptance remains incomplete; dynamic status-value/event delivery and screen-reader announcement quality remain open, and Maintenance Insights still requires accepted 200%-text constrained rendering, true-bottom reachability, resize responsiveness, keyboard traversal, and AT-SPI/Orca evidence.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
-    - Dev14 Maintenance Insights exact-head repository and representative-device acceptance remain incomplete.
+    - Dev16 Maintenance Insights exact-head repository and representative-device acceptance remain incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
     - Release Candidate and release evidence are intentionally absent for this Development build.
