@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev12
+version: 0.1.0-dev13
 
 supported_platforms:
   - linux
@@ -20,26 +20,31 @@ platform_systems:
   manager:
     result: applicable-blocked
     version: null
-    evidence: []
-    notes: Operational visibility requirements have not yet been integrated or accepted.
+    evidence:
+      - CAPABILITIES.md
+      - goreecloud_care/reporting.py
+    notes: Dev13 exposes a local schema-versioned read-only maintenance report that could support future Manager operational visibility, but no Manager discovery, transport, authorization, or acceptance is implemented yet.
   privacy_shield:
     result: applicable-blocked
     version: null
     evidence:
       - PRIVACY.md
-    notes: Local-only privacy design is documented; formal Privacy Shield acceptance is not claimed.
+      - tests/test_reporting.py
+      - goreecloud_care/reporting.py
+    notes: Local-only privacy design is documented. Dev13 report output explicitly omits candidate paths, filenames, and raw scan-error strings by default and declares no network/telemetry use; formal Privacy Shield acceptance is not claimed.
   wardveil_security:
     result: applicable-blocked
     version: null
     evidence:
       - SECURITY.md
-    notes: Least-privilege source controls are present; formal Wardveil Security acceptance is not claimed.
+      - tests/test_reporting.py
+    notes: Least-privilege source controls and read-only reporting boundaries are present; formal Wardveil Security acceptance is not claimed.
   everkeep:
     result: applicable-blocked
     version: null
     evidence:
       - RECOVERY.md
-    notes: Recovery behavior is documented; Everkeep recovery acceptance has not been completed.
+    notes: Recovery behavior is documented; Everkeep recovery and package rollback acceptance have not been completed.
   glaze_ui:
     result: applicable-blocked
     version: "1.1.0"
@@ -65,19 +70,22 @@ platform_systems:
       Dev12 additionally sets the GLib program name before application startup,
       retains the human-readable application name, and adds source-level regression
       guards for both identities. Representative-device dev12 AT-SPI revalidation
-      now exposes GoreeCloud Care as the application root and a follow-up static
+      exposes GoreeCloud Care as the application root and a follow-up static
       semantic-tree probe verifies the expected status-bar role, selector/action
       roles, names/descriptions, and live checked/focused state. A first dynamic
-      accessible-name listener produced no status events while the session again
-      reported a stale/unavailable AT-SPI socket path. Because static reads work and
-      Care's set_status() updates the accessible name and emits visible-data-changed,
-      dynamic event delivery remains inconclusive pending read-only polling and
-      screen-reader announcement verification.
+      accessible-name listener produced no status events while the session reported
+      a stale/unavailable AT-SPI socket path. A later polling harness safely verified
+      all three routine selectors were unchecked and read the initial live status,
+      but the submitted evidence did not include the post-click status mutation.
+      Dynamic status-value/event delivery and screen-reader announcement quality
+      therefore remain open.
   mesh:
     result: applicable-blocked
     version: null
-    evidence: []
-    notes: Mesh registration/runtime acceptance has not been implemented.
+    evidence:
+      - CAPABILITIES.md
+      - goreecloud_care/reporting.py
+    notes: Dev13's local JSON report creates a potential future capability payload, but Mesh registration, capability discovery, transport, runtime integration, and acceptance are not implemented.
     capabilities: []
     dependencies: []
     published_events: []
@@ -87,7 +95,7 @@ platform_systems:
     version: null
     evidence:
       - SPECIFICATIONS.md
-    notes: The Development specification explicitly excludes an account requirement and remote management; re-evaluate Identity applicability if remote or multi-user capabilities are introduced.
+    notes: The Development specification explicitly excludes an account requirement and remote management; re-evaluate Identity applicability if remote, managed, or multi-user capabilities are introduced.
 
 health:
   health_endpoint: null
@@ -105,15 +113,15 @@ continuity:
   export:
     required: false
     requirements:
-      - No durable user application data is currently stored for export.
+      - Dev13 can export a read-only maintenance snapshot as text or JSON, but Care still persists no durable user application dataset that requires an application-data export workflow.
   portability:
     required: true
     requirements:
-      - Keep maintenance policy and package state documented and avoid proprietary durable data formats.
+      - Keep maintenance policy and package state documented, keep report schemas versioned, and avoid proprietary durable data formats.
 
 external_dependencies:
   - name: python3
-    purpose: Native application runtime.
+    purpose: Native application runtime and read-only report generation.
     required: true
     version_constraint: ">=3.10"
   - name: PyGObject GTK 3
@@ -137,6 +145,7 @@ compatibility:
     - glaze-ui==1.1.0
   provides:
     - goreecloud-care-local-maintenance
+    - goreecloud-care-read-only-maintenance-report
 
 evidence:
   acceptance_tests:
@@ -188,7 +197,7 @@ evidence:
       revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
       result: blocked
       observed_at: "2026-09-06T14:40:00Z"
-      notes: A property-change accessible-name listener produced no Care status events and the session again reported a stale/unavailable AT-SPI socket path. Static AT-SPI reads remain successful and Care set_status() updates the accessible name and emits visible-data-changed, so read-only polling is required to distinguish application semantic mutation from event-subscription transport failure.
+      notes: A property-change accessible-name listener produced no Care status events and the session reported a stale/unavailable AT-SPI socket path. Static AT-SPI reads remain successful. A later polling harness safely verified all three routine selectors were unchecked and read the initial live status but did not include the post-click mutation result, so dynamic status-value/event delivery remains open.
   release: []
 
 conformance:
@@ -201,8 +210,9 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and cleanup functions are representative-device verified through dev5; dev8 closes the combined 200%-text compact adaptive-layout blocker; dev10 closes the HighContrast focus/traversal slice. Dev12 closes AT-SPI application identity and static semantic-tree roles/names/descriptions/state semantics for the representative slice; dynamic event delivery and screen-reader announcement quality remain open.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and cleanup functions are representative-device verified through dev5; dev8 closes the combined 200%-text compact adaptive-layout blocker; dev10 closes the HighContrast focus/traversal slice. Dev12 closes AT-SPI application identity and static semantic-tree roles/names/descriptions/state semantics for the representative slice; dynamic status-value/event delivery and screen-reader announcement quality remain open.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
+    - Dev13 read-only report source, package, and documentation are implemented but representative-device build/install/report execution is not yet accepted.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
     - Release Candidate and release evidence are intentionally absent for this Development build.
