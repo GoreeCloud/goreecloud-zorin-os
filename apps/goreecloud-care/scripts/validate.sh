@@ -43,6 +43,15 @@ assert everkeep['read_only'] is True
 assert everkeep['fail_closed'] is True
 assert 'restore_capability' in everkeep['dimensions']
 assert everkeep['status_schema'] == 'contracts/continuity.status.schema.json'
+
+everkeep_acceptance = json.loads(Path('contracts/everkeep.acceptance.json').read_text(encoding='utf-8'))
+assert everkeep_acceptance['schema_version'] == 1
+assert everkeep_acceptance['application'] == 'GoreeCloud Care'
+assert everkeep_acceptance['freshness']['required_for_ready'] is True
+assert everkeep_acceptance['acceptance']['everkeep_integrated'] is False
+assert everkeep_acceptance['acceptance']['everkeep_ready'] is False
+assert everkeep_acceptance['acceptance']['target_runtime_acceptance_required'] is True
+assert everkeep_acceptance['acceptance']['exact_revision_acceptance_required'] is True
 print('Platform integration contract validation: passed')
 PY
 # Exact Development version alignment.
@@ -74,6 +83,20 @@ grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION - 1' goreecloud_care/focus_resi
 grep -F '@theme_fg_color' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'button:focus, checkbutton:focus' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'gir1.2-atk-1.0' scripts/build-deb.sh >/dev/null
+# Current Stable GLAZE UI V1.2 native fallback invariants.
+grep -F 'GLAZE_UI_VERSION = "1.2.0"' goreecloud_care/glaze_v12.py >/dev/null
+grep -F 'GLAZE_UI_LABEL = "GLAZE UI V1.2"' goreecloud_care/glaze_v12.py >/dev/null
+grep -F 'MIN_TARGET_PX = 48' goreecloud_care/glaze_v12.py >/dev/null
+grep -F 'button, checkbutton { min-height: 48px; }' goreecloud_care/glaze_v12.py >/dev/null
+grep -F 'reduced-transparency' goreecloud_care/glaze_v12.py >/dev/null
+grep -F 'reduced-motion' goreecloud_care/glaze_v12.py >/dev/null
+grep -F 'install_glaze_v12_global_style' goreecloud_care/__main__.py >/dev/null
+grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_USER - 1' goreecloud_care/glaze_v12_global.py >/dev/null
+grep -F 'is_high_contrast_theme' goreecloud_care/glaze_v12_global.py >/dev/null
+! grep -E 'transition[[:space:]]*:|animation[[:space:]]*:' goreecloud_care/glaze_v12.py >/dev/null
+grep -F 'version: "1.2.0"' goreecloud.platform.yaml >/dev/null
+grep -F 'glaze_ui_required: "1.2.0"' goreecloud.platform.yaml >/dev/null
+grep -F 'glaze-ui==1.2.0' goreecloud.platform.yaml >/dev/null
 # Privacy-safe read-only report and local integration API invariants.
 for flag in --report --report-json --api-version --health-json --privacy-status-json --security-status-json --continuity-status-json; do
   grep -F -- "\"$flag\"" goreecloud_care/__main__.py >/dev/null
@@ -114,7 +137,7 @@ grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
 grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
 grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
 # Mandatory GoreeCloud component documentation and integration records.
-for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json scripts/validate-installed.sh; do
+for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json contracts/everkeep.acceptance.json scripts/validate-installed.sh scripts/validate-package-lifecycle.sh; do
   test -s "$f"
 done
 echo 'Local source validation: passed'
