@@ -43,6 +43,32 @@ Report modes are read-only. They do not delete files, request administrator auth
 
 Disk-headroom labels such as `comfortable`, `watch`, `low`, and `critical` are informational capacity signals. They are not filesystem-health certification and do not trigger cleanup automatically.
 
+Representative-device dev13 build/install/report execution is accepted at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`.
+
+## Maintenance Insights — dev14 Development
+
+Open the dedicated read-only review surface from a terminal with:
+
+```sh
+goreecloud-care --insights-ui
+```
+
+The installed desktop entry also provides the **Maintenance Insights (Read-only)** action.
+
+Maintenance Insights currently reviews three things without performing maintenance:
+
+- stale application cache older than seven days, grouped by top-level application/cache namespace;
+- files at least 250 MB in `Downloads`, `Desktop`, `Documents`, `Pictures`, `Videos`, and `Music`;
+- files in `Downloads` that are at least 30 days old.
+
+Choose **Refresh** inside Maintenance Insights to repeat the read-only scan. The window displays home-relative paths such as `~/Downloads/example.iso` because you explicitly opened a local file-review view. The normal `--report` and `--report-json` modes continue to omit paths.
+
+Maintenance Insights does **not** select, move, quarantine, or delete any finding. It does not request administrator authentication, invoke PolicyKit or the Care privileged helper, launch subprocess maintenance commands, or access the network. Symlinks are not followed. Standard-folder discovery is capped at 50,000 visited entries per refresh; when that limit is reached the window states that its results are partial.
+
+Review a finding manually before changing it outside Care. A large file or old Download is not automatically “junk,” and its presence is not a recommendation to delete it.
+
+The dev14 Insights window remains Development validation work until its package build/install, displayed findings, keyboard/focus behavior, HighContrast behavior, large-text/constrained-window behavior, and AT-SPI semantics are accepted on the representative Zorin OS laptop.
+
 ## Keyboard and accessibility
 Use **Tab** and **Shift+Tab** to move through interactive controls. GoreeCloud Care requires keyboard focus to be visibly perceivable as it moves; an interface where focus changes cannot be seen is not considered accepted keyboard behavior.
 
