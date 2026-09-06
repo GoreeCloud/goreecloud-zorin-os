@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev16
+version: 0.1.0-dev17
 
 supported_platforms:
   - linux
@@ -62,20 +62,23 @@ platform_systems:
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560572070
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560656873
     notes: >-
-      Current Stable consumer target is 1.1.0. Dev8 accepted the combined
-      200%-text plus compact/minimum-width adaptive-layout slice for the core Care
-      window. Dev10 accepted HighContrast palette authority, visible focus,
-      constrained-width rendering, and complete requested forward/reverse keyboard
-      traversal. Dev12 accepted the GoreeCloud Care AT-SPI application identity
-      and static semantic-tree roles/names/descriptions/checked/focused-state slice.
-      Dynamic accessible status mutation/event delivery and screen-reader
-      announcement quality remain open. Dev14 added the read-only Maintenance
-      Insights GTK surface. Dev15 representative-device build/install passed, but
-      the constrained GDK_DPI_SCALE=2 screenshot still showed a truncated compact
-      HeaderBar title, so large-text visual acceptance remains failed/open. Dev16
-      reduces compact HeaderBar and fixed-copy pressure and requires a fresh target
-      rendering, true-bottom reachability, and resize-responsiveness pass.
+      The manifest's currently declared Stable consumer target is 1.1.0. Dev8
+      accepted the combined 200%-text plus compact/minimum-width adaptive-layout
+      slice for the core Care window. Dev10 accepted HighContrast palette authority,
+      visible focus, constrained-width rendering, and complete requested
+      forward/reverse keyboard traversal. Dev12 accepted the GoreeCloud Care AT-SPI
+      application identity and static semantic-tree
+      roles/names/descriptions/checked/focused-state slice. Dynamic accessible
+      status mutation/event delivery and screen-reader announcement quality remain
+      open. Dev14 added the read-only Maintenance Insights GTK surface. Dev15
+      representative-device build/install passed but its compact HeaderBar title
+      still truncated. Dev16 representative screenshots verify the compact Insights
+      title, visible Refresh focus, and true-bottom findings reachability; resize
+      responsiveness was not reported. Dev17 replaces synthetic-hyphen-prone CHAR
+      wrapping with selectable Pango WORD_CHAR wrapping and insert_hyphens=false;
+      exact-head and representative-device validation remain required.
   mesh:
     result: applicable-blocked
     version: null
@@ -210,6 +213,13 @@ evidence:
       result: failed
       observed_at: "2026-09-06T16:22:00Z"
       notes: Representative-device dev15 validation passed 48 tests plus XML/source validation and the package built/installed successfully, but the constrained GDK_DPI_SCALE=2 compact HeaderBar still ellipsized the title. Complete true-bottom and resize-responsiveness evidence was not supplied, so those behaviors remain open.
+    - id: care-dev16-large-text-insights-visual-target
+      category: accessibility
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560656873
+      revision: 02b7df9eb7543e7147dd7e81212d465daa15086e
+      result: passed
+      observed_at: "2026-09-06T16:42:00Z"
+      notes: Representative-device GDK_DPI_SCALE=2 screenshots verify a fully readable compact Insights title, visible keyboard focus on the symbolic Refresh control, and true-bottom findings reachability. Continuous-resize responsiveness was not reported and remains a separate open checkpoint; screenshots also exposed synthetic mid-word hyphenation in CHAR-wrapped findings, addressed by the dev17 source candidate.
   release: []
 
 conformance:
@@ -222,9 +232,9 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete; dynamic status-value/event delivery and screen-reader announcement quality remain open, and Maintenance Insights still requires accepted 200%-text constrained rendering, true-bottom reachability, resize responsiveness, keyboard traversal, and AT-SPI/Orca evidence.
+    - Final Glaze UI current-Stable native acceptance remains incomplete; dynamic status-value/event delivery and screen-reader announcement quality remain open, Maintenance Insights continuous-resize responsiveness is still unreported, and dev17 hyphen-free large-text rendering plus keyboard/AT-SPI/Orca evidence remain unaccepted.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
-    - Dev16 Maintenance Insights exact-head repository and representative-device acceptance remain incomplete.
+    - Dev17 Maintenance Insights exact-head repository and representative-device acceptance remain incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
     - Release Candidate and release evidence are intentionally absent for this Development build.
