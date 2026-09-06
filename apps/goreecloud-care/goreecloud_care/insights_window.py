@@ -20,6 +20,8 @@ from .ui_contract import (
 
 APP_ID = "com.goreecloud.care.dev.insights"
 RESULTS_MIN_HEIGHT = 320
+REGULAR_SPACING = 12
+COMPACT_SPACING = 8
 
 
 class InsightsWindow(Gtk.ApplicationWindow):
@@ -38,9 +40,17 @@ class InsightsWindow(Gtk.ApplicationWindow):
         self.header.props.subtitle = self.header_subtitle
         self.set_titlebar(self.header)
 
-        self.refresh = Gtk.Button(label="Refresh")
+        # Keep Refresh visually compact at large text. The symbolic control keeps
+        # its explicit accessible name/description and tooltip, so reducing width
+        # pressure does not remove the action's meaning for keyboard/AT users.
+        self.refresh = Gtk.Button()
+        self.refresh_icon = Gtk.Image.new_from_icon_name(
+            "view-refresh-symbolic", Gtk.IconSize.BUTTON
+        )
+        self.refresh.add(self.refresh_icon)
         self.refresh.set_can_focus(True)
         self.refresh.set_tooltip_text("Refresh read-only maintenance insights")
+        self.refresh.get_accessible().set_name("Refresh")
         self.refresh.get_accessible().set_description(
             "Re-scan local maintenance insights. Refreshing does not delete files or perform maintenance."
         )
@@ -55,7 +65,9 @@ class InsightsWindow(Gtk.ApplicationWindow):
         self.page_scroll.set_vexpand(True)
         self.add(self.page_scroll)
 
-        self.root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self.root = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, spacing=REGULAR_SPACING
+        )
         self.root.set_border_width(REGULAR_BORDER)
         self.page_scroll.add(self.root)
 
@@ -65,8 +77,8 @@ class InsightsWindow(Gtk.ApplicationWindow):
             "large files in standard user folders, and older Downloads. Nothing is selected or deleted automatically."
         )
         self.intro_compact_markup = (
-            "<span size='large' weight='bold'>Review storage safely</span>\n"
-            "Read-only local review. Nothing is selected or deleted automatically."
+            "<span weight='bold'>Review storage safely</span>\n"
+            "Read-only. Nothing is selected or deleted automatically."
         )
         self.intro = Gtk.Label(xalign=0)
         self.intro.set_line_wrap(True)
@@ -78,8 +90,8 @@ class InsightsWindow(Gtk.ApplicationWindow):
             "Paths are shown only inside this local review view; default Care reports remain path-redacted."
         )
         self.privacy_compact_text = (
-            "Local only • no telemetry • no network • no administrator authentication. "
-            "Paths appear only in this local review; default Care reports stay path-redacted."
+            "Local only • no network or telemetry • no administrator authentication. "
+            "Paths are shown only here."
         )
         self.privacy = Gtk.Label(xalign=0)
         self.privacy.set_line_wrap(True)
@@ -102,7 +114,7 @@ class InsightsWindow(Gtk.ApplicationWindow):
 
         # The findings keep their own scroll position, but they also have a
         # guaranteed visible viewport. The outer page scroller above prevents
-        # this child from being allocated partly below the window at 200% text.
+        # enlarged fixed content from making the results permanently unreachable.
         self.results_scroll = Gtk.ScrolledWindow()
         self.results_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         self.results_scroll.set_hexpand(True)
@@ -139,6 +151,7 @@ class InsightsWindow(Gtk.ApplicationWindow):
             return
         self._compact_layout = compact
         self.root.set_border_width(COMPACT_BORDER if compact else REGULAR_BORDER)
+        self.root.set_spacing(COMPACT_SPACING if compact else REGULAR_SPACING)
         self.header.set_title("Insights" if compact else "Maintenance Insights")
         self.header.set_subtitle(None if compact else self.header_subtitle)
         self.intro.set_markup(
@@ -167,7 +180,12 @@ class InsightsWindow(Gtk.ApplicationWindow):
         threading.Thread(target=worker, daemon=True).start()
 
     def on_refresh(self, _button) -> None:
-        self._set_status("Analyzing standard user folders and stale application cache without deleting files…")
+        if self._compact_layout:
+            self._set_status("Refreshing read-only insights…")
+        else:
+            self._set_status(
+                "Analyzing standard user folders and stale application cache without deleting files…"
+            )
         self._run_thread(build_insights, self._refresh_done)
 
     def _refresh_done(self, snapshot: InsightsSnapshot | None, error: Exception | None) -> bool:
@@ -181,11 +199,20 @@ class InsightsWindow(Gtk.ApplicationWindow):
 
         self.text.get_buffer().set_text(render_insights_text(snapshot))
         total_findings = len(snapshot.cache_groups) + len(snapshot.large_files) + len(snapshot.stale_downloads)
-        suffix = " Results are partial because the bounded discovery limit was reached." if snapshot.truncated else ""
-        self._set_status(
-            f"Insights ready. {total_findings} review item/group(s) shown; "
-            f"{snapshot.scan_error_count} scan error(s). No files were changed.{suffix}"
-        )
+        if self._compact_layout:
+            suffix = (
+                " Partial results: discovery limit reached." if snapshot.truncated else ""
+            )
+            self._set_status(
+                f"Ready. {total_findings} review item/group(s); "
+                f"{snapshot.scan_error_count} scan error(s). No files changed.{suffix}"
+            )
+        else:
+            suffix = " Results are partial because the bounded discovery limit was reached." if snapshot.truncated else ""
+            self._set_status(
+                f"Insights ready. {total_findings} review item/group(s) shown; "
+                f"{snapshot.scan_error_count} scan error(s). No files were changed.{suffix}"
+            )
         return False
 
 
