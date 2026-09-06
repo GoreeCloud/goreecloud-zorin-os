@@ -1,12 +1,12 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev15`  
+**Version:** `0.1.0-dev16`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
 
-GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance application. It previews reclaimable storage before deletion, keeps routine cache/temp cleanup unprivileged, provides privacy-safe read-only reports, and now has a bounded local Maintenance Insights review surface for understanding storage pressure before taking action.
+GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance application. It previews reclaimable storage before deletion, keeps routine cache/temp cleanup unprivileged, provides privacy-safe read-only reports, and has a bounded local Maintenance Insights review surface for understanding storage pressure before taking action.
 
 ## Current Development features
 
@@ -39,7 +39,7 @@ Reports include disk headroom, memory/file-cache summary, total visible reclaima
 
 Representative-device dev13 validation is accepted at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`: 38 tests plus XML/source validation passed, `0.1.0~dev13` built and upgraded over dev12, `dpkg-query` reported `install ok installed 0.1.0~dev13`, `--version` returned `0.1.0-dev13`, and both human and JSON reports executed successfully on the Zorin OS laptop. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 maintenance items, and zero scan errors. These values are representative-device evidence from that run, not fixed product guarantees.
 
-## Maintenance Insights — dev14 foundation, dev15 resilience remediation
+## Maintenance Insights — dev14 foundation, dev16 large-text refinement
 
 Launch the Development review surface with:
 
@@ -58,9 +58,11 @@ The Insights engine is deliberately bounded and read-only. It currently reviews:
 
 Symlinks are not followed. The standard-folder crawl is capped at 50,000 visited entries per refresh so the feature cannot silently become an unbounded home-directory scan. Local file paths may be shown inside the explicitly requested interactive review window, while default Care reports remain path-redacted. No finding is automatically selected for deletion and the Insights modules contain no cleanup, PolicyKit, privileged-helper, or network execution path.
 
-Representative-device dev14 screenshots accepted the normal-width rendering/focus slice and the constrained normal-text HighContrast rendering/focus/scroll slice. A subsequent `GDK_DPI_SCALE=2` constrained-width run exposed a real large-text defect: the fixed explanatory/status content could consume the visible allocation so the nested results viewport could not be scrolled to its true bottom, and continuous resizing was reported as very slow.
+Representative-device dev14 screenshots accepted the normal-width rendering/focus slice and the constrained normal-text HighContrast rendering/focus/scroll slice. A subsequent `GDK_DPI_SCALE=2` constrained-width run exposed a large-text defect: fixed explanatory/status content could consume the visible allocation so the nested results viewport could not be scrolled to its true bottom, and continuous resizing was reported as very slow.
 
-Dev15 remediates that failure by making the whole Insights page vertically scrollable, guaranteeing a visible findings viewport, using the same effective-width compact decision as core Care, collapsing the HeaderBar subtitle and fixed explanatory copy in compact mode, and switching long-path result wrapping from `WORD_CHAR` to deterministic `CHAR` wrapping to reduce continuous-resize relayout cost. Dev15 remains target-unaccepted until the exact package is rebuilt, installed, and the 200%-text constrained-width run is repeated successfully.
+Dev15 introduced the whole-page vertical scroller, a 320-pixel minimum findings viewport, effective-width compact behavior, compact fixed copy, and `CHAR` result wrapping. Exact dev15 head `e36707264a62b4b66083c909b62b55041b909d12` then passed all 48 local tests plus XML/source validation on the representative laptop, built `0.1.0~dev15`, and upgraded successfully to `install ok installed 0.1.0~dev15`. A fresh constrained-width `GDK_DPI_SCALE=2` screenshot confirmed compact mode was active, but the HeaderBar title still ellipsized to `Insig…` beside the full text Refresh action. That visual slice therefore remains unaccepted. The submitted checkpoint did not include a complete true-bottom scroll or resize-responsiveness result, so those two behaviors remain open rather than inferred.
+
+Dev16 is the next remediation candidate. It replaces the text-heavy HeaderBar Refresh button with a symbolic icon while preserving an explicit accessible `Refresh` name, description, tooltip, and keyboard focus; removes the extra `large` text role from the compact intro; shortens compact privacy/status copy; and reduces compact vertical spacing. The read-only, local-only, path-display, and no-automatic-change guarantees remain unchanged. Dev16 remains target-unaccepted until the exact package is rebuilt, installed, and the 200%-text constrained-width rendering, true-bottom reachability, and resize-responsiveness pass is repeated successfully.
 
 See `CAPABILITIES.md` for the expanded current and planned capability set and `BENEFITS.md` for product/user benefits.
 
@@ -75,12 +77,12 @@ Representative Zorin OS testing through dev5 verifies the core cleanup and privi
 
 Dynamic assistive-technology event/announcement behavior remains open. A property-change listener did not receive status events in a session that also reported an unavailable/stale AT-SPI socket. A subsequent polling harness confirmed all three routine selectors were unchecked and successfully read the initial Care status, but the submitted output did not include a post-click status mutation result.
 
-The generated Debian package remains Development software. Dev15 Maintenance Insights large-text target revalidation, broader Maintenance Insights AT-SPI acceptance, dynamic assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+The generated Debian package remains Development software. Dev16 Maintenance Insights large-text target revalidation, broader Maintenance Insights AT-SPI/Orca acceptance, dynamic core assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev15_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev16_all.deb
 ```
 
 Uninstall with:
