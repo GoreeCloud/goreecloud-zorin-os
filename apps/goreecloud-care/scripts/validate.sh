@@ -6,13 +6,44 @@ python3 -m compileall -q goreecloud_care tests
 python3 -m unittest discover -s tests -v
 python3 - <<'PY'
 from pathlib import Path
+import json
 import xml.etree.ElementTree as ET
+
 for p in [
     Path('packaging/com.goreecloud.care.policy'),
     Path('packaging/com.goreecloud.care.dev.metainfo.xml'),
 ]:
     ET.parse(p)
 print('XML validation: passed')
+
+privacy_app = json.loads(Path('contracts/privacy-shield.application.json').read_text(encoding='utf-8'))
+assert privacy_app['manifest_version'] == 1
+assert privacy_app['application_id'] == 'goreecloud-care'
+assert privacy_app['resources']
+assert all(resource['processing_zones'] == ['local'] for resource in privacy_app['resources'])
+assert all(resource.get('destinations', []) == [] for resource in privacy_app['resources'])
+assert all(resource.get('ai_usage') is False for resource in privacy_app['resources'])
+
+privacy_adapter = json.loads(Path('contracts/privacy-shield.adapter.json').read_text(encoding='utf-8'))
+assert privacy_adapter['schema_version'] == 1
+assert privacy_adapter['adapter']['id'] == 'goreecloud-care'
+assert privacy_adapter['adapter']['runtime_authority'] == 'GoreeCloud/goreecloud-zorin-os'
+assert privacy_adapter['acceptance']['runtime_acceptance_required'] is True
+assert privacy_adapter['acceptance']['production_approved'] is False
+assert set(privacy_adapter['capabilities']) == {
+    'telemetry-minimization', 'data-minimization', 'privacy-status'
+}
+assert privacy_adapter['privacy']['local_first'] is True
+assert privacy_adapter['privacy']['raw_private_activity_exported_for_status'] is False
+
+everkeep = json.loads(Path('contracts/everkeep.adoption.json').read_text(encoding='utf-8'))
+assert everkeep['schema_version'] == 1
+assert everkeep['project'] == 'GoreeCloud Care'
+assert everkeep['read_only'] is True
+assert everkeep['fail_closed'] is True
+assert 'restore_capability' in everkeep['dimensions']
+assert everkeep['status_schema'] == 'contracts/continuity.status.schema.json'
+print('Platform integration contract validation: passed')
 PY
 # Security/source invariants for the privileged boundary.
 grep -F '["/usr/bin/apt-get", "clean"]' goreecloud_care/helper.py >/dev/null
@@ -37,13 +68,18 @@ grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION - 1' goreecloud_care/focus_resi
 grep -F '@theme_fg_color' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'button:focus, checkbutton:focus' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'gir1.2-atk-1.0' scripts/build-deb.sh >/dev/null
-# Privacy-safe read-only report invariants retained from dev13.
-grep -F -- '"--report"' goreecloud_care/__main__.py >/dev/null
-grep -F -- '"--report-json"' goreecloud_care/__main__.py >/dev/null
+# Privacy-safe read-only report and local integration API invariants.
+for flag in --report --report-json --api-version --health-json --privacy-status-json --security-status-json --continuity-status-json; do
+  grep -F -- "\"$flag\"" goreecloud_care/__main__.py >/dev/null
+done
 grep -F 'contains_file_paths' goreecloud_care/reporting.py >/dev/null
 grep -F 'contains_raw_scan_errors' goreecloud_care/reporting.py >/dev/null
 grep -F 'read-only-local-maintenance-report' goreecloud_care/reporting.py >/dev/null
 grep -F 'classify_disk_headroom' goreecloud_care/reporting.py >/dev/null
+grep -F 'production_approved: bool = False' goreecloud_care/platform_status.py >/dev/null
+grep -F 'rollback_verified: bool = False' goreecloud_care/platform_status.py >/dev/null
+grep -F '"protected_by_wardveil": False' goreecloud_care/platform_status.py >/dev/null
+grep -F 'stat.S_IWGRP | stat.S_IWOTH' goreecloud_care/platform_status.py >/dev/null
 # Maintenance Insights must remain bounded, local, review-only, and large-text reachable.
 grep -F -- '"--insights-ui"' goreecloud_care/__main__.py >/dev/null
 grep -F 'MAX_VISITED_ENTRIES = 50_000' goreecloud_care/insights.py >/dev/null
@@ -71,8 +107,8 @@ grep -F 'def _refresh_after_action(' goreecloud_care/app.py >/dev/null
 grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
 grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
 grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
-# Mandatory GoreeCloud component documentation.
-for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md goreecloud.platform.yaml; do
+# Mandatory GoreeCloud component documentation and integration records.
+for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json; do
   test -s "$f"
 done
 echo 'Local source validation: passed'
