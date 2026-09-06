@@ -1,7 +1,7 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev14`  
+**Version:** `0.1.0-dev15`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
@@ -39,9 +39,9 @@ Reports include disk headroom, memory/file-cache summary, total visible reclaima
 
 Representative-device dev13 validation is accepted at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`: 38 tests plus XML/source validation passed, `0.1.0~dev13` built and upgraded over dev12, `dpkg-query` reported `install ok installed 0.1.0~dev13`, `--version` returned `0.1.0-dev13`, and both human and JSON reports executed successfully on the Zorin OS laptop. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 maintenance items, and zero scan errors. These values are representative-device evidence from that run, not fixed product guarantees.
 
-## New in dev14: Maintenance Insights review
+## Maintenance Insights — dev14 foundation, dev15 resilience remediation
 
-Launch the new Development review surface with:
+Launch the Development review surface with:
 
 ```sh
 goreecloud-care --insights-ui
@@ -49,7 +49,7 @@ goreecloud-care --insights-ui
 
 The installed desktop entry also exposes **Maintenance Insights (Read-only)** as a desktop action.
 
-The dev14 insights engine is deliberately bounded and read-only. It currently reviews:
+The Insights engine is deliberately bounded and read-only. It currently reviews:
 
 - largest stale application-cache groups using the same >7-day application-cache policy as routine Care cleanup, excluding thumbnails;
 - large files of at least 250 MB in standard user folders (`Downloads`, `Desktop`, `Documents`, `Pictures`, `Videos`, and `Music`);
@@ -58,7 +58,9 @@ The dev14 insights engine is deliberately bounded and read-only. It currently re
 
 Symlinks are not followed. The standard-folder crawl is capped at 50,000 visited entries per refresh so the feature cannot silently become an unbounded home-directory scan. Local file paths may be shown inside the explicitly requested interactive review window, while default Care reports remain path-redacted. No finding is automatically selected for deletion and the Insights modules contain no cleanup, PolicyKit, privileged-helper, or network execution path.
 
-Dev14 Maintenance Insights is source/package implemented and repository-tested only until it is built, installed, launched, visually reviewed, and accessibility-checked on the representative Zorin OS laptop.
+Representative-device dev14 screenshots accepted the normal-width rendering/focus slice and the constrained normal-text HighContrast rendering/focus/scroll slice. A subsequent `GDK_DPI_SCALE=2` constrained-width run exposed a real large-text defect: the fixed explanatory/status content could consume the visible allocation so the nested results viewport could not be scrolled to its true bottom, and continuous resizing was reported as very slow.
+
+Dev15 remediates that failure by making the whole Insights page vertically scrollable, guaranteeing a visible findings viewport, using the same effective-width compact decision as core Care, collapsing the HeaderBar subtitle and fixed explanatory copy in compact mode, and switching long-path result wrapping from `WORD_CHAR` to deterministic `CHAR` wrapping to reduce continuous-resize relayout cost. Dev15 remains target-unaccepted until the exact package is rebuilt, installed, and the 200%-text constrained-width run is repeated successfully.
 
 See `CAPABILITIES.md` for the expanded current and planned capability set and `BENEFITS.md` for product/user benefits.
 
@@ -69,16 +71,16 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-Representative Zorin OS testing through dev5 verifies the core cleanup and privileged-maintenance functions. Dev8 accepted the combined 200%-text + compact/minimum-width adaptive-layout slice. Dev10 accepted system HighContrast palette authority, visible focus, constrained-width composition, and complete requested forward/reverse keyboard traversal. Dev12 accepted the AT-SPI `GoreeCloud Care` application-root identity and the current static roles/names/descriptions/checked/focused-state semantic slice on exact runtime head `09c3a6bcbec094dd3cb0c828de88d084fcbd5a22`. Dev13 accepts the read-only reporting slice on exact runtime head `48049b6f634a05300e01bb0e85d718284b79d7ee`.
+Representative Zorin OS testing through dev5 verifies the core cleanup and privileged-maintenance functions. Dev8 accepted the combined 200%-text + compact/minimum-width adaptive-layout slice for the core Care window. Dev10 accepted system HighContrast palette authority, visible focus, constrained-width composition, and complete requested forward/reverse keyboard traversal. Dev12 accepted the AT-SPI `GoreeCloud Care` application-root identity and the current static roles/names/descriptions/checked/focused-state semantic slice on exact runtime head `09c3a6bcbec094dd3cb0c828de88d084fcbd5a22`. Dev13 accepts the read-only reporting slice on exact runtime head `48049b6f634a05300e01bb0e85d718284b79d7ee`.
 
 Dynamic assistive-technology event/announcement behavior remains open. A property-change listener did not receive status events in a session that also reported an unavailable/stale AT-SPI socket. A subsequent polling harness confirmed all three routine selectors were unchecked and successfully read the initial Care status, but the submitted output did not include a post-click status mutation result.
 
-The generated Debian package remains Development software. Dev14 Maintenance Insights target acceptance, dynamic assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+The generated Debian package remains Development software. Dev15 Maintenance Insights large-text target revalidation, broader Maintenance Insights AT-SPI acceptance, dynamic assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev14_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev15_all.deb
 ```
 
 Uninstall with:
