@@ -31,17 +31,18 @@ def drain_events(limit: int = 500) -> None:
         count += 1
 
 
-def make_app(app_id: str) -> Gtk.Application:
+def make_app() -> Gtk.Application:
+    # No application ID means the headless CI probe does not require a session
+    # D-Bus name. NON_UNIQUE keeps the test isolated from desktop registration.
     app = Gtk.Application(
-        application_id=app_id,
+        application_id=None,
         flags=Gio.ApplicationFlags.NON_UNIQUE,
     )
     app.register(None)
     return app
 
 
-def test_core_status_accessible_mutation() -> None:
-    app = make_app("com.goreecloud.care.runtime-core-test")
+def test_core_status_accessible_mutation(app: Gtk.Application) -> None:
     window = CareWindow(app)
     window.set_status("Synthetic completion state.", "success", "Completed")
     name = window.status_accessible.get_name()
@@ -49,7 +50,7 @@ def test_core_status_accessible_mutation() -> None:
     window.destroy()
 
 
-def test_insights_focus_resize_and_rendering() -> None:
+def test_insights_focus_resize_and_rendering(app: Gtk.Application) -> None:
     snapshot = InsightsSnapshot(
         cache_groups=(CacheGroupInsight("example-cache", 1024, 2),),
         large_files=(
@@ -66,7 +67,6 @@ def test_insights_focus_resize_and_rendering() -> None:
     )
     insights_window.build_insights = lambda: snapshot
 
-    app = make_app("com.goreecloud.care.runtime-insights-test")
     window = insights_window.InsightsWindow(app)
     window.show_all()
     drain_events()
@@ -77,10 +77,13 @@ def test_insights_focus_resize_and_rendering() -> None:
     assert "example-video.mp4" in window.results.get_text()
     assert "synthetic-hyphenation" in window.results.get_text()
 
+    # At GDK_DPI_SCALE=2 the effective layout width is half the allocated width.
+    # 480 therefore exercises compact mode while 1800 crosses back into regular
+    # mode above the 820 effective-width breakpoint.
     window._apply_layout(480)
     assert window.header.get_title() == "Insights"
     assert window.header.get_subtitle() is None
-    window._apply_layout(1100)
+    window._apply_layout(1800)
     assert window.header.get_title() == "Maintenance Insights"
     assert window.header.get_subtitle() == window.header_subtitle
 
@@ -101,7 +104,7 @@ def test_insights_focus_resize_and_rendering() -> None:
     for _ in range(20):
         window.resize(480, 620)
         drain_events()
-        window.resize(1180, 720)
+        window.resize(1800, 720)
         drain_events()
     elapsed = time.monotonic() - start
     assert elapsed < 5.0, f"synthetic continuous resize took {elapsed:.3f}s"
@@ -113,8 +116,9 @@ def main() -> int:
     ok, _argv = Gtk.init_check(None)
     if not ok:
         raise SystemExit("GTK could not initialize; run this probe under Xvfb or a desktop session")
-    test_core_status_accessible_mutation()
-    test_insights_focus_resize_and_rendering()
+    app = make_app()
+    test_core_status_accessible_mutation(app)
+    test_insights_focus_resize_and_rendering(app)
     print("Headless GTK runtime acceptance probe: passed")
     return 0
 
