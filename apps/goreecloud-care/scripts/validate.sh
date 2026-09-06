@@ -49,11 +49,14 @@ grep -F -- '"--insights-ui"' goreecloud_care/__main__.py >/dev/null
 grep -F 'MAX_VISITED_ENTRIES = 50_000' goreecloud_care/insights.py >/dev/null
 grep -F 'STANDARD_USER_DIRS' goreecloud_care/insights.py >/dev/null
 grep -F 'def build_insights(' goreecloud_care/insights.py >/dev/null
-grep -F 'self.text.set_editable(False)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.results = Gtk.Label(xalign=0, yalign=0)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.results.set_selectable(True)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'Atk.Role.STATUSBAR' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.page_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.results_scroll.set_min_content_height(RESULTS_MIN_HEIGHT)' goreecloud_care/insights_window.py >/dev/null
-grep -F 'self.text.set_wrap_mode(Gtk.WrapMode.CHAR)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.results.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)' goreecloud_care/insights_window.py >/dev/null
+grep -F "<span insert_hyphens='false'>{escaped}</span>" goreecloud_care/insights_window.py >/dev/null
+! grep -F 'Gtk.WrapMode.CHAR' goreecloud_care/insights_window.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.header.set_subtitle(None if compact else self.header_subtitle)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.root.set_spacing(COMPACT_SPACING if compact else REGULAR_SPACING)' goreecloud_care/insights_window.py >/dev/null
