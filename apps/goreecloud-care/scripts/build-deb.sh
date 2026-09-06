@@ -13,6 +13,7 @@ mkdir -p "$OUT" \
   "$STAGE/usr/bin" \
   "$STAGE/usr/lib/goreecloud-care/goreecloud_care" \
   "$STAGE/usr/share/applications" \
+  "$STAGE/usr/share/icons/hicolor/scalable/apps" \
   "$STAGE/usr/share/metainfo" \
   "$STAGE/usr/share/polkit-1/actions" \
   "$STAGE/usr/share/doc/goreecloud-care"
@@ -32,6 +33,7 @@ install -m 0755 "$ROOT/packaging/goreecloud-care" "$STAGE/usr/bin/goreecloud-car
 install -m 0755 "$ROOT/packaging/goreecloud-care-helper" "$STAGE/usr/lib/goreecloud-care/goreecloud-care-helper"
 install -m 0644 "$ROOT/goreecloud_care/"*.py "$STAGE/usr/lib/goreecloud-care/goreecloud_care/"
 install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.desktop" "$STAGE/usr/share/applications/"
+install -m 0644 "$ROOT/packaging/icons/com.goreecloud.care.svg" "$STAGE/usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg"
 install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.metainfo.xml" "$STAGE/usr/share/metainfo/"
 install -m 0644 "$ROOT/packaging/com.goreecloud.care.policy" "$STAGE/usr/share/polkit-1/actions/"
 install -m 0644 "$ROOT/LICENSE" "$STAGE/usr/share/doc/goreecloud-care/copyright"
