@@ -7,6 +7,11 @@ on:
       - 'apps/goreecloud-care/PRIVACY.md'
       - 'apps/goreecloud-care/SECURITY.md'
       - 'apps/goreecloud-care/RECOVERY.md'
+      - 'apps/goreecloud-care/API.md'
+      - 'apps/goreecloud-care/WARDVEIL-INTEGRATION.md'
+      - 'apps/goreecloud-care/GLAZE-UI-CONFORMANCE.md'
+      - 'apps/goreecloud-care/RELEASE-ACCEPTANCE.md'
+      - 'apps/goreecloud-care/contracts/**'
       - '.github/workflows/care-platform-contract.yml'
   push:
     branches:
@@ -16,6 +21,11 @@ on:
       - 'apps/goreecloud-care/PRIVACY.md'
       - 'apps/goreecloud-care/SECURITY.md'
       - 'apps/goreecloud-care/RECOVERY.md'
+      - 'apps/goreecloud-care/API.md'
+      - 'apps/goreecloud-care/WARDVEIL-INTEGRATION.md'
+      - 'apps/goreecloud-care/GLAZE-UI-CONFORMANCE.md'
+      - 'apps/goreecloud-care/RELEASE-ACCEPTANCE.md'
+      - 'apps/goreecloud-care/contracts/**'
       - '.github/workflows/care-platform-contract.yml'
 
 permissions:
