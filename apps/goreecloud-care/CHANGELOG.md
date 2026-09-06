@@ -6,7 +6,10 @@
 - Expanded accessibility identity regression coverage to require the program name and human-readable application name before launch, and to require program identity establishment before application identity.
 - Strengthened local source validation to guard both GLib identity declarations.
 - Advanced runtime, Python project metadata, Debian package, AppStream metadata, README, Platform Contract, validation guards, and CI package inspection to dev12.
-- Dev12 is a Development remediation candidate only. AT-SPI runtime identity and downstream semantic roles/names/states remain target-unverified until the rebuilt package is installed and probed on the representative Zorin OS laptop.
+- Representative-device dev12 AT-SPI identity revalidation now exposes the application root as `GoreeCloud Care`, closing the dev10/dev11 product-identity defect for this target slice.
+- A follow-up static semantic-tree probe confirms a genuine `status bar`, useful accessible names/descriptions for Scan, the three cleanup selectors, Reclaim file cache…, Clean selected, Empty Trash…, and Clean APT cache…, and live focus/checked states. Treat application-root identity and static roles/names/descriptions/state semantics as accepted for this representative dev12 slice.
+- A first dynamic `object:property-change:accessible-name` listener attempt produced no Care status events and again emitted the representative session's stale/unavailable AT-SPI socket warning. This is classified as inconclusive for Care dynamic semantics rather than a confirmed application defect because static AT-SPI reads continue to work and `set_status()` updates the accessible name and emits `visible-data-changed`. Read-only status-name polling during a manual Scan is the next discriminator between application semantic updates and event-subscription transport failure.
+- Dynamic status-change/event delivery, screen-reader announcement quality, and broader Release Candidate gates remain open.
 
 ## 0.1.0-dev11 — 2026-09-06
 - Attempted to correct the first AT-SPI application-root naming defect by setting `GLib.set_application_name("GoreeCloud Care")` before `Gtk.Application` startup.
@@ -64,14 +67,14 @@
 ## 0.1.0-dev5 — 2026-09-05
 - Fixed post-action status replacement that could hide successful privileged-action feedback behind the automatic refresh scan.
 - Added an explicit completion notice after successful PolicyKit-authorized APT cache cleanup and Memory Refresh.
-- Added a post-action refresh path that updates category/system values without overwriting the final success/attention result.
+- Added a post-action refresh path that updates category/system values without overwriting the final success/exception status.
 - Applied the same status-preservation behavior to normal selected cleanup and Trash refreshes so their final result remains visible after values refresh.
 - If a maintenance action completes but the follow-up scan fails, GoreeCloud Care now preserves the completed-action fact while reporting the refresh failure as attention instead of falsely claiming a fully refreshed result.
 - Repository validation is green; representative-device successful privileged-action execution remains a required acceptance gate before success is treated as verified.
 
 ## 0.1.0-dev4 — 2026-09-05
 - Changed GoreeCloud Care to open in a light appearance by default without modifying the user's desktop-wide Zorin OS appearance setting.
-- Reworked the persistent maintenance-status surface into a higher-salience semantic indicator with a symbol, bold state title, stronger border/surface treatment, and explicit text so changed state is not communicated by color alone.
+- Reworked the persistent maintenance-status surface into a higher-salience semantic indicator with a symbol, bold state label, stronger border/surface treatment, and explicit text so changed state does not depend on color alone.
 - Classified ordinary user cancellation as an attention/changed-state condition rather than a warning or error; cancellation now uses a prominent but non-critical presentation.
 - Added distinct informational, attention, success, and error status treatments mapped from current Glaze UI V1.1 semantic roles while keeping final Glaze UI conformance/acceptance explicitly open.
 - Preserved the representative-device-verified high-contrast keyboard-focus treatment.
