@@ -82,15 +82,19 @@ platform_systems:
     version: "1.1.0"
     evidence:
       - GLAZE-UI-CONFORMANCE.md
+      - BRANDING.md
+      - packaging/icons/com.goreecloud.care.svg
       - tests/test_ui_contract.py
       - tests/test_focus_resilience.py
       - tests/test_accessibility_identity.py
       - tests/test_insights_window_contract.py
+      - tests/runtime_ui_acceptance.py
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560656873
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5561183405
-    notes: Current required Stable consumer target is GLAZE UI V1.1 / 1.1.0. Revision-scoped target evidence covers core 200%-text/compact adaptation, HighContrast authority and keyboard focus/traversal, static AT-SPI semantics, and dev17 Insights rendering/reachability. Continuous large-text drag-resize responsiveness, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final appearance/visual-quality acceptance, official Care branding, representative task flows, and product-specific current-Stable approval remain open.
+      - https://github.com/GoreeCloud/goreecloud-branding-assets/blob/main/products/care/app-icon.svg
+    notes: Current required Stable consumer target is GLAZE UI V1.1 / 1.1.0. Revision-scoped target evidence covers core 200%-text/compact adaptation, HighContrast authority and keyboard focus/traversal, static AT-SPI semantics, and dev17 Insights rendering/reachability. Dev18 establishes the canonical Care product icon centrally and packages its synchronized derivative. Continuous large-text drag-resize responsiveness, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final appearance/visual-quality and icon-rendering acceptance, representative task flows, and product-specific current-Stable approval remain open.
   mesh:
     result: not-applicable-justified
     version: null
@@ -227,6 +231,6 @@ conformance:
     - Privacy Shield exact-candidate runtime/application acceptance is incomplete and production_approved remains false.
     - Wardveil Security exact-candidate adoption/target acceptance is incomplete; no broad Protected by Wardveil claim is authorized.
     - Everkeep package uninstall/downgrade/reinstall/rollback acceptance is incomplete and continuity remains non-ready.
-    - Final current-Stable Glaze UI V1.1 product acceptance is incomplete, including continuous large-text drag-resize responsiveness, complete Insights forward/reverse keyboard traversal, dynamic AT-SPI/Orca behavior, final appearance/visual-quality review, and representative task flows.
-    - Official canonical GoreeCloud Care icon/branding is absent from GoreeCloud/goreecloud-branding-assets and remains a production blocker.
+    - Final current-Stable Glaze UI V1.1 product acceptance is incomplete, including continuous large-text drag-resize responsiveness, complete Insights forward/reverse keyboard traversal, dynamic AT-SPI/Orca behavior, final appearance/visual-quality review, icon-rendering acceptance, and representative task flows.
+    - Canonical GoreeCloud Care branding now exists and is packaged, but exact-candidate target rendering and visual-quality acceptance remain open.
     - Release Candidate artifact/release evidence and governed final acceptance are intentionally absent while Development gates remain open.
