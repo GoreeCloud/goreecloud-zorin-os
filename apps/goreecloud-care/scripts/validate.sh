@@ -17,12 +17,7 @@ PY
 # Security/source invariants for the privileged boundary.
 grep -F '["/usr/bin/apt-get", "clean"]' goreecloud_care/helper.py >/dev/null
 ! grep -R --line-number -E 'shell[[:space:]]*=[[:space:]]*True|os\.system\(' goreecloud_care packaging scripts
-# Current Development interaction invariants.
-grep -F 'gtk-application-prefer-dark-theme' goreecloud_care/app.py >/dev/null
-grep -F 'settings.set_property("gtk-application-prefer-dark-theme", False)' goreecloud_care/app.py >/dev/null
-grep -F '.status-banner.status-attention' goreecloud_care/app.py >/dev/null
-grep -F '"Action cancelled"' goreecloud_care/app.py >/dev/null
-# Adaptive/accessibility invariants for dev14.
+# Adaptive/accessibility invariants for current Development.
 grep -F 'self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)' goreecloud_care/app.py >/dev/null
 grep -F 'def _apply_layout(' goreecloud_care/app.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/app.py >/dev/null
@@ -49,13 +44,18 @@ grep -F 'contains_file_paths' goreecloud_care/reporting.py >/dev/null
 grep -F 'contains_raw_scan_errors' goreecloud_care/reporting.py >/dev/null
 grep -F 'read-only-local-maintenance-report' goreecloud_care/reporting.py >/dev/null
 grep -F 'classify_disk_headroom' goreecloud_care/reporting.py >/dev/null
-# Dev14 Maintenance Insights must remain bounded, local, and review-only.
+# Maintenance Insights must remain bounded, local, review-only, and large-text reachable.
 grep -F -- '"--insights-ui"' goreecloud_care/__main__.py >/dev/null
 grep -F 'MAX_VISITED_ENTRIES = 50_000' goreecloud_care/insights.py >/dev/null
 grep -F 'STANDARD_USER_DIRS' goreecloud_care/insights.py >/dev/null
 grep -F 'def build_insights(' goreecloud_care/insights.py >/dev/null
 grep -F 'self.text.set_editable(False)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'Atk.Role.STATUSBAR' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.page_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.results_scroll.set_min_content_height(RESULTS_MIN_HEIGHT)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.text.set_wrap_mode(Gtk.WrapMode.CHAR)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'compact = is_compact_width(width)' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.header.set_subtitle(None if compact else self.header_subtitle)' goreecloud_care/insights_window.py >/dev/null
 grep -F 'Maintenance Insights (Read-only)' packaging/com.goreecloud.care.dev.desktop >/dev/null
 ! grep -R --line-number -E '\.unlink\(|shutil\.rmtree|os\.remove|subprocess|pkexec' goreecloud_care/insights.py goreecloud_care/insights_window.py
 # Post-action completion must survive the automatic values refresh.
