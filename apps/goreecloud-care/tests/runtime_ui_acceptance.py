@@ -1,9 +1,18 @@
 from __future__ import annotations
 
 import os
+import sys
 import time
+from pathlib import Path
 
 os.environ.setdefault("GDK_DPI_SCALE", "2")
+
+# This file is intentionally runnable both from the repository root and directly
+# from tests/. Python otherwise puts tests/ rather than the Care source root on
+# sys.path when invoked as `python3 tests/runtime_ui_acceptance.py`.
+SOURCE_ROOT = Path(__file__).resolve().parents[1]
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
 
 import gi
 
