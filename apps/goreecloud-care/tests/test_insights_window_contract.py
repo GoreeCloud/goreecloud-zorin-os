@@ -12,8 +12,10 @@ class InsightsWindowContractTests(unittest.TestCase):
 
     def test_window_is_explicitly_read_only(self):
         source = self._source()
-        self.assertIn('self.text.set_editable(False)', source)
+        self.assertIn('self.results = Gtk.Label(xalign=0, yalign=0)', source)
+        self.assertIn('self.results.set_selectable(True)', source)
         self.assertIn('Nothing is selected or deleted automatically', source)
+        self.assertNotIn('Gtk.TextView()', source)
         self.assertNotIn('.unlink(', source)
         self.assertNotIn('shutil.rmtree', source)
         self.assertNotIn('pkexec', source)
@@ -30,7 +32,15 @@ class InsightsWindowContractTests(unittest.TestCase):
         self.assertIn('self.page_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)', source)
         self.assertIn('self.results_scroll.set_min_content_height(RESULTS_MIN_HEIGHT)', source)
         self.assertIn('RESULTS_MIN_HEIGHT = 320', source)
-        self.assertIn('self.text.set_wrap_mode(Gtk.WrapMode.CHAR)', source)
+        self.assertIn('self.results.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)', source)
+
+    def test_results_wrap_without_synthetic_hyphens_or_copy_mutation(self):
+        source = self._source()
+        self.assertIn('gi.require_version("Pango", "1.0")', source)
+        self.assertIn("<span insert_hyphens='false'>{escaped}</span>", source)
+        self.assertIn('escaped = GLib.markup_escape_text(text)', source)
+        self.assertNotIn('\\u200b', source.lower())
+        self.assertNotIn('Gtk.WrapMode.CHAR', source)
 
     def test_compact_insights_layout_reduces_header_and_fixed_copy(self):
         source = self._source()
