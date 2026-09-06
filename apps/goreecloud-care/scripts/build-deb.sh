@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-VERSION="0.1.0~dev16"
+VERSION="0.1.0~dev17"
 ARCH="all"
 PKG="goreecloud-care"
 OUT=${1:-"$ROOT/dist"}
