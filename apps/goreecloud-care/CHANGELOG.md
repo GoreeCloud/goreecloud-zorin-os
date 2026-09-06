@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.0-dev13 — 2026-09-06
+- Added a privacy-safe, read-only maintenance-reporting layer over the existing Care scan engine.
+- Added `goreecloud-care --report` for human-readable local maintenance snapshots and `goreecloud-care --report-json` for schema-versioned machine-readable output.
+- Added `goreecloud-care --version` for installed Development-version verification.
+- Added conservative disk-headroom classification (`comfortable`, `watch`, `low`, `critical`, `unknown`) as an informational capacity signal only; it never triggers cleanup and is not a filesystem-health/failure claim.
+- Reports aggregate visible maintenance bytes/items, per-category byte/item counts, scan-error counts, disk headroom, memory availability, and file-cache estimates.
+- Reports deliberately omit candidate file paths, local filenames, and raw scan-error strings by default, and explicitly declare that they do not use telemetry or the network.
+- Report modes never delete files, invoke PolicyKit, call the privileged helper, or authenticate.
+- Added pure unit coverage for disk-headroom bands, aggregate report totals, JSON machine readability, and path/raw-error redaction.
+- Added `CAPABILITIES.md` and substantially expanded `BENEFITS.md`, `FEATURES.md`, the Development specification, README, and user manual with current and planned Care capabilities while preserving the preview-first/least-privilege boundaries.
+- Advanced Python runtime metadata, Debian package metadata, AppStream metadata, source-validation guards, and CI package inspection to `0.1.0-dev13` / `0.1.0~dev13`.
+- The latest representative dev12 AT-SPI polling output confirms all three routine cleanup selectors were unchecked and the live status bar could be read at its initial `Scan complete` value. The submitted output did not yet contain the post-click status mutation, so dynamic status-value/event delivery and Orca announcement quality remain open.
+- Dev13 target-device build/install/report execution remains unaccepted until the representative laptop updates to the exact dev13 head and runs the new report modes.
+
 ## 0.1.0-dev12 — 2026-09-06
 - Recorded representative-device dev11 AT-SPI revalidation as failed for application-root identity: the AT-SPI desktop tree remained readable, but the running Care process was still exposed as `__main__.py` rather than `GoreeCloud Care`, so product-name discovery still failed.
 - Corrected the identity boundary by setting both `GLib.set_prgname("GoreeCloud Care")` and `GLib.set_application_name("GoreeCloud Care")` before `Gtk.Application` startup. The program identity is established first so `GApplication.run()` cannot inherit the Python module basename for assistive-technology discovery.
