@@ -24,7 +24,7 @@ platform_systems:
       - CAPABILITIES.md
       - goreecloud_care/reporting.py
       - goreecloud_care/insights.py
-    notes: Dev13 provides a local schema-versioned read-only maintenance report and dev14 adds local Maintenance Insights, creating potential future operational-visibility inputs. No Manager discovery, transport, authorization, or acceptance is implemented yet.
+    notes: Dev13 provides a local schema-versioned read-only maintenance report and dev14 adds local Maintenance Insights, but no Manager discovery, transport, authorization, or acceptance is implemented.
   privacy_shield:
     result: applicable-blocked
     version: null
@@ -34,7 +34,7 @@ platform_systems:
       - tests/test_insights.py
       - goreecloud_care/reporting.py
       - goreecloud_care/insights.py
-    notes: Local-only privacy design is documented. Default reports omit candidate paths, filenames, and raw scan-error strings. Dev14 may show home-relative paths only inside the explicitly opened local Insights review surface; there is no network or telemetry path. Formal Privacy Shield acceptance is not claimed.
+    notes: Default reports omit candidate paths, filenames, and raw scan-error strings. Dev14 may show home-relative paths only inside the explicitly opened local Insights review surface. No network or telemetry path is present; formal Privacy Shield acceptance is not claimed.
   wardveil_security:
     result: applicable-blocked
     version: null
@@ -43,7 +43,7 @@ platform_systems:
       - tests/test_reporting.py
       - tests/test_insights.py
       - tests/test_insights_window_contract.py
-    notes: Least-privilege source controls and read-only reporting/Insights boundaries are present. Dev14 source guards prohibit deletion, PolicyKit, privileged-helper, subprocess, and network execution in the Insights engine/window; formal Wardveil Security acceptance is not claimed.
+    notes: Least-privilege controls and read-only reporting/Insights boundaries are present. Dev14 guards prohibit deletion, PolicyKit, privileged-helper, subprocess, and network execution in the Insights engine/window; formal Wardveil Security acceptance is not claimed.
   everkeep:
     result: applicable-blocked
     version: null
@@ -69,19 +69,17 @@ platform_systems:
       the GoreeCloud Care AT-SPI application identity and static semantic-tree
       roles/names/descriptions/checked/focused-state slice. Dynamic accessible
       status mutation/event delivery and screen-reader announcement quality remain
-      open. Dev14 adds a distinct read-only Maintenance Insights GTK surface with
-      a non-editable scrolling result view, Refresh action, result accessible
+      open. Dev14 adds a read-only Maintenance Insights GTK surface with a
+      non-editable scrolling result view, Refresh action, result accessible
       name/description, ATK status-bar semantics, and live accessible status-name
-      mutation. That new window has source-level contract coverage only; rendered,
-      keyboard, HighContrast, large-text, constrained-window, and AT-SPI target
-      acceptance remain open.
+      mutation. That new window remains target-unaccepted.
   mesh:
     result: applicable-blocked
     version: null
     evidence:
       - CAPABILITIES.md
       - goreecloud_care/reporting.py
-    notes: Dev13's local JSON report creates a potential future capability payload, but Mesh registration, capability discovery, transport, runtime integration, and acceptance are not implemented. Dev14 Maintenance Insights remains local-only and does not add a Mesh transport.
+    notes: Dev13's local JSON report creates a potential future capability payload, but Mesh registration, capability discovery, transport, runtime integration, and acceptance are not implemented. Dev14 Maintenance Insights remains local-only.
     capabilities: []
     dependencies: []
     published_events: []
@@ -91,7 +89,7 @@ platform_systems:
     version: null
     evidence:
       - SPECIFICATIONS.md
-    notes: The Development specification explicitly excludes an account requirement and remote management; re-evaluate Identity applicability if remote, managed, or multi-user capabilities are introduced.
+    notes: The Development specification excludes an account requirement and remote management; re-evaluate Identity applicability if remote, managed, or multi-user capabilities are introduced.
 
 health:
   health_endpoint: null
@@ -109,7 +107,7 @@ continuity:
   export:
     required: false
     requirements:
-      - Dev13 can export a read-only maintenance snapshot as text or JSON, but Care still persists no durable user application dataset that requires an application-data export workflow.
+      - Dev13 can export a read-only maintenance snapshot as text or JSON, but Care persists no durable user application dataset requiring an application-data export workflow.
   portability:
     required: true
     requirements:
@@ -159,56 +157,49 @@ evidence:
       revision: 7db8710b113cda314903475cd7c220d57bea94d8
       result: failed
       observed_at: "2026-09-05T20:41:00Z"
-      notes: Representative-device screenshot verified system HighContrast palette takeover, but the user reported no visibly perceivable response to Tab; dev10 remediated this defect.
+      notes: Representative-device screenshot verified system HighContrast palette takeover, but Tab had no visibly perceivable focus response; dev10 remediated this defect.
     - id: care-dev10-highcontrast-focus-sampled-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
       revision: 3524a4a82da87ea51dcde08992a402190b54c130
       result: passed
       observed_at: "2026-09-05T23:38:00Z"
-      notes: Representative-device dev10 build/install succeeded; HighContrast palette authority, sampled focus, constrained-width compact rendering, and complete requested forward/reverse keyboard traversal are accepted for this slice.
+      notes: Representative-device dev10 build/install succeeded; HighContrast palette authority, focus, constrained-width rendering, and complete requested forward/reverse keyboard traversal are accepted for this slice.
     - id: care-dev10-atspi-application-identity-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: 3524a4a82da87ea51dcde08992a402190b54c130
       result: failed
       observed_at: "2026-09-06T13:04:00Z"
-      notes: AT-SPI desktop enumeration succeeded but exposed the running Care application as __main__.py rather than GoreeCloud Care, preventing product-name discovery. Dev11 attempted remediation by setting only the GLib application name.
+      notes: AT-SPI enumerated Care as __main__.py rather than GoreeCloud Care, preventing product-name discovery.
     - id: care-dev11-atspi-application-identity-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: c5582ab650ab41f76fed396e84851f3507a0e1b9
       result: failed
       observed_at: "2026-09-06T13:26:00Z"
-      notes: Representative-device dev11 validation/build/install succeeded, but the AT-SPI application root still appeared as __main__.py. Dev12 additionally sets the GLib program name before Gtk.Application startup and requires target revalidation.
+      notes: Dev11 validation/build/install succeeded, but AT-SPI still exposed __main__.py; dev12 additionally set the GLib program name.
     - id: care-dev12-atspi-application-identity-static-semantics-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
       result: passed
       observed_at: "2026-09-06T14:14:00Z"
-      notes: Representative-device AT-SPI inspection exposes GoreeCloud Care as the application root and verifies the expected status-bar, cleanup-selector, and action-control roles, useful accessible names/descriptions, and live checked/focused states. Dynamic event delivery and screen-reader announcement quality remain open.
+      notes: Representative-device AT-SPI inspection exposes GoreeCloud Care as the application root and verifies expected status-bar, selector/action roles, useful names/descriptions, and live checked/focused states.
     - id: care-dev12-atspi-dynamic-listener-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
       result: blocked
       observed_at: "2026-09-06T14:40:00Z"
-      notes: A property-change accessible-name listener produced no Care status events and the session reported a stale/unavailable AT-SPI socket path. Static AT-SPI reads remain successful. A later polling harness safely verified all three routine selectors were unchecked and read the initial live status but did not include the post-click mutation result, so dynamic status-value/event delivery remains open.
+      notes: A property-change accessible-name listener produced no Care status events while the session reported a stale/unavailable AT-SPI socket. Static reads remain successful; dynamic delivery remains open.
     - id: care-dev13-read-only-report-target
       category: supported-platform
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
       revision: 48049b6f634a05300e01bb0e85d718284b79d7ee
       result: passed
       observed_at: "2026-09-06T15:15:49Z"
-      notes: Representative Zorin OS laptop passed 38 local tests plus XML/source validation, built and installed 0.1.0~dev13, returned 0.1.0-dev13 from --version, and successfully produced both human and JSON read-only maintenance reports. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 items, and zero scan errors; default report output remained path/raw-error redacted.
-    - id: care-dev14-maintenance-insights-target
-      category: supported-platform
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: a3015ebc699965346dd9c37cebe4b1a747824753
-      result: blocked
-      observed_at: null
-      notes: Dev14 Maintenance Insights is source/package implemented. Exact-head repository validation and representative-device build/install, rendered-result, keyboard/focus, HighContrast, large-text/constrained-window, and AT-SPI acceptance remain required.
+      notes: Representative Zorin OS laptop passed 38 tests plus XML/source validation, built and installed 0.1.0~dev13, returned 0.1.0-dev13 from --version, and successfully produced both human and JSON read-only reports. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 items, and zero scan errors; default report output remained path/raw-error redacted.
   release: []
 
 conformance:
@@ -221,9 +212,8 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and cleanup functions are representative-device verified through dev5; dev8 closes the combined 200%-text compact adaptive-layout blocker; dev10 closes the HighContrast focus/traversal slice; dev12 closes AT-SPI application identity and static semantic-tree roles/names/descriptions/state semantics for the representative slice. Dynamic status-value/event delivery and screen-reader announcement quality remain open. The new dev14 Maintenance Insights window also requires its own rendered/accessibility acceptance.
+    - Final Glaze UI current-Stable native acceptance remains incomplete; dynamic status-value/event delivery and screen-reader announcement quality remain open, and the dev14 Maintenance Insights window requires its own rendered/accessibility acceptance.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
-    - Dev13 read-only report source/package/runtime execution is accepted at exact head 48049b6f634a05300e01bb0e85d718284b79d7ee.
     - Dev14 Maintenance Insights exact-head repository and representative-device acceptance remain incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
