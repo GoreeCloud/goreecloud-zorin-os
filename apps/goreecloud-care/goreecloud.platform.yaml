@@ -53,7 +53,8 @@ platform_systems:
       - tests/test_platform_status.py
       - tests/test_reporting.py
       - tests/test_insights.py
-    notes: Dev18 adds explicit local-only Privacy Shield application and adapter declarations plus minimized status output for telemetry-minimization, data-minimization, and privacy-status. Runtime acceptance remains required and production_approved remains false until exact-candidate application-specific acceptance is completed.
+      - https://github.com/GoreeCloud/goreecloud-privacy-shield/pull/17
+    notes: Dev18 adds explicit local-only Privacy Shield application and adapter declarations plus minimized status output for telemetry-minimization, data-minimization, and privacy-status. The authoritative Privacy Shield adapter registration is proposed in Draft PR 17 and preserves runtime_acceptance_required=true and production_approved=false. Exact-candidate runtime/application acceptance remains required.
   wardveil_security:
     result: applicable-blocked
     version: null
@@ -65,7 +66,7 @@ platform_systems:
       - tests/test_platform_status.py
       - tests/test_helper.py
       - tests/test_privilege.py
-    notes: Dev18 defines a fail-closed Wardveil-compatible security record scoped to Care's installed helper/PolicyKit boundary. The record keeps protected_by_wardveil=false; no broad Wardveil protection claim or cross-service execution authority is inferred. Exact-candidate target-device and Wardveil adoption acceptance remain required.
+    notes: Dev18 defines a fail-closed Wardveil-compatible security record scoped to Care's installed helper/PolicyKit boundary. The record keeps protected_by_wardveil=false; no broad Wardveil protection claim or cross-service execution authority is inferred. Exact-candidate source evidence, target-device runtime evidence, and Wardveil adoption acceptance remain required.
   everkeep:
     result: applicable-blocked
     version: null
@@ -73,17 +74,23 @@ platform_systems:
       - RECOVERY.md
       - RELEASE-ACCEPTANCE.md
       - contracts/everkeep.adoption.json
+      - contracts/everkeep.acceptance.json
       - goreecloud_care/platform_status.py
       - tests/test_platform_status.py
+      - tests/test_everkeep_contract.py
       - scripts/validate-installed.sh
-    notes: Care persists no substantial durable application-owned user dataset. Dev18 declares Everkeep adoption for restore_capability, migration, documentation, and provenance and fails closed to attention until representative-device uninstall/downgrade/reinstall/rollback evidence is accepted.
+      - scripts/validate-package-lifecycle.sh
+    notes: Care persists no substantial durable application-owned user dataset. Dev18 declares read-only fail-closed Everkeep adoption and an exact-candidate acceptance policy for restore capability, migration, documentation, and provenance. It remains non-ready until representative-device install/remove/reinstall/downgrade/restore evidence is accepted for the immutable candidate package and checksum.
   glaze_ui:
     result: applicable-blocked
-    version: "1.1.0"
+    version: "1.2.0"
     evidence:
       - GLAZE-UI-CONFORMANCE.md
       - BRANDING.md
+      - goreecloud_care/glaze_v12.py
+      - goreecloud_care/glaze_v12_global.py
       - packaging/icons/com.goreecloud.care.svg
+      - tests/test_glaze_v12_contract.py
       - tests/test_ui_contract.py
       - tests/test_focus_resilience.py
       - tests/test_accessibility_identity.py
@@ -94,7 +101,7 @@ platform_systems:
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560656873
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5561183405
       - https://github.com/GoreeCloud/goreecloud-branding-assets/blob/main/products/care/app-icon.svg
-    notes: Current required Stable consumer target is GLAZE UI V1.1 / 1.1.0. Revision-scoped target evidence covers core 200%-text/compact adaptation, HighContrast authority and keyboard focus/traversal, static AT-SPI semantics, and dev17 Insights rendering/reachability. Dev18 establishes the canonical Care product icon centrally and packages its synchronized derivative. Continuous large-text drag-resize responsiveness, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final appearance/visual-quality and icon-rendering acceptance, representative task flows, and product-specific current-Stable approval remain open.
+    notes: Current required Stable consumer target is GLAZE UI V1.2 / 1.2.0. Dev18 adds a bounded GTK3 V1.2 neutral-material fallback, Light/Dark/Deep Dark state resolution, 48-pixel minimum targets, Reduced Transparency and Reduced Motion degradation paths, system-authoritative HighContrast, and process-level activation for both Care windows without claiming compositor backdrop-blur fidelity. Historical revision-scoped evidence remains provenance only. Exact-head CI, representative appearance/resilience and drag-resize validation, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final visual/icon/task-flow review, registry registration, and governed product-specific V1.2 acceptance remain open.
   mesh:
     result: not-applicable-justified
     version: null
@@ -159,10 +166,10 @@ external_dependencies:
 
 compatibility:
   platform_contract: "0.2"
-  glaze_ui_required: "1.1.0"
+  glaze_ui_required: "1.2.0"
   requires:
     - goreecloud-platform-contract==0.2
-    - glaze-ui==1.1.0
+    - glaze-ui==1.2.0
   provides:
     - goreecloud-care-local-maintenance
     - goreecloud-care-read-only-maintenance-report
@@ -227,10 +234,10 @@ conformance:
   validated_at: null
   evidence: []
   blockers:
-    - Dev18 exact-head source/package CI and representative-device status/API acceptance are not yet recorded.
+    - Dev18 exact-head source/runtime/package CI must be rerun and recorded after the V1.2 migration settles.
     - Privacy Shield exact-candidate runtime/application acceptance is incomplete and production_approved remains false.
-    - Wardveil Security exact-candidate adoption/target acceptance is incomplete; no broad Protected by Wardveil claim is authorized.
-    - Everkeep package uninstall/downgrade/reinstall/rollback acceptance is incomplete and continuity remains non-ready.
-    - Final current-Stable Glaze UI V1.1 product acceptance is incomplete, including continuous large-text drag-resize responsiveness, complete Insights forward/reverse keyboard traversal, dynamic AT-SPI/Orca behavior, final appearance/visual-quality review, icon-rendering acceptance, and representative task flows.
-    - Canonical GoreeCloud Care branding now exists and is packaged, but exact-candidate target rendering and visual-quality acceptance remain open.
+    - Wardveil Security exact-candidate source/runtime adoption acceptance is incomplete; no broad Protected by Wardveil claim is authorized.
+    - Everkeep package install/remove/reinstall/downgrade/restore acceptance is incomplete and continuity remains non-ready.
+    - Current-Stable GLAZE UI V1.2 product acceptance is incomplete, including representative appearance/resilience, continuous large-text drag-resize responsiveness, complete Insights forward/reverse keyboard traversal, dynamic AT-SPI/Orca behavior, final visual/icon review, representative task flows, and registry acceptance.
+    - Canonical GoreeCloud Care branding exists and is packaged, but exact-candidate target rendering and visual-quality acceptance remain open.
     - Release Candidate artifact/release evidence and governed final acceptance are intentionally absent while Development gates remain open.
