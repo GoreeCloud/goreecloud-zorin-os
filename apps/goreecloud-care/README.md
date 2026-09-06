@@ -1,12 +1,12 @@
 # GoreeCloud Care
 
 **Lifecycle:** Development  
-**Version:** `0.1.0-dev13`  
+**Version:** `0.1.0-dev14`  
 **Canonical source:** `GoreeCloud/goreecloud-zorin-os` → `apps/goreecloud-care/`  
 **Target:** Zorin OS 17.3 and compatible GTK 3 Linux desktops  
 **License:** GPL-3.0-or-later
 
-GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance application. It previews reclaimable storage before deletion, keeps routine cache/temp cleanup unprivileged, and now includes privacy-safe read-only maintenance reporting for local diagnostics and future governed GoreeCloud integrations.
+GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance application. It previews reclaimable storage before deletion, keeps routine cache/temp cleanup unprivileged, provides privacy-safe read-only reports, and now has a bounded local Maintenance Insights review surface for understanding storage pressure before taking action.
 
 ## Current Development features
 
@@ -25,7 +25,7 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 - No telemetry, advertising, cloud upload, remote service, or GoreeCloud account requirement.
 - Symlink-safe user cleanup and fixed privileged-action boundaries.
 
-## New in dev13: privacy-safe read-only reports
+## Privacy-safe read-only reports — accepted dev13 slice
 
 ```sh
 goreecloud-care --report
@@ -37,6 +37,29 @@ goreecloud-care --version
 
 Reports include disk headroom, memory/file-cache summary, total visible reclaimable bytes/items, per-category byte/item counts, and scan-error counts. Candidate paths, filenames, and raw scan-error strings are deliberately omitted by default so the output is safer to copy into troubleshooting or local automation workflows.
 
+Representative-device dev13 validation is accepted at exact runtime/source head `48049b6f634a05300e01bb0e85d718284b79d7ee`: 38 tests plus XML/source validation passed, `0.1.0~dev13` built and upgraded over dev12, `dpkg-query` reported `install ok installed 0.1.0~dev13`, `--version` returned `0.1.0-dev13`, and both human and JSON reports executed successfully on the Zorin OS laptop. The observed report showed 74.7 GB free of 233.2 GB, 135.0 MB visible across 984 maintenance items, and zero scan errors. These values are representative-device evidence from that run, not fixed product guarantees.
+
+## New in dev14: Maintenance Insights review
+
+Launch the new Development review surface with:
+
+```sh
+goreecloud-care --insights-ui
+```
+
+The installed desktop entry also exposes **Maintenance Insights (Read-only)** as a desktop action.
+
+The dev14 insights engine is deliberately bounded and read-only. It currently reviews:
+
+- largest stale application-cache groups using the same >7-day application-cache policy as routine Care cleanup, excluding thumbnails;
+- large files of at least 250 MB in standard user folders (`Downloads`, `Desktop`, `Documents`, `Pictures`, `Videos`, and `Music`);
+- Downloads at least 30 days old;
+- aggregate scan-error count and whether the bounded discovery limit was reached.
+
+Symlinks are not followed. The standard-folder crawl is capped at 50,000 visited entries per refresh so the feature cannot silently become an unbounded home-directory scan. Local file paths may be shown inside the explicitly requested interactive review window, while default Care reports remain path-redacted. No finding is automatically selected for deletion and the Insights modules contain no cleanup, PolicyKit, privileged-helper, or network execution path.
+
+Dev14 Maintenance Insights is source/package implemented and repository-tested only until it is built, installed, launched, visually reviewed, and accessibility-checked on the representative Zorin OS laptop.
+
 See `CAPABILITIES.md` for the expanded current and planned capability set and `BENEFITS.md` for product/user benefits.
 
 ## Build and test
@@ -46,18 +69,16 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-Representative Zorin OS testing through dev5 verifies the core cleanup and privileged-maintenance functions. Dev8 accepted the combined 200%-text + compact/minimum-width adaptive-layout slice. Dev10 accepted system HighContrast palette authority, visible focus, constrained-width composition, and complete requested forward/reverse keyboard traversal. Dev12 accepted the AT-SPI `GoreeCloud Care` application-root identity and the current static roles/names/descriptions/checked/focused-state semantic slice on exact runtime head `09c3a6bcbec094dd3cb0c828de88d084fcbd5a22`.
+Representative Zorin OS testing through dev5 verifies the core cleanup and privileged-maintenance functions. Dev8 accepted the combined 200%-text + compact/minimum-width adaptive-layout slice. Dev10 accepted system HighContrast palette authority, visible focus, constrained-width composition, and complete requested forward/reverse keyboard traversal. Dev12 accepted the AT-SPI `GoreeCloud Care` application-root identity and the current static roles/names/descriptions/checked/focused-state semantic slice on exact runtime head `09c3a6bcbec094dd3cb0c828de88d084fcbd5a22`. Dev13 accepts the read-only reporting slice on exact runtime head `48049b6f634a05300e01bb0e85d718284b79d7ee`.
 
-Dynamic assistive-technology event/announcement behavior remains open. A property-change listener did not receive status events in a session that also reported an unavailable/stale AT-SPI socket. The subsequent polling harness confirmed all three routine selectors were unchecked and successfully read the initial Care status, but the submitted output did not yet include a post-click status mutation result.
+Dynamic assistive-technology event/announcement behavior remains open. A property-change listener did not receive status events in a session that also reported an unavailable/stale AT-SPI socket. A subsequent polling harness confirmed all three routine selectors were unchecked and successfully read the initial Care status, but the submitted output did not include a post-click status mutation result.
 
-Dev13 adds the read-only reporting layer, report CLI modes, disk-headroom classification, privacy-redaction tests, capability documentation, and aligned Development package metadata. Dev13 target-device build/install/report execution is not accepted until the representative laptop updates to the exact dev13 head and runs the report modes.
-
-The generated Debian package remains Development software. Dynamic assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
+The generated Debian package remains Development software. Dev14 Maintenance Insights target acceptance, dynamic assistive-technology acceptance, package rollback, official GoreeCloud Care visual assets, full current-Stable Glaze UI V1.1 acceptance, and broader GoreeCloud platform-system acceptance remain required before Release Candidate consideration.
 
 ## Install or upgrade a locally built Development package
 
 ```sh
-sudo apt install ./dist/goreecloud-care_0.1.0~dev13_all.deb
+sudo apt install ./dist/goreecloud-care_0.1.0~dev14_all.deb
 ```
 
 Uninstall with:
