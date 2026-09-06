@@ -7,7 +7,8 @@ import gi
 
 gi.require_version("Atk", "1.0")
 gi.require_version("Gtk", "3.0")
-from gi.repository import Atk, Gio, GLib, Gtk  # noqa: E402
+gi.require_version("Pango", "1.0")
+from gi.repository import Atk, Gio, GLib, Gtk, Pango  # noqa: E402
 
 from .insights import InsightsSnapshot, build_insights, render_insights_text
 from .ui_contract import (
@@ -22,6 +23,7 @@ APP_ID = "com.goreecloud.care.dev.insights"
 RESULTS_MIN_HEIGHT = 320
 REGULAR_SPACING = 12
 COMPACT_SPACING = 8
+RESULTS_MARGIN = 10
 
 
 class InsightsWindow(Gtk.ApplicationWindow):
@@ -122,21 +124,24 @@ class InsightsWindow(Gtk.ApplicationWindow):
         self.results_scroll.set_min_content_height(RESULTS_MIN_HEIGHT)
         self.root.pack_start(self.results_scroll, True, True, 0)
 
-        self.text = Gtk.TextView()
-        self.text.set_editable(False)
-        self.text.set_cursor_visible(False)
-        # CHAR wrapping is deterministic for long path-like strings and avoids
-        # the more expensive WORD_CHAR relayout path during continuous resizing.
-        self.text.set_wrap_mode(Gtk.WrapMode.CHAR)
-        self.text.set_left_margin(10)
-        self.text.set_right_margin(10)
-        self.text.set_top_margin(10)
-        self.text.set_bottom_margin(10)
-        self.text.get_accessible().set_name("Maintenance Insights results")
-        self.text.get_accessible().set_description(
+        # Use a selectable Pango-backed label instead of Gtk.TextView CHAR wrap.
+        # WORD_CHAR keeps long path-like strings reachable, while the Pango
+        # insert_hyphens attribute disables synthetic hyphens such as "da-\nys"
+        # that dev16 exposed at 200% text. The displayed/copied text itself remains
+        # unchanged because no zero-width break characters are inserted.
+        self.results = Gtk.Label(xalign=0, yalign=0)
+        self.results.set_selectable(True)
+        self.results.set_line_wrap(True)
+        self.results.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+        self.results.set_margin_start(RESULTS_MARGIN)
+        self.results.set_margin_end(RESULTS_MARGIN)
+        self.results.set_margin_top(RESULTS_MARGIN)
+        self.results.set_margin_bottom(RESULTS_MARGIN)
+        self.results.get_accessible().set_name("Maintenance Insights results")
+        self.results.get_accessible().set_description(
             "Read-only maintenance findings. Review manually; nothing in this view is selected for deletion."
         )
-        self.results_scroll.add(self.text)
+        self.results_scroll.add(self.results)
 
         self.connect("size-allocate", self._on_size_allocate)
         self._apply_layout(780)
@@ -169,6 +174,12 @@ class InsightsWindow(Gtk.ApplicationWindow):
         except (TypeError, RuntimeError):
             pass
 
+    def _set_results_text(self, text: str) -> None:
+        escaped = GLib.markup_escape_text(text)
+        self.results.set_markup(
+            f"<span insert_hyphens='false'>{escaped}</span>"
+        )
+
     def _run_thread(self, fn, done) -> None:
         def worker() -> None:
             try:
@@ -192,12 +203,12 @@ class InsightsWindow(Gtk.ApplicationWindow):
         if error is not None or snapshot is None:
             message = f"Maintenance Insights scan failed: {error}"
             self._set_status(message)
-            self.text.get_buffer().set_text(
+            self._set_results_text(
                 message + "\nNo maintenance action was performed and no files were changed."
             )
             return False
 
-        self.text.get_buffer().set_text(render_insights_text(snapshot))
+        self._set_results_text(render_insights_text(snapshot))
         total_findings = len(snapshot.cache_groups) + len(snapshot.large_files) + len(snapshot.stale_downloads)
         if self._compact_layout:
             suffix = (
