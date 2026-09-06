@@ -22,7 +22,7 @@ grep -F 'gtk-application-prefer-dark-theme' goreecloud_care/app.py >/dev/null
 grep -F 'settings.set_property("gtk-application-prefer-dark-theme", False)' goreecloud_care/app.py >/dev/null
 grep -F '.status-banner.status-attention' goreecloud_care/app.py >/dev/null
 grep -F '"Action cancelled"' goreecloud_care/app.py >/dev/null
-# Adaptive/accessibility invariants for dev12.
+# Adaptive/accessibility invariants for dev13.
 grep -F 'self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)' goreecloud_care/app.py >/dev/null
 grep -F 'def _apply_layout(' goreecloud_care/app.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/app.py >/dev/null
@@ -42,13 +42,20 @@ grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION - 1' goreecloud_care/focus_resi
 grep -F '@theme_fg_color' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'button:focus, checkbutton:focus' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'gir1.2-atk-1.0' scripts/build-deb.sh >/dev/null
+# Privacy-safe read-only report invariants for dev13.
+grep -F -- '"--report"' goreecloud_care/__main__.py >/dev/null
+grep -F -- '"--report-json"' goreecloud_care/__main__.py >/dev/null
+grep -F 'contains_file_paths' goreecloud_care/reporting.py >/dev/null
+grep -F 'contains_raw_scan_errors' goreecloud_care/reporting.py >/dev/null
+grep -F 'read-only-local-maintenance-report' goreecloud_care/reporting.py >/dev/null
+grep -F 'classify_disk_headroom' goreecloud_care/reporting.py >/dev/null
 # Post-action completion must survive the automatic values refresh.
 grep -F 'def _refresh_after_action(' goreecloud_care/app.py >/dev/null
 grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
 grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
 grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
 # Mandatory GoreeCloud component documentation.
-for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md goreecloud.platform.yaml; do
+for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md goreecloud.platform.yaml; do
   test -s "$f"
 done
 echo 'Local source validation: passed'
