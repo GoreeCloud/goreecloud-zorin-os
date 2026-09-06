@@ -64,8 +64,15 @@ platform_systems:
       but representative-device AT-SPI revalidation still exposed __main__.py.
       Dev12 additionally sets the GLib program name before application startup,
       retains the human-readable application name, and adds source-level regression
-      guards for both identities. Dev12 AT-SPI runtime acceptance remains open until
-      the rebuilt package is tested on the representative laptop.
+      guards for both identities. Representative-device dev12 AT-SPI revalidation
+      now exposes GoreeCloud Care as the application root and a follow-up static
+      semantic-tree probe verifies the expected status-bar role, selector/action
+      roles, names/descriptions, and live checked/focused state. A first dynamic
+      accessible-name listener produced no status events while the session again
+      reported a stale/unavailable AT-SPI socket path. Because static reads work and
+      Care's set_status() updates the accessible name and emits visible-data-changed,
+      dynamic event delivery remains inconclusive pending read-only polling and
+      screen-reader announcement verification.
   mesh:
     result: applicable-blocked
     version: null
@@ -168,6 +175,20 @@ evidence:
       result: failed
       observed_at: "2026-09-06T13:26:00Z"
       notes: Representative-device dev11 validation/build/install succeeded, but the AT-SPI application root still appeared as __main__.py. Dev12 additionally sets the GLib program name before Gtk.Application startup and requires target revalidation.
+    - id: care-dev12-atspi-application-identity-static-semantics-target
+      category: accessibility
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
+      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
+      result: passed
+      observed_at: "2026-09-06T14:14:00Z"
+      notes: Representative-device AT-SPI inspection exposes GoreeCloud Care as the application root and verifies the expected status-bar, cleanup-selector, and action-control roles, useful accessible names/descriptions, and live checked/focused states. Dynamic event delivery and screen-reader announcement quality remain open.
+    - id: care-dev12-atspi-dynamic-listener-target
+      category: accessibility
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
+      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
+      result: inconclusive
+      observed_at: "2026-09-06T14:40:00Z"
+      notes: A property-change accessible-name listener produced no Care status events and the session again reported a stale/unavailable AT-SPI socket path. Static AT-SPI reads remain successful and Care set_status() updates the accessible name and emits visible-data-changed, so read-only polling is required to distinguish application semantic mutation from event-subscription transport failure.
   release: []
 
 conformance:
@@ -180,7 +201,7 @@ conformance:
     - Privacy Shield formal acceptance remains incomplete.
     - Wardveil Security formal acceptance remains incomplete.
     - Everkeep recovery/rollback acceptance remains incomplete.
-    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and cleanup functions are representative-device verified through dev5; dev8 closes the combined 200%-text compact adaptive-layout blocker; dev10 closes the HighContrast focus/traversal slice. Dev11 AT-SPI application identity failed target revalidation; dev12 program/application identity remediation and broader assistive-technology semantics remain target-unverified.
+    - Final Glaze UI current-Stable native acceptance remains incomplete. Core light-default, status-salience, cancellation, privileged-success, and cleanup functions are representative-device verified through dev5; dev8 closes the combined 200%-text compact adaptive-layout blocker; dev10 closes the HighContrast focus/traversal slice. Dev12 closes AT-SPI application identity and static semantic-tree roles/names/descriptions/state semantics for the representative slice; dynamic event delivery and screen-reader announcement quality remain open.
     - GoreeCloud Mesh registration/runtime acceptance remains incomplete.
     - Package rollback remains unverified.
     - Official GoreeCloud Care application icon/branding remains incomplete.
