@@ -1,0 +1,76 @@
+name: GoreeCloud Care Development
+
+on:
+  pull_request:
+    paths:
+      - 'apps/goreecloud-care/**'
+      - '.github/workflows/care-ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/goreecloud-care/**'
+      - '.github/workflows/care-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/goreecloud-care
+    steps:
+      - name: Check out exact source revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Verify exact source revision
+        run: |
+          expected='${{ github.event.pull_request.head.sha || github.sha }}'
+          actual="$(git rev-parse HEAD)"
+          printf 'Expected source revision: %s\nActual source revision:   %s\n' "$expected" "$actual"
+          test "$actual" = "$expected"
+
+      - name: Install native GTK test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-gi gir1.2-gtk-3.0 gir1.2-atk-1.0 xvfb
+
+      - name: Validate Care source
+        run: sh ./scripts/validate.sh
+
+      - name: Run headless GTK runtime acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 python3 tests/runtime_ui_acceptance.py
+
+      - name: Build Development Debian package
+        run: sh ./scripts/build-deb.sh dist
+
+      - name: Inspect Development Debian package
+        run: |
+          dpkg-deb -I dist/goreecloud-care_0.1.0~dev20_all.deb
+          dpkg-deb -c dist/goreecloud-care_0.1.0~dev20_all.deb
+
+      - name: Record Development package provenance
+        run: |
+          cd dist
+          sha256sum goreecloud-care_0.1.0~dev20_all.deb | tee SHA256SUMS
+          printf 'source_revision=%s\nworkflow_run_id=%s\n' \
+            '${{ github.event.pull_request.head.sha || github.sha }}' \
+            '${{ github.run_id }}' \
+            > SOURCE_REVISION
+          cat SOURCE_REVISION
+
+      - name: Preserve Development package evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: goreecloud-care-dev20-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            apps/goreecloud-care/dist/goreecloud-care_0.1.0~dev20_all.deb
+            apps/goreecloud-care/dist/SHA256SUMS
+            apps/goreecloud-care/dist/SOURCE_REVISION
+          if-no-files-found: error
+          retention-days: 14

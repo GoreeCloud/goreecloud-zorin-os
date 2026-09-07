@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# Care's private Python package must not retain root-created bytecode from an
+# older package revision. The launchers use -B, but historical Development
+# versions could have created this fixed cache directory through the privileged
+# helper. Removing it after install/upgrade guarantees source is reloaded from
+# the package that dpkg just installed.
+rm -rf -- /usr/lib/goreecloud-care/goreecloud_care/__pycache__
+
+exit 0

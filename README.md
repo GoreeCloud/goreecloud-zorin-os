@@ -1,8 +1,22 @@
-# GoreeCloud Themes for Zorin OS
+# GoreeCloud for Zorin OS
 
-This repository contains the Development-stage GoreeCloud desktop experience for the verified Zorin OS 17.3 target environment.
+This repository contains the Development-stage GoreeCloud desktop experience and workstation-specific applications for the verified Zorin OS 17.3 target environment.
 
-The project is **light-first**. `GoreeCloud-Zorin-Light` is the primary experience and the installer activates it together with the GoreeCloud icon theme, cursor theme, and primary light wallpaper. Dark and Deep Dark remain secondary compatibility variants.
+The desktop project is **light-first**. `GoreeCloud-Zorin-Light` is the primary experience and the installer activates it together with the GoreeCloud icon theme, cursor theme, and primary light wallpaper. Dark and Deep Dark remain secondary compatibility variants.
+
+## Native applications
+
+### GoreeCloud Care
+
+GoreeCloud Care is developed in this repository under:
+
+```text
+apps/goreecloud-care/
+```
+
+It is a Development-stage local maintenance utility with scan/preview-first cache, thumbnail, stale user-owned temporary-file, Trash, APT-cache, disk/memory-status, and truthful Linux file-cache reclaim foundations. Routine user cleanup is unprivileged; permanent Trash deletion is separately confirmed; APT cache cleanup and file-cache reclaim cross a PolicyKit authorization boundary. It has no telemetry or network requirement in the current Development slice.
+
+Care remains nonconformant/pre-release until its component Platform Contract and applicable Integral Platform System evidence, target Zorin OS 17.3 PolicyKit/runtime behavior, rendered/accessibility acceptance, package install/upgrade/rollback validation, and release gates are complete.
 
 ## Desktop assets
 
@@ -12,7 +26,7 @@ The repository currently provides:
 - `GoreeCloud-Zorin-Dark` — secondary compatibility theme;
 - `GoreeCloud-Zorin-DeepDark` — secondary compatibility theme;
 - `GoreeCloud-Zorin` — light-first icon theme;
-- `GoreeCloud-Zorin-Cursors` — neutral Frost White + Graphite Xcursor theme with restrained GoreeCloud Blue activity/action accents;
+- `GoreeCloud-Zorin-Cursors` — Frost White + GoreeCloud Blue Xcursor theme;
 - 24 identity-derived wallpaper source derivatives, with only 8 Light wallpapers exposed in Settings;
 - recovery-backed replacement of the audited Zorin OS 17.3 stock wallpaper set without removing Zorin desktop packages.
 
@@ -109,9 +123,7 @@ The generated Xcursor theme is named:
 GoreeCloud-Zorin-Cursors
 ```
 
-The cursor is intentionally quieter than the rest of the desktop branding. Primary pointer, link hand, text, crosshair, move, and resize families use a familiar Frost White fill with a Graphite outline so they remain legible on both light and dark content. GoreeCloud Blue is reserved for activity/action accents such as progress spinners and the copy badge instead of outlining every cursor.
-
-The generator uses only the Python standard library and does not require `xcursorgen` at install time. It renders a 24px, 32px, 48px, 64px, and 96px Xcursor size ladder with 4x supersampling and premultiplied-alpha downsampling. Wait and progress cursors use eight animation frames at a 55ms frame delay. Common Xcursor aliases and a dedicated copy cursor are included, while unoverridden cursor names inherit from Adwaita.
+It is generated with Python standard-library code and does not require `xcursorgen` at install time. The theme contains 24px, 32px, and 48px Xcursor image frames and custom Frost White / GoreeCloud Blue treatments for pointer, hand, text, crosshair, move, wait/progress, blocked, and resize cursor families, with common Xcursor aliases included.
 
 ## Wallpaper collection
 
@@ -161,7 +173,7 @@ If the GoreeCloud GTK, Shell, icon, or cursor themes are currently selected, uni
 
 ## Validation
 
-Run the complete source validation set with:
+Run the complete desktop source validation set with:
 
 ```bash
 ./scripts/validate.sh --gtk
@@ -172,11 +184,17 @@ python3 ./scripts/validate_v12_preview.py
 python3 ./scripts/validate_system_wallpapers.py
 ```
 
+Run the GoreeCloud Care Development validation/build with:
+
+```bash
+cd apps/goreecloud-care
+sh ./scripts/validate.sh
+sh ./scripts/build-deb.sh
+```
+
 The light-catalog gate verifies that all 24 compatibility entries remain valid while only the exact 8 Light wallpaper IDs are visible in the GNOME catalog.
 
-Cursor validation verifies the complete configured size ladder, animated-frame/delay contract, non-empty Xcursor payloads, and the neutral Frost/Graphite primary-pointer contract so the default pointer cannot regress to a blue-heavy treatment unnoticed.
-
-CI runs ShellCheck plus wallpaper source/rendering, light-first catalog visibility, icon/cursor, V1.2 preview, stock-wallpaper safety, and generated GTK theme validation.
+CI keeps the existing desktop validation separate from Care's component-specific source/package and Platform Contract workflows so application work does not weaken or replace the theme acceptance surface.
 
 ## Target diagnostics
 
@@ -193,4 +211,4 @@ The Development installer composes from the verified local Zorin 17.3 GTK 3, GTK
 
 ## Status
 
-Development / Draft. The primary product direction is the light GoreeCloud experience. Source presence, installation success, green CI, or individual screenshots do not by themselves establish Stable qualification; real-device visual/accessibility acceptance remains revision-specific.
+Development / Draft. The primary desktop product direction is the light GoreeCloud experience, and GoreeCloud Care is a separate Development application component in the same Zorin OS repository. Source presence, installation success, green CI, or individual screenshots do not by themselves establish Stable qualification; real-device visual/accessibility and application-specific acceptance remain revision-specific.

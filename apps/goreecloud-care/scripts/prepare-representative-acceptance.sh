@@ -1,0 +1,252 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
+OUT=${1:-"$ROOT/dist/representative-acceptance"}
+EXPECTED_RUNTIME_VERSION="0.1.0-dev20"
+EXPECTED_PACKAGE_VERSION="0.1.0~dev20"
+EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
+
+for command_name in git python3 sha256sum dpkg-deb tee awk rm mktemp; do
+  command -v "$command_name" >/dev/null || {
+    echo "Required command not found: $command_name" >&2
+    exit 2
+  }
+done
+
+TRACKED_CHANGES=$(git -C "$REPO_ROOT" status --porcelain --untracked-files=no)
+[ -z "$TRACKED_CHANGES" ] || {
+  echo "Tracked working-tree changes are present. Commit/stash them before preparing exact-source acceptance evidence." >&2
+  printf '%s\n' "$TRACKED_CHANGES" >&2
+  exit 2
+}
+
+SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)
+SOURCE_BRANCH=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || printf '%s' detached)
+RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __version__; print(__version__)')
+[ "$RUNTIME_VERSION" = "$EXPECTED_RUNTIME_VERSION" ] || {
+  echo "Representative Development harness expects runtime $EXPECTED_RUNTIME_VERSION; got $RUNTIME_VERSION" >&2
+  exit 2
+}
+
+# An older installed Care package may predate dev19's isolated launcher. Probe
+# installed runtime/status from an empty neutral directory so the source checkout
+# cannot make an older ambient `python3 -m` launcher look like the new candidate.
+INSTALLED_PROBE_DIR=$(mktemp -d)
+cleanup() {
+  rm -rf "$INSTALLED_PROBE_DIR"
+}
+trap cleanup EXIT INT TERM
+
+mkdir -p "$OUT"
+
+printf '%s\n' "Preparing read-only/non-destructive representative acceptance evidence."
+printf '%s\n' "Source revision: $SOURCE_REVISION"
+printf '%s\n' "Source branch:   $SOURCE_BRANCH"
+printf '%s\n' "Runtime version: $RUNTIME_VERSION"
+printf '%s\n' "Output directory: $OUT"
+printf '%s\n' "Installed-runtime probes use a clean neutral working directory."
+printf '%s\n' "This preparation harness does not invoke Care cleanup, PolicyKit, pkexec, sudo, apt, or network operations."
+
+(
+  cd "$ROOT"
+  sh ./scripts/validate.sh
+) 2>&1 | tee "$OUT/source-validation.log"
+
+(
+  cd "$ROOT"
+  sh ./scripts/build-deb.sh dist
+) 2>&1 | tee "$OUT/package-build.log"
+
+PACKAGE=$EXPECTED_PACKAGE
+[ -f "$PACKAGE" ] || {
+  echo "Expected built package not found: $PACKAGE" >&2
+  exit 1
+}
+PACKAGE_VERSION=$(dpkg-deb -f "$PACKAGE" Version)
+[ "$PACKAGE_VERSION" = "$EXPECTED_PACKAGE_VERSION" ] || {
+  echo "Representative Development harness expects package $EXPECTED_PACKAGE_VERSION; got $PACKAGE_VERSION" >&2
+  exit 2
+}
+sha256sum "$PACKAGE" > "$OUT/package.sha256"
+PACKAGE_SHA256=$(awk '{print $1}' "$OUT/package.sha256")
+
+cat > "$OUT/SOURCE_REVISION" <<EOF
+source_revision=$SOURCE_REVISION
+source_branch=$SOURCE_BRANCH
+runtime_version=$RUNTIME_VERSION
+package_version=$PACKAGE_VERSION
+package_sha256=$PACKAGE_SHA256
+EOF
+
+# Remove only previously generated read-only snapshot files so a rerun cannot
+# accidentally preserve stale evidence from another installed Care version.
+rm -f \
+  "$OUT/report.json" \
+  "$OUT/health.json" \
+  "$OUT/privacy-status.json" \
+  "$OUT/security-status.json" \
+  "$OUT/continuity-status.json" \
+  "$OUT/installed-status-snapshots-skipped.txt"
+
+if command -v goreecloud-care >/dev/null 2>&1; then
+  INSTALLED_RUNTIME=$(cd "$INSTALLED_PROBE_DIR" && goreecloud-care --version 2>/dev/null || true)
+  if [ "$INSTALLED_RUNTIME" = "$EXPECTED_RUNTIME_VERSION" ]; then
+    {
+      printf 'installed_version=%s\n' "$INSTALLED_RUNTIME"
+      printf 'api_version='
+      (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --api-version)
+    } > "$OUT/installed-version.txt"
+
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --report-json) > "$OUT/report.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --health-json) > "$OUT/health.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --privacy-status-json) > "$OUT/privacy-status.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --security-status-json) > "$OUT/security-status.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --continuity-status-json) > "$OUT/continuity-status.json"
+  else
+    {
+      printf 'installed_version=%s\n' "$INSTALLED_RUNTIME"
+      printf 'expected_runtime=%s\n' "$EXPECTED_RUNTIME_VERSION"
+      printf 'api_version=not-probed-runtime-mismatch\n'
+    } > "$OUT/installed-version.txt"
+    printf '%s\n' \
+      "Installed Care runtime differs from the dev20 source candidate; dev20-only status snapshots were skipped." \
+      > "$OUT/installed-status-snapshots-skipped.txt"
+  fi
+else
+  printf '%s\n' "GoreeCloud Care is not currently installed; installed read-only status snapshots were skipped." > "$OUT/installed-version.txt"
+  printf '%s\n' "No installed Care executable was found; dev20-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
+fi
+
+cat > "$OUT/MANUAL-CHECKLIST.txt" <<'EOF'
+GoreeCloud Care representative-device acceptance checklist
+==========================================================
+
+Record PASS or FAIL plus notes for every exercised item. A blank item is NOT accepted evidence.
+Do not use unrelated personal files for destructive-flow testing; use disposable fixtures/test data.
+Do not promote lifecycle status from this checklist alone.
+
+GLAZE UI lifecycle note: Care dev20 implements the latest Proposed V1.3 Adaptive Resonance development language. V1.3 Candidate is not active and consumer eligibility is not granted upstream; GLAZE UI V1.2 / 1.2.0 remains the official Stable compatibility baseline.
+
+A. Large text / continuous resize
+[ ] PASS [ ] FAIL  GDK_DPI_SCALE=2 Care and Maintenance Insights open in compact layouts.
+[ ] PASS [ ] FAIL  Drag continuously narrower/wider for at least 15 seconds; UI remains responsive and does not freeze.
+[ ] PASS [ ] FAIL  Compact titles remain readable; Scan/Refresh focus remains visible.
+[ ] PASS [ ] FAIL  Findings remain readable and the true bottom remains reachable after resizing.
+[ ] PASS [ ] FAIL  Expanded width adds useful two-column context instead of merely stretching the primary plan.
+Notes:
+
+B. Keyboard traversal
+[ ] PASS [ ] FAIL  Forward Tab reaches Scan, routine selectors, primary action, system actions, Refresh, selectable findings, and subsequent controls without a trap.
+[ ] PASS [ ] FAIL  Reverse Shift+Tab traverses back through the same regions without a trap.
+[ ] PASS [ ] FAIL  Focus indication is perceivable in normal and HighContrast presentation.
+Notes:
+
+C. Assistive technology
+[ ] PASS [ ] FAIL  AT-SPI application identity is GoreeCloud Care.
+[ ] PASS [ ] FAIL  Roles/names/descriptions/checked/focused state are useful.
+[ ] PASS [ ] FAIL  Dynamic status value changes are observable after Scan/Refresh.
+[ ] PASS [ ] FAIL  Orca announcements for completion/cancellation/failure are understandable and not misleading.
+Notes:
+
+D. Adaptive Resonance appearance / resilience
+[ ] PASS [ ] FAIL  System Light presentation is readable, neutral, and visually complete.
+[ ] PASS [ ] FAIL  System/Dark presentation is readable, neutral, and visually complete.
+[ ] PASS [ ] FAIL  HighContrast remains system-authoritative and focus is visible.
+[ ] PASS [ ] FAIL  Reduced Transparency converts glazed chrome/signature surfaces to solid equivalents.
+[ ] PASS [ ] FAIL  Reduced Motion does not remove required state feedback.
+[ ] PASS [ ] FAIL  Show Borders strengthens boundaries without relying on extra saturation.
+[ ] PASS [ ] FAIL  Calm / Balanced / Expressive profiles change emphasis without changing semantic correctness.
+[ ] PASS [ ] FAIL  Clear / Balanced / Dense clarity profiles remain distinct from expression and preserve target size/readability.
+[ ] PASS [ ] FAIL  Deep Dark Development override, if reviewed, is clearly treated as Development evidence rather than an automatically released mode.
+Notes:
+
+E. Visual / Glaze discipline / branding
+[ ] PASS [ ] FAIL  Canonical Care icon renders correctly in launcher/desktop/application surfaces.
+[ ] PASS [ ] FAIL  Content planes used for reading/decisions remain optically stable; Glaze is concentrated in command chrome/signature surfaces.
+[ ] PASS [ ] FAIL  Routine categories read as one grouped maintenance collection rather than five repetitive floating cards.
+[ ] PASS [ ] FAIL  Only appropriate compact command controls use capsule geometry; ordinary buttons are not universally pill-shaped.
+[ ] PASS [ ] FAIL  Primary action hierarchy is unmistakable and destructive Trash remains visually/behaviorally separate.
+[ ] PASS [ ] FAIL  Normal, compact, enlarged-text, status, empty/no-findings, confirmation, failure, and privileged-action states have no clipping/overlap/unreadable text.
+Notes:
+
+F. Representative task flows
+[ ] PASS [ ] FAIL  Scan is read-only and does not delete files.
+[ ] PASS [ ] FAIL  Routine selected cleanup requires explicit confirmation and reports completion truthfully.
+[ ] PASS [ ] FAIL  No-selection/stale-preview behavior is safe and understandable.
+[ ] PASS [ ] FAIL  Permanent Trash flow has a separate irreversible-action confirmation and cancellation path.
+[ ] PASS [ ] FAIL  APT authorization success/cancellation/denial/failure are distinguishable.
+[ ] PASS [ ] FAIL  File-cache reclaim warning and completion language are truthful and do not claim a lasting RAM/performance boost.
+[ ] PASS [ ] FAIL  Post-action refresh preserves the final operation result.
+Notes:
+
+G. Package lifecycle / continuity
+Build the pinned accepted dev17 rollback package locally with scripts/build-dev17-rollback-package.sh, then run the separate package lifecycle probe as the normal desktop user.
+[ ] PASS [ ] FAIL  dev17 rollback package build/checksum/provenance preparation passed.
+[ ] PASS [ ] FAIL  installed application/helper cannot be shadowed by the source working directory and leaves no private bytecode cache.
+[ ] PASS [ ] FAIL  install/remove/reinstall/downgrade/restore/final-state probe passed.
+Candidate package:
+Previous package:
+Lifecycle log/evidence:
+
+H. Platform-system acceptance
+[ ] PASS [ ] FAIL  Privacy Shield exact-candidate runtime/application review complete (production_approved must remain false until governed approval).
+[ ] PASS [ ] FAIL  Wardveil scoped adoption/runtime review complete (do not claim broad protection unless separately accepted).
+[ ] PASS [ ] FAIL  Everkeep continuity evidence is complete and provenance matches the exact candidate package.
+[ ] PASS [ ] FAIL  Proposed GLAZE UI V1.3 consumer implementation is reviewed against its pinned development source without claiming Candidate activation or consumer conformance; V1.2 remains the Stable baseline.
+Notes:
+EOF
+
+cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
+# Run one mode at a time from the representative desktop session.
+
+# Normal Care
+  goreecloud-care
+
+# Maintenance Insights at the large-text acceptance condition
+  GDK_DPI_SCALE=2 goreecloud-care --insights-ui
+
+# HighContrast
+  GTK_THEME=HighContrast goreecloud-care
+  GTK_THEME=HighContrast GDK_DPI_SCALE=2 goreecloud-care --insights-ui
+
+# Explicit Development appearance/resilience probes
+  GOREECLOUD_CARE_APPEARANCE=light goreecloud-care
+  GOREECLOUD_CARE_APPEARANCE=dark goreecloud-care
+  GOREECLOUD_CARE_APPEARANCE=deep-dark goreecloud-care
+  GOREECLOUD_CARE_REDUCE_TRANSPARENCY=1 goreecloud-care
+  GOREECLOUD_CARE_REDUCE_MOTION=1 goreecloud-care
+  GOREECLOUD_CARE_SHOW_BORDERS=1 goreecloud-care
+
+# Proposed V1.3 expression and clarity are separate Development dimensions.
+  GOREECLOUD_CARE_GLAZE_EXPRESSION=calm goreecloud-care
+  GOREECLOUD_CARE_GLAZE_EXPRESSION=balanced goreecloud-care
+  GOREECLOUD_CARE_GLAZE_EXPRESSION=expressive goreecloud-care
+  GOREECLOUD_CARE_GLAZE_CLARITY=clear goreecloud-care
+  GOREECLOUD_CARE_GLAZE_CLARITY=balanced goreecloud-care
+  GOREECLOUD_CARE_GLAZE_CLARITY=dense goreecloud-care
+
+# Installed read-only status probes
+  goreecloud-care --version
+  goreecloud-care --api-version
+  goreecloud-care --report
+  goreecloud-care --report-json
+  goreecloud-care --health-json
+  goreecloud-care --privacy-status-json
+  goreecloud-care --security-status-json
+  goreecloud-care --continuity-status-json
+
+# Build the accepted dev17 rollback package locally; no install/remove/network action occurs here.
+  sh ./scripts/build-dev17-rollback-package.sh
+
+# Package lifecycle (run as the normal desktop user; the script requests sudo only for apt operations)
+  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev20_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
+EOF
+
+printf '%s\n' "Representative acceptance preparation: passed"
+printf '%s\n' "Package: $PACKAGE_VERSION"
+printf '%s\n' "SHA-256: $PACKAGE_SHA256"
+printf '%s\n' "Manual checklist: $OUT/MANUAL-CHECKLIST.txt"
+printf '%s\n' "Manual commands:  $OUT/MANUAL-COMMANDS.txt"
+printf '%s\n' "No manual item is accepted until a representative-device result is explicitly recorded."
