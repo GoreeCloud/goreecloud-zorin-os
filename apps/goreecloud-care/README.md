@@ -14,7 +14,7 @@ Care remains Development. Green CI, historical representative-device passes, pac
 
 ## Dev22 focus
 
-Dev22 combines the current **GLAZE UI V1.3 Adaptive Resonance Development mapping** with release-hardening automation. The official Stable compatibility baseline remains **GLAZE UI V1.2 / `1.2.0`** because upstream V1.3 is still Proposed and consumer eligibility is not active.
+Dev22 combines the current **GLAZE UI V1.3 Adaptive Resonance Development mapping** with release hardening. The official Stable compatibility baseline remains **GLAZE UI V1.2 / `1.2.0`** because upstream V1.3 is still Proposed and consumer eligibility is not active.
 
 Current dev22 work includes:
 
@@ -27,11 +27,14 @@ Current dev22 work includes:
 - safe task-flow automation for selection/preview guardrails, confirmation defaults, cancellation boundaries, and PolicyKit outcome mapping without destructive side effects;
 - installed package-lifecycle prequalification that installs, removes, freshly reinstalls, downgrades to immutable accepted dev17, restores dev22, and validates final state;
 - installed Wardveil-compatible privilege-boundary prequalification with current/fresh/scoped/minimized evidence and an explicit `protected_by_wardveil=false` invariant;
+- deterministic Debian package construction with `SOURCE_DATE_EPOCH`, normalized staged metadata, explicit Debian format 2.0, and `-Znone` to remove compressor-version variability;
+- independent Ubuntu 22.04 and Ubuntu 24.04 package builds followed by byte-for-byte comparison, covering the Zorin OS 17.3 Ubuntu-base boundary and current CI;
+- root-controlled package provenance for the exact source revision, Care source tree, runtime version, package version, and deterministic source timestamp;
+- fail-closed rejection of dirty tracked Care source and untracked files that could otherwise enter the package;
+- evidence-derived Everkeep continuity status that separates Care-owned target evidence from Everkeep-owned governance and cannot self-promote;
 - immutable Development package/rollback-package provenance preservation in CI artifacts.
 
-The separate `hardening/care-reproducible-package` branch adds deterministic Debian package construction for the same Development version. It binds package timestamps to `SOURCE_DATE_EPOCH` derived from the exact Git revision when not supplied, normalizes staged filesystem mtimes, and adds a byte-for-byte independent rebuild comparison in CI. This is a hardening candidate until its exact-head workflows pass; it does not retroactively make the already accepted `a0eeac5...` package reproducible.
-
-The exact accepted branch revision, workflow run IDs, package digest and artifact ID are maintained in PR #2 and the canonical Care project/change records so this README does not become self-stale when documentation-only commits advance a Development branch.
+Exact-candidate acceptance is revision-bound. Historical dev22 evidence does not automatically transfer to a later hardening revision, even when the human-visible Development version remains `0.1.0-dev22`.
 
 ## Current features
 
@@ -45,7 +48,7 @@ The exact accepted branch revision, workflow run IDs, package digest and artifac
 - Explicit cancellation, failure, partial-success, and completion reporting.
 - Post-action refresh that preserves final action outcome text.
 - GTK/ATK/AT-SPI identity, status semantics, keyboard focus, enlarged-text adaptation, and system HighContrast authority.
-- Privacy-safe human/JSON reports plus local health, Privacy Shield, Wardveil-compatible security, and Everkeep continuity status output.
+- Privacy-safe human/JSON reports plus local health, Privacy Shield, Wardveil-compatible security, and evidence-derived Everkeep continuity status output.
 - Canonical Care identity derived from `GoreeCloud/goreecloud-branding-assets/products/care/app-icon.svg` with a synchronized packaged derivative.
 - Isolated installed Python launchers that cannot resolve a same-named package from the invoking working directory, `PYTHONPATH`, or user site.
 - Symlink-safe cleanup and fixed privileged-action allowlists.
@@ -90,7 +93,7 @@ runtime_acceptance_required=true
 production_approved=false
 ```
 
-Exact dev22 representative runtime acceptance is centrally recorded for the accepted revision, but production approval remains a separate governed release gate. A later hardening revision does not inherit exact-revision acceptance automatically.
+Historical exact-dev22 representative runtime acceptance does not grant production approval and does not carry forward to a later source/package revision automatically.
 
 ### Wardveil Security
 
@@ -108,7 +111,15 @@ See [`WARDVEIL-INTEGRATION.md`](WARDVEIL-INTEGRATION.md).
 
 ### Everkeep
 
-Care has package-lifecycle and restore-path evidence, including accepted representative dev20 history, exact dev22 representative lifecycle evidence, and repeatable CI prequalification. Governed Everkeep readiness remains fail-closed until the exact release candidate satisfies the authoritative target-runtime acceptance policy and is explicitly promoted. `--continuity-status-json` therefore remains `attention` in Development.
+Care now derives continuity from three distinct evidence layers rather than a manual readiness boolean:
+
+1. package-owned exact-source provenance at `/usr/share/goreecloud-care/build-provenance.json`;
+2. Care-owned representative Zorin OS 17.3 target evidence at `/var/lib/goreecloud-care/acceptance/representative-target.json`;
+3. a separate Everkeep-owned governance record at `/var/lib/goreecloud/everkeep/acceptance/goreecloud-care.target-runtime.json`.
+
+The Care target record can establish only `attention / target-accepted-governance-pending`. It is generated with both Everkeep promotion flags false and cannot self-promote. `ready / everkeep-promoted` requires a separate trusted Everkeep record that matches the installed source identity, identifies Zorin OS 17.3, explicitly promotes integration/readiness, and has the same exact package SHA-256 as the Care target record. Missing, malformed, writable, symlinked, source-mismatched, target-mismatched, package-mismatched, or unpromoted evidence fails closed.
+
+The machine-readable boundary is defined by `contracts/continuity.status.schema.json`.
 
 ## Maintenance Insights
 
@@ -176,9 +187,9 @@ sh ./scripts/build-deb.sh
 sh ./scripts/verify-reproducible-package.sh ./dist/goreecloud-care_0.1.0~dev22_all.deb
 ```
 
-`build-deb.sh` never uses the wall clock for package metadata. In a Git checkout it derives `SOURCE_DATE_EPOCH` from the exact repository `HEAD`; outside a Git checkout an explicit `SOURCE_DATE_EPOCH` is required. The staged package tree is normalized to that timestamp before `dpkg-deb` builds the archive. The verifier independently rebuilds with the same epoch and requires byte-for-byte identity with the reference package.
+`build-deb.sh` requires the authoritative Git checkout, rejects dirty tracked Care source, and rejects any untracked file that could enter the package. It derives `SOURCE_DATE_EPOCH` from the exact repository `HEAD` when not explicitly supplied, embeds exact source revision/Care source-tree provenance, normalizes the staged package tree, and builds Debian format 2.0 with `-Znone`. The verifier independently rebuilds with the same epoch and requires byte-for-byte identity with the reference package.
 
-Development CI verifies the exact PR head and currently exercises:
+Development CI verifies the exact PR head and exercises:
 
 - unit/source contracts;
 - XML and platform integration validation;
@@ -189,7 +200,8 @@ Development CI verifies the exact PR head and currently exercises:
 - clarity profiles;
 - Reduced Motion behavior;
 - Debian package construction and inspection;
-- byte-for-byte reproducible-package verification on the hardening branch;
+- same-environment byte-for-byte reproducible-package verification;
+- independent Ubuntu 22.04 and Ubuntu 24.04 builds plus a cross-environment byte comparison;
 - immutable dev17 rollback construction;
 - full installed dev22↔dev17 lifecycle prequalification;
 - installed Wardveil-compatible boundary prequalification;
@@ -197,13 +209,21 @@ Development CI verifies the exact PR head and currently exercises:
 
 Green CI is evidence only. It does not manufacture representative Zorin compositor rendering, Orca speech quality, desktop PolicyKit-agent UX, or governed platform acceptance.
 
-## Representative-device acceptance preparation
+## Representative-device acceptance
+
+Read-only preparation remains available with:
 
 ```sh
 sh ./scripts/prepare-representative-acceptance.sh
 ```
 
-The preparation harness requires a clean tracked tree, records exact source/package/checksum provenance, captures only supported read-only installed snapshots, and keeps human-only gates explicit.
+The final automated exact-target handoff is:
+
+```sh
+sh ./scripts/run-representative-acceptance.sh
+```
+
+`run-representative-acceptance.sh` must be run as the normal desktop user on Zorin OS 17.3. It requires a clean tracked candidate, records the exact source revision and Care source tree, runs source validation, deterministic package construction, same-environment reproducibility verification, builds the accepted dev17 rollback package, executes the complete package lifecycle, verifies final installed provenance, computes the exact candidate SHA-256, generates a schema-compatible Care target record, and installs only the root-controlled Care-owned target handoff. It does not invoke Care cleanup and does not write or promote the Everkeep governance record.
 
 ## Package lifecycle acceptance
 
@@ -221,7 +241,7 @@ sh ./scripts/validate-package-lifecycle.sh \
   ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 ```
 
-The probe performs candidate install/upgrade, installed validation, removal, fresh reinstall, downgrade to accepted dev17, restoration to dev22, repeated installed validation, and final-state verification. It does not invoke Care cleanup actions.
+The probe performs candidate install/upgrade, installed validation, removal, fresh reinstall, downgrade to accepted dev17, restoration to dev22, repeated installed validation, final-state verification, and package-owned provenance cleanup/restoration checks. It does not invoke Care cleanup actions.
 
 ## Install a local Development package
 
@@ -241,13 +261,13 @@ Care remains **Development / nonconformant**. Automated Development evidence has
 
 Remaining release boundaries include:
 
-- exact-head validation of the deterministic package hardening branch and, if integrated, exact-candidate representative target acceptance for the resulting new source revision;
+- final exact-head CI validation of the frozen source candidate and new representative Zorin OS 17.3 acceptance for that same source/package revision;
 - final representative Orca speech/announcement-quality acceptance;
 - final physical Zorin optical/compositor review for native window controls and canonical Care icon rendering, including Dark/Deep Dark;
 - actual desktop PolicyKit-agent success/cancellation/failure UX and any controlled destructive-flow evidence required by release policy;
 - Privacy Shield governed production approval for an eligible exact candidate;
 - governed Wardveil runtime/adoption promotion while `protected_by_wardveil=false` remains authoritative until accepted;
-- governed Everkeep integration/readiness promotion after the exact candidate satisfies the required evidence;
+- separate governed Everkeep integration/readiness promotion whose package SHA exactly matches the Care representative-target handoff;
 - applicable future Glaze consumer acceptance only when upstream V1.3 lifecycle permits it;
 - immutable Release Candidate regression/evidence and explicit governed lifecycle promotion.
 
