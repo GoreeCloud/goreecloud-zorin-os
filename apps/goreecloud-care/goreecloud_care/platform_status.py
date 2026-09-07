@@ -19,6 +19,7 @@ REPRESENTATIVE_ACCEPTANCE_PATH = Path(
 EVERKEEP_ACCEPTANCE_PATH = Path(
     "/var/lib/goreecloud/everkeep/acceptance/goreecloud-care.target-runtime.json"
 )
+REPRESENTATIVE_TARGET_TOKEN = "Zorin OS 17.3"
 MAX_EVIDENCE_BYTES = 64 * 1024
 _SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -254,7 +255,10 @@ def _acceptance_matches_build(
     ) or not isinstance(dimensions, list):
         return False
     package_sha = candidate.get("package_sha256")
+    target_name = target.get("name")
     if not isinstance(package_sha, str) or not _SHA256_RE.fullmatch(package_sha):
+        return False
+    if not isinstance(target_name, str) or REPRESENTATIVE_TARGET_TOKEN not in target_name:
         return False
     exact_identity = (
         candidate.get("source_revision") == provenance["source_revision"]
