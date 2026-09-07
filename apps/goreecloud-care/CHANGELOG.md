@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.1.0-dev22 — 2026-09-07
+- Advanced the Development source/package line to `0.1.0-dev22` / `0.1.0~dev22` while retaining Development / nonconformant lifecycle status.
+- Added Dark and Development Deep Dark HeaderBar command-surface contrast remediation, exact-source enlarged-text GTK runtime checks, Clear/Balanced/Dense clarity geometry checks, Reduced Motion checks, live core/Insights AT-SPI event acceptance, and safe non-destructive task-flow automation.
+- Historical exact dev22 representative evidence is revision-scoped. The earlier accepted `a0eeac5fc3081225dbaeec6e0a5e5578cfe26569` slice recorded 106 tests and representative package-lifecycle acceptance; a later `c0d6ac8c49c2167cbf8345a44d5bb4daa3048dc5` slice passed 110 tests and the representative install/remove/reinstall/downgrade/restore lifecycle. Neither acceptance automatically applies to later source/package revisions.
+- Identified a reproducibility defect after the same `c0d6ac8...` source and deterministic timestamp produced different Debian package SHA-256 values on the representative Zorin environment and Ubuntu 24.04 CI. Same-environment reproducibility was therefore insufficient for release provenance.
+- Hardened Debian construction at exact tested revision `c39e0850405b418b168706885f5614d7e353004c`: locale/timezone are deterministic, package members use Debian format 2.0 with `-Znone`, staged mtimes remain normalized, and CI independently builds on Ubuntu 22.04 and Ubuntu 24.04 before requiring byte-for-byte equality. That cross-environment gate passed with SHA-256 `d2ceed689fab626efc88002559641a3f41ca87ef2dce86ff493aabb8648bd568` on both environments.
+- Replaced the old manual continuity readiness boolean with an evidence-derived, fail-closed chain: package-owned exact-source provenance; a separate Care-owned Zorin OS 17.3 representative-target handoff; and an Everkeep-owned governance record.
+- Added package-owned `/usr/share/goreecloud-care/build-provenance.json` containing exact source revision, Care source-tree SHA, runtime/package versions, and deterministic source timestamp. The package SHA is intentionally external because embedding a package's own digest is circular.
+- Package construction now rejects tracked dirty Care source and rejects any untracked file that could enter the package through the packaging inputs/globs.
+- Added `contracts/continuity.status.schema.json`, protected evidence loading, source/package/target matching, explicit `target-accepted-governance-pending` and `everkeep-promoted` stages, and exact-build-bound freshness semantics.
+- A Care-produced representative-target record cannot grant Everkeep readiness. `ready` requires a separate root-controlled Everkeep record that matches source revision/tree/runtime/package, identifies Zorin OS 17.3, explicitly promotes integration/readiness, and has the same package SHA-256 as the Care target handoff.
+- Missing, malformed, oversized, writable, symlinked, source-mismatched, target-mismatched, package-mismatched, or unpromoted continuity evidence fails closed.
+- Added `scripts/run-representative-acceptance.sh` to perform exact Zorin OS 17.3 source validation, deterministic/reproducible package construction, accepted dev17 rollback preparation, complete package lifecycle, final installed-provenance verification, package SHA capture, Care target-record generation, protected local handoff installation, and an explicit self-promotion rejection check. The runner does not invoke Care cleanup and does not write/promote the Everkeep governance record.
+- Expanded source/contract tests for governed continuity, target binding, package provenance, untracked-input rejection, provenance removal, and representative-runner behavior. An intermediate hardening head passed all 128 tests plus XML/platform contract validation; its CI failure was an obsolete static `rollback_verified` grep, not a unit/runtime failure, and the static guard was updated to the new evidence model.
+- Synchronized README, Development specification, Everkeep acceptance policy, release-acceptance policy, and source validation to the actual dev22 provenance/governance model.
+- Current dev22 hardening remains target-unaccepted until the final frozen exact head passes all CI and is rerun on the representative Zorin OS 17.3 device. Stable/RC, Privacy Shield production approval, Wardveil protection, Everkeep readiness, and GLAZE UI V1.3 conformance are not implied.
+
+## 0.1.0-dev21 — 2026-09-07
+- Continued Adaptive Resonance Development refinement while preserving GLAZE UI V1.2 / `1.2.0` as the official Stable compatibility baseline.
+- Representative exact head `2836a700935a019f21a4e19612a2609c21fd874c` accepted the compact/wide HeaderBar identity transition.
+- Dark/Deep Dark target screenshots exposed HeaderBar command/window-control contrast issues that became the remediation focus for dev22 rather than being treated as accepted visual quality.
+- Preserved explicit nonconformance and Development lifecycle status while opening the dev22 contrast/runtime hardening work.
+
+## 0.1.0-dev20 — 2026-09-07
+- Expanded Care's Proposed GLAZE UI V1.3 Adaptive Resonance Development mapping with layout environments, expression/clarity separation, restrained material/shape roles, content-first composition, and bounded appearance/resilience controls.
+- Representative exact head `9da1107527bb4d7627e4940bd5b1b752cf318e83` accepted the submitted Adaptive Resonance visual slices, continuous enlarged-text resizing, complete keyboard traversal, package lifecycle, and installed launcher isolation for that exact revision.
+- Kept upstream V1.3 lifecycle/consumer eligibility fail-closed and retained V1.2 as the Stable compatibility baseline.
+- Exact-source acceptance remained non-transferable to later dev21/dev22 revisions.
+
+## 0.1.0-dev19 — 2026-09-07
+- Hardened installed application and privileged-helper launchers against working-directory, `PYTHONPATH`, user-site, and same-named-package shadowing by using isolated Python execution for package entrypoints.
+- Added package maintainer cleanup for only the fixed private Care bytecode cache so stale bytecode cannot cross package removal/downgrade/restore boundaries.
+- Strengthened installed/lifecycle validation around the fixed helper/policy boundary and source-directory shadow-resistance regression.
+- Preserved normal-user execution for installed acceptance; sudo remains limited to package-manager operations in the lifecycle harness.
+
+## 0.1.0-dev18 — 2026-09-07
+- Added the read-only local platform integration API: `--api-version`, `--health-json`, `--privacy-status-json`, `--security-status-json`, and `--continuity-status-json`.
+- Added repository-local Privacy Shield application/adapter declarations, a bounded local-first status producer, and explicit `production_approved=false` / runtime-acceptance-required behavior.
+- Added Wardveil-compatible status for only the Care-owned privileged-maintenance boundary; passing local evidence never becomes a broad `protected_by_wardveil` claim.
+- Added Everkeep adoption/acceptance policy foundations for package restore capability, migration, documentation, and provenance, with fail-closed readiness.
+- Added canonical Care branding derivative packaging and current-Stable GLAZE UI V1.2 source/runtime mapping while retaining product-specific acceptance requirements.
+- Kept Manager, Mesh, and Identity as potentially `not-applicable-justified` only for the bounded local single-user first-release scope.
+
 ## 0.1.0-dev17 — 2026-09-06
 - Recorded the representative-device dev16 enlarged-text screenshots at exact runtime/source head `02b7df9eb7543e7147dd7e81212d465daa15086e` as positive evidence for three previously open visual checkpoints: the compact HeaderBar fully displays `Insights`, the symbolic Refresh control shows a clearly perceivable keyboard-focus outline, and the findings viewport reaches its true bottom.
 - The dev16 true-bottom screenshot showed 24,238 inspected user-folder entries with 0 scan errors. This is representative-device evidence, not a fixed product guarantee.
