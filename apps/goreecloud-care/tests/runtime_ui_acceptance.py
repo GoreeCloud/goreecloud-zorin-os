@@ -20,8 +20,13 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, Gtk  # noqa: E402
 
 from goreecloud_care.app import CareWindow
-from goreecloud_care.glaze_v12 import GLAZE_UI_VERSION
-from goreecloud_care.glaze_v12_global import install_glaze_v12_global_style
+from goreecloud_care.glaze_v13 import (
+    GLAZE_UI_CONSUMER_ELIGIBLE,
+    GLAZE_UI_LIFECYCLE,
+    GLAZE_UI_STABLE_BASELINE,
+    GLAZE_UI_TARGET_VERSION,
+)
+from goreecloud_care.glaze_v13_global import install_glaze_v13_global_style
 from goreecloud_care.insights import CacheGroupInsight, FileInsight, InsightsSnapshot
 import goreecloud_care.insights_window as insights_window
 
@@ -44,11 +49,21 @@ def make_app() -> Gtk.Application:
     return app
 
 
-def test_core_status_accessible_mutation(app: Gtk.Application) -> None:
+def test_core_status_accessible_mutation_and_layout(app: Gtk.Application) -> None:
     window = CareWindow(app)
     window.set_status("Synthetic completion state.", "success", "Completed")
     name = window.status_accessible.get_name()
     assert name == "Completed. Synthetic completion state.", name
+
+    window._apply_layout(480)
+    assert window._layout_environment == "compact"
+    assert window.workspace.get_orientation() == Gtk.Orientation.VERTICAL
+    window._apply_layout(1800)
+    assert window._layout_environment == "medium"
+    assert window.workspace.get_orientation() == Gtk.Orientation.VERTICAL
+    window._apply_layout(2200)
+    assert window._layout_environment == "expanded"
+    assert window.workspace.get_orientation() == Gtk.Orientation.HORIZONTAL
     window.destroy()
 
 
@@ -78,10 +93,10 @@ def test_insights_focus_resize_and_rendering(app: Gtk.Application) -> None:
     assert window.results.get_can_focus()
     assert "example-video.mp4" in window.results.get_text()
     assert "synthetic-hyphenation" in window.results.get_text()
+    assert window.findings_plane.get_style_context().has_class("findings-plane")
+    assert window.refresh.get_style_context().has_class("command-capsule")
 
     # At GDK_DPI_SCALE=2 the effective layout width is half the allocated width.
-    # 480 therefore exercises compact mode while 1800 crosses back into regular
-    # mode above the 820 effective-width breakpoint.
     window._apply_layout(480)
     assert window.header.get_title() == "Insights"
     assert window.header.get_subtitle() is None
@@ -119,14 +134,20 @@ def main() -> int:
     if not ok:
         raise SystemExit("GTK could not initialize; run this probe under Xvfb or a desktop session")
 
-    glaze = install_glaze_v12_global_style()
-    assert GLAZE_UI_VERSION == "1.2.0"
-    assert glaze.provider_attached, "GLAZE UI V1.2 provider was not attached"
+    glaze = install_glaze_v13_global_style()
+    assert GLAZE_UI_TARGET_VERSION == "1.3.0-candidate"
+    assert GLAZE_UI_LIFECYCLE == "proposed"
+    assert GLAZE_UI_STABLE_BASELINE == "1.2.0"
+    assert not GLAZE_UI_CONSUMER_ELIGIBLE
+    assert glaze.provider_attached, "Proposed GLAZE UI V1.3 provider was not attached"
 
     app = make_app()
-    test_core_status_accessible_mutation(app)
+    test_core_status_accessible_mutation_and_layout(app)
     test_insights_focus_resize_and_rendering(app)
-    print("Headless GTK runtime acceptance probe: passed (GLAZE UI V1.2 native fallback)")
+    print(
+        "Headless GTK runtime acceptance probe: passed "
+        "(Proposed GLAZE UI V1.3 Adaptive Resonance Development mapping; V1.2 Stable baseline retained)"
+    )
     return 0
 
 
