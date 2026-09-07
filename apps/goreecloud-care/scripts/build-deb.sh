@@ -110,7 +110,7 @@ Architecture: $ARCH
 Maintainer: GoreeCloud <support@goreecloud.com>
 Depends: python3, python3-gi, gir1.2-gtk-3.0, gir1.2-atk-1.0, policykit-1
 Homepage: https://goreecloud.com/
-Description: GoreeCloud Care Development maintenance utility
+Description: GoreeCloud Care Release Candidate maintenance utility
  Local-first GTK maintenance utility for Zorin OS and compatible Linux systems.
 CONTROL
 chmod 0644 "$STAGE/DEBIAN/control"
@@ -119,9 +119,9 @@ install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"
 install -m 0755 "$ROOT/packaging/goreecloud-care" "$STAGE/usr/bin/goreecloud-care"
 install -m 0755 "$ROOT/packaging/goreecloud-care-helper" "$STAGE/usr/lib/goreecloud-care/goreecloud-care-helper"
 install -m 0644 "$ROOT/goreecloud_care/"*.py "$STAGE/usr/lib/goreecloud-care/goreecloud_care/"
-install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.desktop" "$STAGE/usr/share/applications/"
+install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.desktop" "$STAGE/usr/share/applications/com.goreecloud.care.desktop"
 install -m 0644 "$ROOT/packaging/icons/com.goreecloud.care.svg" "$STAGE/usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg"
-install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.metainfo.xml" "$STAGE/usr/share/metainfo/"
+install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.metainfo.xml" "$STAGE/usr/share/metainfo/com.goreecloud.care.metainfo.xml"
 install -m 0644 "$ROOT/packaging/com.goreecloud.care.policy" "$STAGE/usr/share/polkit-1/actions/"
 install -m 0644 "$ROOT/LICENSE" "$STAGE/usr/share/doc/goreecloud-care/copyright"
 install -m 0644 "$ROOT/API.md" "$STAGE/usr/share/doc/goreecloud-care/API.md"
