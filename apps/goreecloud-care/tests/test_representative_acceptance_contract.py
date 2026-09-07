@@ -46,12 +46,24 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertIn('source_branch=$SOURCE_BRANCH', self.source)
 
     def test_preparation_harness_records_exact_source_and_package_provenance(self) -> None:
+        self.assertIn('EXPECTED_RUNTIME_VERSION="0.1.0-dev18"', self.source)
+        self.assertIn('EXPECTED_PACKAGE_VERSION="0.1.0~dev18"', self.source)
+        self.assertIn('"$RUNTIME_VERSION" = "$EXPECTED_RUNTIME_VERSION"', self.source)
+        self.assertIn('"$PACKAGE_VERSION" = "$EXPECTED_PACKAGE_VERSION"', self.source)
         self.assertIn('sha256sum "$PACKAGE"', self.source)
         self.assertIn("source_revision=$SOURCE_REVISION", self.source)
         self.assertIn("package_sha256=$PACKAGE_SHA256", self.source)
         self.assertIn("SOURCE_REVISION", self.source)
-        self.assertIn('"$RUNTIME_VERSION" = "0.1.0-dev18"', self.source)
-        self.assertIn('"$PACKAGE_VERSION" = "0.1.0~dev18"', self.source)
+
+    def test_preparation_harness_selects_exact_expected_package(self) -> None:
+        self.assertIn(
+            'EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"',
+            self.source,
+        )
+        self.assertIn("PACKAGE=$EXPECTED_PACKAGE", self.source)
+        self.assertIn("Expected built package not found", self.source)
+        self.assertNotIn('find "$ROOT/dist"', self.source)
+        self.assertNotIn("sort | tail", self.source)
 
     def test_preparation_harness_uses_only_read_only_installed_status_modes(self) -> None:
         for mode in (
