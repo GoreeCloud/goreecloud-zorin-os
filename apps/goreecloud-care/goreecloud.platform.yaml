@@ -96,14 +96,17 @@ platform_systems:
       - tests/test_accessibility_identity.py
       - tests/test_insights_window_contract.py
       - tests/runtime_ui_acceptance.py
-      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071450218
-      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071450603
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071691286
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071691586
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560656873
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5561183405
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5563725316
       - https://github.com/GoreeCloud/goreecloud-branding-assets/blob/main/products/care/app-icon.svg
-    notes: Current required Stable consumer target is GLAZE UI V1.2 / 1.2.0. Dev18 adds a bounded GTK3 V1.2 neutral-material fallback, Light/Dark/Deep Dark state resolution, 48-pixel minimum targets, Reduced Transparency and Reduced Motion degradation paths, system-authoritative HighContrast, and process-level activation for both Care windows without claiming compositor backdrop-blur fidelity. Exact-source repository validation passed at Development head 1e91e3f7267ce159958ba53e5536f12a68d7ddef after the central Platform Contract baseline was synchronized to V1.2; Care CI now verifies the pull-request head SHA before validation and preserves source-revision provenance with the package artifact. Historical revision-scoped evidence remains provenance only. Representative appearance/resilience and drag-resize validation, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final visual/icon/task-flow review, registry registration, and governed product-specific V1.2 acceptance remain open.
+      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/8a0e21056acd8012a6e7482bf591027359067c81
+      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/f88aa45b4d012dcfcd04a938cb71e96f9bb107d6
+    notes: Current required Stable consumer target is GLAZE UI V1.2 / 1.2.0. Dev18 adds a bounded GTK3 V1.2 neutral-material fallback, Light/Dark/Deep Dark state resolution, 48-pixel minimum targets, Reduced Transparency and Reduced Motion degradation paths, system-authoritative HighContrast, and process-level activation for both Care windows without claiming compositor backdrop-blur fidelity. Latest accepted exact-source product repository/headless validation passed at Development head ba646235dd12df251a02d728b096d8398a515ab7; Care Development run 34071691286 explicitly verified that immutable revision, Platform Contract run 34071691586 passed against the central V1.2 baseline pinned at c941ce1d8d1eff3c9df994d1e16f83147eadae00, and theme-source run 34071691321 passed. The upstream schemaVersion 6 consumer-registry validation path was repaired at Glaze merge 8a0e21056acd8012a6e7482bf591027359067c81, and Care was registered at Glaze merge f88aa45b4d012dcfcd04a938cb71e96f9bb107d6 as adoption-required with null accepted target/revision/evidence and productionEligible=false. Registration mechanics are complete, but representative appearance/resilience and drag-resize validation, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final visual/icon/task-flow review, and governed product-specific accepted-v1 V1.2 acceptance remain open.
   mesh:
     result: not-applicable-justified
     version: null
@@ -197,14 +200,14 @@ evidence:
     - id: care-dev12-atspi-application-identity-static-semantics-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
+      revision: 09c3a6bcbec094dd3cbec094dd3cbec094dd3cbec
       result: passed
       observed_at: "2026-09-06T14:14:00Z"
       notes: Representative-device AT-SPI inspection exposed GoreeCloud Care as the application root and verified expected static status-bar, selector/action roles, names/descriptions, checked state, and focused state for the accepted static semantic slice.
     - id: care-dev12-atspi-dynamic-listener-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
+      revision: 09c3a6bcbec094dd3cbec094dd3cbec094dd3cbec
       result: blocked
       observed_at: "2026-09-06T14:40:00Z"
       notes: Dynamic status event/Orca quality remains open; one listener run also reported a stale/unavailable AT-SPI socket.
@@ -231,11 +234,18 @@ evidence:
       notes: Representative laptop passed 50 tests plus XML/source validation, built and installed 0.1.0~dev17, removed the prior synthetic mid-word hyphenation, retained compact/wide readability and visible Refresh focus, and reached the true findings bottom. Complete selectable-results keyboard traversal and continuous drag-resize responsiveness remain separate open gates.
     - id: care-dev18-v12-repository-validation
       category: glaze-ui
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071450218
-      revision: 1e91e3f7267ce159958ba53e5536f12a68d7ddef
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071691286
+      revision: ba646235dd12df251a02d728b096d8398a515ab7
       result: passed
-      observed_at: "2026-09-07T00:58:05Z"
-      notes: Exact source revision was explicitly checked out and verified before validation. It passed 73 tests, XML/platform-integration/source validation, GDK_DPI_SCALE=2 headless GTK V1.2 runtime acceptance, Debian 0.1.0~dev18 build/inspection, Platform Contract run 34071450603 against central V1.2 baseline revision c941ce1d8d1eff3c9df994d1e16f83147eadae00, and theme-source run 34071450272. Package SHA-256 was 11a44c66e4eb4346c3c3f4569bd53cafeec9ebf87cb6773ca31023094813ddf5; artifact ID 10000591580 includes SOURCE_REVISION. Representative-device acceptance remains separate.
+      observed_at: "2026-09-07T01:02:36Z"
+      notes: Exact source revision was explicitly checked out and verified before validation. It passed 73 tests, XML/platform-integration/source validation, GDK_DPI_SCALE=2 headless GTK V1.2 runtime acceptance, Debian 0.1.0~dev18 build/inspection, Platform Contract run 34071691586 against central V1.2 baseline revision c941ce1d8d1eff3c9df994d1e16f83147eadae00, and theme-source run 34071691321. Package SHA-256 was 85e4b04847d40c51654d65b06c7daee48db1cd7eac79e8433f789fe07088cf0c; artifact ID 10000667917 includes SOURCE_REVISION. Representative-device acceptance remains separate.
+    - id: care-glaze-v12-consumer-registration
+      category: glaze-ui
+      path: https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/f88aa45b4d012dcfcd04a938cb71e96f9bb107d6
+      revision: ba646235dd12df251a02d728b096d8398a515ab7
+      result: blocked
+      observed_at: "2026-09-07T01:23:00Z"
+      notes: Upstream registration mechanics are complete and the authoritative Glaze registry now contains GoreeCloud Care as adoption-required. targetVersion, referenceRevision, and evidence remain null and productionEligible remains false. This is intentionally blocked for accepted-v1 until product-specific exact-candidate representative acceptance is complete.
   release: []
 
 conformance:
@@ -246,6 +256,6 @@ conformance:
     - Privacy Shield exact-candidate runtime/application acceptance is incomplete and production_approved remains false.
     - Wardveil Security exact-candidate source/runtime adoption acceptance is incomplete; no broad Protected by Wardveil claim is authorized.
     - Everkeep package install/remove/reinstall/downgrade/restore acceptance is incomplete and continuity remains non-ready.
-    - Current-Stable GLAZE UI V1.2 product acceptance is incomplete, including representative appearance/resilience, continuous large-text drag-resize responsiveness, complete Insights forward/reverse keyboard traversal, dynamic AT-SPI/Orca behavior, final visual/icon review, representative task flows, and registry acceptance.
+    - Current-Stable GLAZE UI V1.2 product acceptance is incomplete, including representative appearance/resilience, continuous large-text drag-resize responsiveness, complete Insights forward/reverse keyboard traversal, dynamic AT-SPI/Orca behavior, final visual/icon review, representative task flows, and governed promotion from registered adoption-required state to accepted-v1.
     - Canonical GoreeCloud Care branding exists and is packaged, but exact-candidate target rendering and visual-quality acceptance remain open.
     - Release Candidate artifact/release evidence and governed final acceptance are intentionally absent while Development gates remain open.
