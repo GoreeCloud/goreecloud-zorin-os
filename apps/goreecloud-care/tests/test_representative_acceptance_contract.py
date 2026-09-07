@@ -65,6 +65,20 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertNotIn('find "$ROOT/dist"', self.source)
         self.assertNotIn("sort | tail", self.source)
 
+    def test_preparation_harness_gates_dev18_status_probes_on_installed_runtime(self) -> None:
+        self.assertIn('INSTALLED_RUNTIME=$(goreecloud-care --version 2>/dev/null || true)', self.source)
+        self.assertIn(
+            'if [ "$INSTALLED_RUNTIME" = "$EXPECTED_RUNTIME_VERSION" ]; then',
+            self.source,
+        )
+        self.assertIn("api_version=not-probed-runtime-mismatch", self.source)
+        self.assertIn(
+            "Installed Care runtime differs from the dev18 source candidate; dev18-only status snapshots were skipped.",
+            self.source,
+        )
+        self.assertIn("installed-status-snapshots-skipped.txt", self.source)
+        self.assertIn("Remove only previously generated read-only snapshot files", self.source)
+
     def test_preparation_harness_uses_only_read_only_installed_status_modes(self) -> None:
         for mode in (
             "--version",
