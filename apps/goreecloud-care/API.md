@@ -76,7 +76,24 @@ Endpoint identity:
 goreecloud-care --continuity-status-json
 ```
 
-Returns the current Everkeep continuity record for the Debian package restore/rollback dimension. Until representative-device uninstall, downgrade, reinstall, and rollback evidence is accepted for the release candidate, the state remains `attention` rather than `ready`.
+Returns Care's evidence-derived continuity view for the Debian package restore/rollback dimension. The output is governed by `contracts/continuity.status.schema.json` and never accepts a caller-supplied readiness boolean.
+
+The state is derived from three local evidence layers:
+
+1. package-owned exact-source provenance at `/usr/share/goreecloud-care/build-provenance.json`;
+2. a Care-owned representative Zorin OS 17.3 target record at `/var/lib/goreecloud-care/acceptance/representative-target.json`;
+3. a separate Everkeep-owned governance record at `/var/lib/goreecloud/everkeep/acceptance/goreecloud-care.target-runtime.json`.
+
+Possible stages are:
+
+- `provenance-unavailable` — installed package provenance is absent, untrusted, malformed, or does not identify this runtime/package;
+- `target-acceptance-required` — no trusted exact-candidate Zorin OS 17.3 lifecycle record matches the installed build;
+- `target-accepted-governance-pending` — the Care-owned exact-candidate target record matches, but separate exact package identity / Everkeep promotion is incomplete;
+- `everkeep-promoted` — the complete exact-match chain is trusted and the separate Everkeep record explicitly promotes integration and readiness.
+
+Only `everkeep-promoted` may return `state=ready`, and that output also carries `freshness=exact-build-bound`. The Care-owned target record is generated with both Everkeep promotion flags false and cannot self-promote. A promoted Everkeep record must match the installed source revision, Care source-tree SHA, runtime/package versions, Zorin OS 17.3 representative target, and exact package SHA-256 recorded by the Care target handoff.
+
+Regular evidence files and their immediate parent directories must be root-owned and not group/other writable. Symlinked, malformed, oversized, writable, source-mismatched, target-mismatched, package-mismatched, or unpromoted evidence fails closed to `attention`.
 
 Endpoint identity:
 
