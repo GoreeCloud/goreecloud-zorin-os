@@ -252,7 +252,7 @@ evidence:
       observed_at: "2026-09-07T01:23:00Z"
       notes: Upstream registration mechanics are complete and the authoritative Glaze registry now contains GoreeCloud Care as adoption-required. targetVersion, referenceRevision, and evidence remain null and productionEligible remains false. This passed record covers registration mechanics only; accepted-v1 remains blocked until product-specific exact-candidate representative acceptance is complete.
     - id: care-dev18-package-lifecycle-target
-      category: continuity
+      category: rollback
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5564137242
       revision: 7393ee330f8f2344303be44e26fe7ebca8dcf126
       result: blocked
