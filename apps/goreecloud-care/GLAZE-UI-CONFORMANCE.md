@@ -100,7 +100,9 @@ The dev18 source line adds automated evidence for:
 - process-level activation across both Care GTK windows;
 - headless enlarged-text compact/regular adaptation and focus traversal.
 
-The current exact-source Development checkpoint is `1e91e3f7267ce159958ba53e5536f12a68d7ddef`. Care Development run `34071450218` explicitly checked out and verified that immutable revision before testing, passed all 73 tests, XML/platform-integration/source validation, the `GDK_DPI_SCALE=2` headless GTK V1.2 runtime probe, Debian `0.1.0~dev18` build and package inspection, and preserved `SOURCE_REVISION` with the artifact. Platform Contract run `34071450603` passed against the synchronized central V1.2 baseline pinned at `c941ce1d8d1eff3c9df994d1e16f83147eadae00`, and theme-source run `34071450272` passed. The exact-source package checksum is `11a44c66e4eb4346c3c3f4569bd53cafeec9ebf87cb6773ca31023094813ddf5`, artifact ID `10000591580`. This is repository/headless CI evidence only and does not replace representative-device visual, input, assistive-technology, resilience, or package-lifecycle acceptance.
+The latest accepted exact-source Development checkpoint before this documentation synchronization is `ba646235dd12df251a02d728b096d8398a515ab7`. Care Development run `34071691286` explicitly checked out and verified that immutable revision before testing, passed all 73 tests, XML/platform-integration/source validation, the `GDK_DPI_SCALE=2` headless GTK V1.2 runtime probe, Debian `0.1.0~dev18` build and package inspection, and preserved `SOURCE_REVISION` with the artifact. Platform Contract run `34071691586` passed against the synchronized central V1.2 baseline pinned at `c941ce1d8d1eff3c9df994d1e16f83147eadae00`, and theme-source run `34071691321` passed. The exact-source package checksum is `85e4b04847d40c51654d65b06c7daee48db1cd7eac79e8433f789fe07088cf0c`, artifact ID `10000667917`. This is repository/headless CI evidence only and does not replace representative-device visual, input, assistive-technology, resilience, or package-lifecycle acceptance.
+
+The upstream consumer-registry mechanics are now complete. `GoreeCloud/goreecloud-glaze-ui` PR #161 repaired the schemaVersion 6 consumer-registry schema, validator, guidance, and dedicated exact-source CI guard and merged at `8a0e21056acd8012a6e7482bf591027359067c81`. Follow-up PR #162 registered GoreeCloud Care in the authoritative `consumers/registry.json` and merged at `f88aa45b4d012dcfcd04a938cb71e96f9bb107d6` after all applicable Glaze workflows passed. Care is intentionally registered as `adoption-required` with `targetVersion=null`, `referenceRevision=null`, `evidence=null`, and `productionEligible=false`. Registration therefore does not establish `accepted-v1`, product conformance, Release Candidate, Stable, or production eligibility.
 
 ## Current blockers
 
@@ -114,8 +116,8 @@ Care remains nonconformant against the complete Stable V1.2 consumer gate until 
 - canonical Care icon target rendering and visual-quality acceptance;
 - visual-quality review of supported normal, compact, enlarged-text, semantic status, empty/no-findings, confirmation, failure, and privileged-maintenance states;
 - exact release-candidate regression pass against GLAZE UI V1.2 / `1.2.0`;
-- governed Care registration and product-specific acceptance in the Glaze UI consumer registry.
+- governed product-specific promotion from the current registry state `adoption-required` to `accepted-v1` only after the complete Care acceptance evidence exists.
 
 ## Fail-closed rule
 
-Missing, stale, contradictory, or unverifiable Glaze UI evidence is non-passing. A source mapping, version string, successful build, historical screenshot, or Glaze platform-level Stable status does not by itself authorize GoreeCloud Care to claim Glaze UI conformance, production readiness, Release Candidate completion, or Stable status.
+Missing, stale, contradictory, or unverifiable Glaze UI evidence is non-passing. A source mapping, version string, successful build, historical screenshot, registry entry, or Glaze platform-level Stable status does not by itself authorize GoreeCloud Care to claim Glaze UI conformance, production readiness, Release Candidate completion, or Stable status.
