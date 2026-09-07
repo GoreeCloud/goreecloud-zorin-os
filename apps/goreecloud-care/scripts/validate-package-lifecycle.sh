@@ -101,9 +101,13 @@ fi
 for path in \
   /usr/bin/goreecloud-care \
   /usr/lib/goreecloud-care/goreecloud-care-helper \
+  /usr/lib/goreecloud-care/goreecloud_care \
+  /usr/lib/goreecloud-care \
+  /usr/lib/python3/dist-packages/goreecloud_care.pth \
   /usr/share/polkit-1/actions/com.goreecloud.care.policy \
   /usr/share/applications/com.goreecloud.care.dev.desktop \
-  /usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg; do
+  /usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg \
+  /usr/share/metainfo/com.goreecloud.care.dev.metainfo.xml; do
   [ ! -e "$path" ] || { echo "Package-owned path remained after removal: $path" >&2; exit 1; }
 done
 [ ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ ] || {
