@@ -51,6 +51,21 @@ class EverkeepContractTests(unittest.TestCase):
         self.assertIn("recovery codes", forbidden)
         self.assertIn("reusable credentials", forbidden)
 
+    def test_package_lifecycle_probe_runs_as_representative_user(self) -> None:
+        source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
+        self.assertIn('"$(id -u)" -ne 0', source)
+        self.assertIn("Run this acceptance probe as the representative desktop user, not as root", source)
+        self.assertIn('sudo apt install -y --allow-downgrades', source)
+        self.assertIn('sudo apt remove -y goreecloud-care', source)
+        self.assertNotIn('sudo goreecloud-care', source)
+        self.assertNotIn('sudo sh "$ROOT/scripts/validate-installed.sh"', source)
+
+    def test_package_lifecycle_probe_requires_true_older_rollback_package(self) -> None:
+        source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
+        self.assertIn('dpkg --compare-versions "$previous_version" lt "$candidate_version"', source)
+        self.assertIn("Previous package must sort older than the candidate", source)
+        self.assertIn("This Development lifecycle probe expects candidate 0.1.0~dev18", source)
+
 
 if __name__ == "__main__":
     unittest.main()
