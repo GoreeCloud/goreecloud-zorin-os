@@ -132,12 +132,13 @@ PY
 
 test -f /usr/lib/goreecloud-care/goreecloud-care-helper
 test -f /usr/share/polkit-1/actions/com.goreecloud.care.policy
-test -f /usr/share/applications/com.goreecloud.care.dev.desktop
+test -f /usr/share/applications/com.goreecloud.care.desktop
 test -f /usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg
-test -f /usr/share/metainfo/com.goreecloud.care.dev.metainfo.xml
+test -f /usr/share/metainfo/com.goreecloud.care.metainfo.xml
 test -f /usr/share/doc/goreecloud-care/API.md
 test -f /usr/share/doc/goreecloud-care/WARDVEIL-INTEGRATION.md
-grep -F 'Icon=com.goreecloud.care' /usr/share/applications/com.goreecloud.care.dev.desktop >/dev/null
+grep -F 'Icon=com.goreecloud.care' /usr/share/applications/com.goreecloud.care.desktop >/dev/null
+grep -F 'Name=GoreeCloud Care (Release Candidate)' /usr/share/applications/com.goreecloud.care.desktop >/dev/null
 
 SHADOW_ROOT=$(mktemp -d)
 cleanup() {
@@ -187,5 +188,5 @@ printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe acceptan
 printf '%s\n' "Installed application/helper launchers are isolated from working-directory Python shadowing."
 printf '%s\n' "Installed package-owned exact-source provenance is present and structurally valid."
 printf '%s\n' "Installed Wardveil-compatible privilege-boundary evidence is passing, current, minimized, scoped, and does not claim Wardveil protection."
-printf '%s\n' "Canonical Care icon derivative is installed and referenced by the desktop entry."
+printf '%s\n' "Canonical Care Release Candidate desktop/AppStream identity and icon derivative are installed."
 printf '%s\n' "Continuity is evidence-derived and cannot become ready without exact governed Everkeep promotion."
