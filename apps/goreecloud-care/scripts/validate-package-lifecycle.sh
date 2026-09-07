@@ -67,7 +67,10 @@ printf '%s\n' "Administrator authentication may be requested by apt."
 
 install_package() {
   package_path=$1
-  sudo apt install -y --allow-downgrades "$package_path"
+  # Exact-candidate acceptance is package-byte scoped. --reinstall prevents
+  # APT from treating a different local build with the same Debian version as
+  # already satisfied and leaving older dev22 bytes/provenance installed.
+  sudo apt install -y --reinstall --allow-downgrades "$package_path"
 }
 
 assert_version_from() {
