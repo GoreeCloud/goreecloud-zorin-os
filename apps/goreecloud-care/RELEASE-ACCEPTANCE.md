@@ -6,7 +6,7 @@ GoreeCloud Care follows the GoreeCloud lifecycle:
 
 `Development -> Release Candidate -> Stable`
 
-The lifecycle is evidence-based. A passing build, successful package installation, working feature, registry entry, or individual screenshot does not permit a lifecycle promotion by itself.
+The lifecycle is evidence-based. A passing build, successful package installation, working feature, registry entry, individual screenshot, or Care-produced platform-status record does not permit a lifecycle promotion by itself.
 
 ## Development exit criteria
 
@@ -17,14 +17,19 @@ Before a Care build may be nominated as a Release Candidate, it must have an exa
 - the Privacy Shield, Wardveil Security, Everkeep, and Glaze UI repository-local integration records are current;
 - all intended RC functionality is source-complete and documented;
 - the official canonical Care application identity/branding exists and is consumed from the branding-assets authority;
-- known release-blocking security, privacy, accessibility, compatibility, recovery, data-integrity, packaging, or visual-quality defects are resolved rather than waived;
+- known release-blocking security, privacy, accessibility, compatibility, recovery, data-integrity, packaging, reproducibility, or visual-quality defects are resolved rather than waived;
 - package build metadata, application metadata, documentation, and lifecycle records agree on the candidate version;
 - installed Python entrypoints are isolated from the invoking working directory, `PYTHONPATH`, and user-site package shadowing, including the privileged PolicyKit helper boundary;
-- package install/remove behavior does not leave stale private Python bytecode capable of affecting a later installed revision.
+- package install/remove behavior does not leave stale private Python bytecode or package-owned provenance capable of affecting a later installed revision;
+- every file that can enter the Debian package is part of the exact committed Care source; untracked package inputs fail closed;
+- the exact package is reproducible within one build environment and byte-identical across the supported Ubuntu 22.04 / Ubuntu 24.04 packaging boundary used to represent Zorin OS 17.3 and current CI;
+- the package contains root-controlled build provenance naming the exact source revision, Care source-tree identity, runtime version, package version, and deterministic source timestamp.
+
+The package SHA-256 is deliberately not embedded inside the package whose digest it would describe. Exact package identity is bound externally by target-runtime acceptance and governed platform evidence.
 
 ## Release Candidate target acceptance
 
-The exact RC package must then receive representative Zorin OS target acceptance covering:
+The exact RC package must then receive representative **Zorin OS 17.3** target acceptance covering the following areas.
 
 ### Package lifecycle
 
@@ -33,10 +38,44 @@ The exact RC package must then receive representative Zorin OS target acceptance
 - removal and reinstall;
 - downgrade or rollback to the explicitly supported prior package state;
 - post-rollback launch and report validation;
-- package-owned helper/policy/desktop/AppStream files removed or restored as expected;
+- package-owned helper/policy/desktop/AppStream/provenance files and directories removed or restored as expected;
 - installed application and helper launchers resolve the installed package even when invoked from a working directory containing a same-named `goreecloud_care` package;
 - private package bytecode/cache residue does not survive removal or cause cross-version execution;
+- final installed package-owned provenance exactly matches the candidate source revision, Care source tree, runtime version, and package version;
 - no user data loss beyond explicitly authorized maintenance actions.
+
+The authoritative automated representative-device runner is `scripts/run-representative-acceptance.sh`. It must be run as the normal desktop user on Zorin OS 17.3. It runs source validation, deterministic package construction, same-environment reproducibility verification, accepted dev17 rollback-package preparation, and the complete install/remove/reinstall/downgrade/restore lifecycle. It does **not** invoke a Care cleanup action and does **not** grant Everkeep promotion.
+
+Testing destructive flows may use disposable fixtures or purpose-created test data. Acceptance must not require deleting unrelated personal content.
+
+### Continuity / Everkeep authority boundary
+
+Care is an evidence producer, not the Everkeep governance authority.
+
+After exact representative-device acceptance passes, Care may create and install only its root-controlled target handoff at:
+
+`/var/lib/goreecloud-care/acceptance/representative-target.json`
+
+That Care-owned record must name the exact source revision, Care source tree, runtime/package versions, package SHA-256, representative Zorin target, local test count, and package-lifecycle result. By construction it must leave:
+
+- `everkeep_integration_promoted = false`
+- `everkeep_ready_promoted = false`
+
+A Care-owned target record by itself may advance the local continuity explanation only to `attention / target-accepted-governance-pending`. It cannot make Care Everkeep-ready.
+
+`ready / everkeep-promoted` is allowed only when a separate root-controlled **Everkeep-owned** governance record exists at:
+
+`/var/lib/goreecloud/everkeep/acceptance/goreecloud-care.target-runtime.json`
+
+and that record:
+
+- matches the installed package provenance source revision, Care source tree, runtime version, and package version;
+- names Zorin OS 17.3 as the representative target and records a passing target lifecycle;
+- has the same exact package SHA-256 as the Care-owned representative-target record;
+- explicitly promotes both Everkeep integration and Everkeep readiness;
+- is a regular root-owned file in a root-owned directory with neither file nor immediate parent group/other writable.
+
+Missing, malformed, oversized, writable, symlinked, source-mismatched, target-mismatched, package-mismatched, or unpromoted evidence fails closed. `contracts/continuity.status.schema.json` defines the machine-readable Care continuity status boundary.
 
 ### Core maintenance task flows
 
@@ -49,8 +88,6 @@ The exact RC package must then receive representative Zorin OS target acceptance
 - post-action refresh preserving the final operation result;
 - symlink-safe behavior and ownership boundary.
 
-Testing destructive flows may use disposable fixtures or purpose-created test data. Acceptance must not require deleting unrelated personal content.
-
 ### Reports and local integration API
 
 - `--version` and `--api-version`;
@@ -58,7 +95,7 @@ Testing destructive flows may use disposable fixtures or purpose-created test da
 - local health output;
 - Privacy Shield status output and data minimization;
 - Wardveil-compatible security status and installed privilege-boundary verification;
-- Everkeep continuity status;
+- evidence-derived Everkeep continuity status;
 - malformed/unexpected CLI combinations fail without falling through to the GUI or performing maintenance.
 
 ### Accessibility and adaptive behavior
@@ -85,10 +122,9 @@ Testing destructive flows may use disposable fixtures or purpose-created test da
 - final supported appearance matrix is explicitly documented;
 - normal, compact, enlarged-text, Light/Dark where claimed, HighContrast, Reduced Transparency, Reduced Motion, status, confirmation, failure, empty/no-findings, and privileged-action states are visually complete;
 - the current Stable **GLAZE UI V1.2 / `1.2.0`** native mapping is accepted on the target device for every Care appearance/resilience mode claimed by the release;
+- Proposed GLAZE UI V1.3 Adaptive Resonance development work may be reviewed as forward-looking evidence but cannot be represented as Candidate/Stable conformance until upstream governance activates it and Care becomes eligible;
 - the official canonical Care icon renders correctly in application/desktop surfaces;
-- the authoritative Glaze consumer registry records Care only at the state justified by product-specific evidence. Registration as `adoption-required` is not conformance; promotion to `accepted-v1` requires the complete exact-candidate Care acceptance record.
-
-The current authoritative Glaze registry already contains GoreeCloud Care as `adoption-required` at merged Glaze revision `f88aa45b4d012dcfcd04a938cb71e96f9bb107d6`. Its accepted `targetVersion`, `referenceRevision`, and `evidence` remain unset and `productionEligible=false`; these values must remain fail-closed until governed product-specific V1.2 acceptance is complete.
+- the authoritative Glaze consumer registry records Care only at the state justified by product-specific evidence. Registration as `adoption-required` is not conformance; promotion requires complete exact-candidate Care acceptance.
 
 ## Stable promotion
 
@@ -106,4 +142,4 @@ Manager, Mesh, and Identity may be `not-applicable-justified` only when the rele
 
 ## Fail-closed promotion rule
 
-Any unresolved required gate remains a blocker. Care must not be represented as Release Candidate-complete or Stable when required evidence is missing, stale, contradictory, failed, or not run.
+Any unresolved required gate remains a blocker. Care must not be represented as Release Candidate-complete or Stable when required evidence is missing, stale, contradictory, failed, mismatched, untrusted, or not run.
