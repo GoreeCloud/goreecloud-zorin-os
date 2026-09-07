@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
-EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev19}
-EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev19}
+EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev21}
+EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev21}
 
 for command_name in goreecloud-care dpkg-query mktemp mkdir rm; do
   command -v "$command_name" >/dev/null
@@ -124,4 +124,4 @@ test ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ || {
 printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe acceptance probe: passed"
 printf '%s\n' "Installed application/helper launchers are isolated from working-directory Python shadowing."
 printf '%s\n' "Canonical Care icon derivative is installed and referenced by the desktop entry."
-printf '%s\n' "Continuity remains attention until destructive package lifecycle rollback testing is separately completed."
+printf '%s\n' "Continuity remains attention until governed Everkeep readiness is explicitly promoted from accepted restore evidence."
