@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-VERSION="0.1.0~dev18"
+VERSION="0.1.0~dev19"
 ARCH="all"
 PKG="goreecloud-care"
 OUT=${1:-"$ROOT/dist"}
@@ -29,6 +29,8 @@ Homepage: https://goreecloud.com/
 Description: GoreeCloud Care Development maintenance utility
  Local-first GTK maintenance utility for Zorin OS and compatible Linux systems.
 CONTROL
+install -m 0755 "$ROOT/packaging/postinst" "$STAGE/DEBIAN/postinst"
+install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"
 install -m 0755 "$ROOT/packaging/goreecloud-care" "$STAGE/usr/bin/goreecloud-care"
 install -m 0755 "$ROOT/packaging/goreecloud-care-helper" "$STAGE/usr/lib/goreecloud-care/goreecloud-care-helper"
 install -m 0644 "$ROOT/goreecloud_care/"*.py "$STAGE/usr/lib/goreecloud-care/goreecloud_care/"
