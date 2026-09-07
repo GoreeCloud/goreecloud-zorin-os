@@ -52,6 +52,18 @@ jobs:
       - name: Run Deep Dark HeaderBar runtime contrast acceptance
         run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_APPEARANCE=deep-dark python3 tests/runtime_ui_acceptance.py
 
+      - name: Run Clear clarity runtime acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_GLAZE_CLARITY=clear python3 tests/runtime_ui_acceptance.py
+
+      - name: Run Balanced clarity runtime acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_GLAZE_CLARITY=balanced python3 tests/runtime_ui_acceptance.py
+
+      - name: Run Dense clarity runtime acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_GLAZE_CLARITY=dense python3 tests/runtime_ui_acceptance.py
+
+      - name: Run Reduced Motion runtime acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_REDUCE_MOTION=1 python3 tests/runtime_ui_acceptance.py
+
       - name: Build Development Debian package
         run: sh ./scripts/build-deb.sh dist
 
