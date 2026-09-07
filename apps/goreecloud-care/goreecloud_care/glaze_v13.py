@@ -215,6 +215,14 @@ window.care-shell.care-dark .chrome-plane {
   color: #f7f8fa;
   border-color: rgba(255, 255, 255, 0.12);
 }
+window.care-shell.care-dark headerbar button {
+  background: #34383f;
+  background-image: none;
+  color: #f7f8fa;
+  border-color: rgba(255, 255, 255, 0.20);
+  box-shadow: none;
+}
+window.care-shell.care-dark headerbar button:hover { background: #3d424a; }
 window.care-shell.care-dark .content-plane,
 window.care-shell.care-dark .surface-solid,
 window.care-shell.care-dark .maintenance-collection,
@@ -250,6 +258,14 @@ window.care-shell.care-deep-dark .chrome-plane {
   color: #f7f8fa;
   border-color: rgba(255, 255, 255, 0.12);
 }
+window.care-shell.care-deep-dark headerbar button {
+  background: #272a2f;
+  background-image: none;
+  color: #f7f8fa;
+  border-color: rgba(255, 255, 255, 0.20);
+  box-shadow: none;
+}
+window.care-shell.care-deep-dark headerbar button:hover { background: #30343a; }
 window.care-shell.care-deep-dark .content-plane,
 window.care-shell.care-deep-dark .surface-solid,
 window.care-shell.care-deep-dark .maintenance-collection,
