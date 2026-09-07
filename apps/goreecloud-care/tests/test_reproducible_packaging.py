@@ -22,6 +22,15 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         )
         self.assertIn('dpkg-deb --root-owner-group', BUILD)
 
+    def test_build_normalizes_umask_sensitive_modes(self):
+        self.assertIn('find "$STAGE" -type d -exec chmod 0755 {} +', BUILD)
+        self.assertIn('chmod 0644 "$STAGE/DEBIAN/control"', BUILD)
+        self.assertIn(
+            'chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"',
+            BUILD,
+        )
+        self.assertIn('Caller umask is not part of package identity', BUILD)
+
     def test_build_eliminates_compressor_and_locale_variability(self):
         self.assertIn('export LC_ALL=C', BUILD)
         self.assertIn('export TZ=UTC', BUILD)
@@ -48,10 +57,15 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
 
     def test_verifier_compares_independent_build_to_reference(self):
         self.assertIn('SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" sh "$ROOT/scripts/build-deb.sh"', VERIFY)
-        self.assertIn('cmp -s "$REFERENCE" "$REBUILT"', VERIFY)
+        self.assertIn('cmp -s "$REFERENCE" "$rebuilt"', VERIFY)
         self.assertIn('sha256sum "$REFERENCE"', VERIFY)
-        self.assertIn('sha256sum "$REBUILT"', VERIFY)
         self.assertIn('Reproducible package verification: passed', VERIFY)
+
+    def test_verifier_exercises_different_umasks(self):
+        self.assertIn('umask 0022', VERIFY)
+        self.assertIn('umask 0002', VERIFY)
+        self.assertIn('cmp -s "$REBUILT_022" "$REBUILT_002"', VERIFY)
+        self.assertIn('Umask independence: passed (0022 == 0002)', VERIFY)
 
     def test_ci_runs_same_environment_reproducibility_gate(self):
         self.assertIn('Verify reproducible GoreeCloud Care package', WORKFLOW)
