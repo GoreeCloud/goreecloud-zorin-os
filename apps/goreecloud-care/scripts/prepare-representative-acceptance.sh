@@ -4,8 +4,8 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 OUT=${1:-"$ROOT/dist/representative-acceptance"}
-EXPECTED_RUNTIME_VERSION="0.1.0-dev19"
-EXPECTED_PACKAGE_VERSION="0.1.0~dev19"
+EXPECTED_RUNTIME_VERSION="0.1.0-dev20"
+EXPECTED_PACKAGE_VERSION="0.1.0~dev20"
 EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 
 for command_name in git python3 sha256sum dpkg-deb tee awk rm mktemp; do
@@ -111,12 +111,12 @@ if command -v goreecloud-care >/dev/null 2>&1; then
       printf 'api_version=not-probed-runtime-mismatch\n'
     } > "$OUT/installed-version.txt"
     printf '%s\n' \
-      "Installed Care runtime differs from the dev19 source candidate; dev19-only status snapshots were skipped." \
+      "Installed Care runtime differs from the dev20 source candidate; dev20-only status snapshots were skipped." \
       > "$OUT/installed-status-snapshots-skipped.txt"
   fi
 else
   printf '%s\n' "GoreeCloud Care is not currently installed; installed read-only status snapshots were skipped." > "$OUT/installed-version.txt"
-  printf '%s\n' "No installed Care executable was found; dev19-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
+  printf '%s\n' "No installed Care executable was found; dev20-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
 fi
 
 cat > "$OUT/MANUAL-CHECKLIST.txt" <<'EOF'
@@ -127,16 +127,19 @@ Record PASS or FAIL plus notes for every exercised item. A blank item is NOT acc
 Do not use unrelated personal files for destructive-flow testing; use disposable fixtures/test data.
 Do not promote lifecycle status from this checklist alone.
 
+GLAZE UI lifecycle note: Care dev20 implements the latest Proposed V1.3 Adaptive Resonance development language. V1.3 Candidate is not active and consumer eligibility is not granted upstream; GLAZE UI V1.2 / 1.2.0 remains the official Stable compatibility baseline.
+
 A. Large text / continuous resize
-[ ] PASS [ ] FAIL  GDK_DPI_SCALE=2 Maintenance Insights opens in compact layout.
+[ ] PASS [ ] FAIL  GDK_DPI_SCALE=2 Care and Maintenance Insights open in compact layouts.
 [ ] PASS [ ] FAIL  Drag continuously narrower/wider for at least 15 seconds; UI remains responsive and does not freeze.
-[ ] PASS [ ] FAIL  Compact title remains readable; Refresh focus remains visible.
+[ ] PASS [ ] FAIL  Compact titles remain readable; Scan/Refresh focus remains visible.
 [ ] PASS [ ] FAIL  Findings remain readable and the true bottom remains reachable after resizing.
+[ ] PASS [ ] FAIL  Expanded width adds useful two-column context instead of merely stretching the primary plan.
 Notes:
 
 B. Keyboard traversal
-[ ] PASS [ ] FAIL  Forward Tab reaches Refresh, selectable findings, and subsequent focusable controls without a trap.
-[ ] PASS [ ] FAIL  Reverse Shift+Tab traverses back through the same region without a trap.
+[ ] PASS [ ] FAIL  Forward Tab reaches Scan, routine selectors, primary action, system actions, Refresh, selectable findings, and subsequent controls without a trap.
+[ ] PASS [ ] FAIL  Reverse Shift+Tab traverses back through the same regions without a trap.
 [ ] PASS [ ] FAIL  Focus indication is perceivable in normal and HighContrast presentation.
 Notes:
 
@@ -147,17 +150,24 @@ C. Assistive technology
 [ ] PASS [ ] FAIL  Orca announcements for completion/cancellation/failure are understandable and not misleading.
 Notes:
 
-D. Appearance / resilience
-[ ] PASS [ ] FAIL  System Light presentation claimed by Care is readable and visually complete.
-[ ] PASS [ ] FAIL  System/Dark presentation claimed by Care is readable and visually complete.
+D. Adaptive Resonance appearance / resilience
+[ ] PASS [ ] FAIL  System Light presentation is readable, neutral, and visually complete.
+[ ] PASS [ ] FAIL  System/Dark presentation is readable, neutral, and visually complete.
 [ ] PASS [ ] FAIL  HighContrast remains system-authoritative and focus is visible.
-[ ] PASS [ ] FAIL  Reduced Transparency remains readable with solid neutral surfaces.
+[ ] PASS [ ] FAIL  Reduced Transparency converts glazed chrome/signature surfaces to solid equivalents.
 [ ] PASS [ ] FAIL  Reduced Motion does not remove required state feedback.
+[ ] PASS [ ] FAIL  Show Borders strengthens boundaries without relying on extra saturation.
+[ ] PASS [ ] FAIL  Calm / Balanced / Expressive profiles change emphasis without changing semantic correctness.
+[ ] PASS [ ] FAIL  Clear / Balanced / Dense clarity profiles remain distinct from expression and preserve target size/readability.
 [ ] PASS [ ] FAIL  Deep Dark Development override, if reviewed, is clearly treated as Development evidence rather than an automatically released mode.
 Notes:
 
-E. Visual / branding
+E. Visual / Glaze discipline / branding
 [ ] PASS [ ] FAIL  Canonical Care icon renders correctly in launcher/desktop/application surfaces.
+[ ] PASS [ ] FAIL  Content planes used for reading/decisions remain optically stable; Glaze is concentrated in command chrome/signature surfaces.
+[ ] PASS [ ] FAIL  Routine categories read as one grouped maintenance collection rather than five repetitive floating cards.
+[ ] PASS [ ] FAIL  Only appropriate compact command controls use capsule geometry; ordinary buttons are not universally pill-shaped.
+[ ] PASS [ ] FAIL  Primary action hierarchy is unmistakable and destructive Trash remains visually/behaviorally separate.
 [ ] PASS [ ] FAIL  Normal, compact, enlarged-text, status, empty/no-findings, confirmation, failure, and privileged-action states have no clipping/overlap/unreadable text.
 Notes:
 
@@ -184,7 +194,7 @@ H. Platform-system acceptance
 [ ] PASS [ ] FAIL  Privacy Shield exact-candidate runtime/application review complete (production_approved must remain false until governed approval).
 [ ] PASS [ ] FAIL  Wardveil scoped adoption/runtime review complete (do not claim broad protection unless separately accepted).
 [ ] PASS [ ] FAIL  Everkeep continuity evidence is complete and provenance matches the exact candidate package.
-[ ] PASS [ ] FAIL  GLAZE UI V1.2 product-specific acceptance is complete; only then may the registry be considered for accepted-v1.
+[ ] PASS [ ] FAIL  Proposed GLAZE UI V1.3 consumer implementation is reviewed against its pinned development source without claiming Candidate activation or consumer conformance; V1.2 remains the Stable baseline.
 Notes:
 EOF
 
@@ -207,6 +217,15 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   GOREECLOUD_CARE_APPEARANCE=deep-dark goreecloud-care
   GOREECLOUD_CARE_REDUCE_TRANSPARENCY=1 goreecloud-care
   GOREECLOUD_CARE_REDUCE_MOTION=1 goreecloud-care
+  GOREECLOUD_CARE_SHOW_BORDERS=1 goreecloud-care
+
+# Proposed V1.3 expression and clarity are separate Development dimensions.
+  GOREECLOUD_CARE_GLAZE_EXPRESSION=calm goreecloud-care
+  GOREECLOUD_CARE_GLAZE_EXPRESSION=balanced goreecloud-care
+  GOREECLOUD_CARE_GLAZE_EXPRESSION=expressive goreecloud-care
+  GOREECLOUD_CARE_GLAZE_CLARITY=clear goreecloud-care
+  GOREECLOUD_CARE_GLAZE_CLARITY=balanced goreecloud-care
+  GOREECLOUD_CARE_GLAZE_CLARITY=dense goreecloud-care
 
 # Installed read-only status probes
   goreecloud-care --version
@@ -222,7 +241,7 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   sh ./scripts/build-dev17-rollback-package.sh
 
 # Package lifecycle (run as the normal desktop user; the script requests sudo only for apt operations)
-  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev19_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
+  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev20_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 EOF
 
 printf '%s\n' "Representative acceptance preparation: passed"
