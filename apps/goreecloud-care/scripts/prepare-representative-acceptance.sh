@@ -8,7 +8,7 @@ EXPECTED_RUNTIME_VERSION="0.1.0-dev19"
 EXPECTED_PACKAGE_VERSION="0.1.0~dev19"
 EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 
-for command_name in git python3 sha256sum dpkg-deb tee awk rm; do
+for command_name in git python3 sha256sum dpkg-deb tee awk rm mktemp; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
@@ -30,6 +30,15 @@ RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __v
   exit 2
 }
 
+# An older installed Care package may predate dev19's isolated launcher. Probe
+# installed runtime/status from an empty neutral directory so the source checkout
+# cannot make an older ambient `python3 -m` launcher look like the new candidate.
+INSTALLED_PROBE_DIR=$(mktemp -d)
+cleanup() {
+  rm -rf "$INSTALLED_PROBE_DIR"
+}
+trap cleanup EXIT INT TERM
+
 mkdir -p "$OUT"
 
 printf '%s\n' "Preparing read-only/non-destructive representative acceptance evidence."
@@ -37,6 +46,7 @@ printf '%s\n' "Source revision: $SOURCE_REVISION"
 printf '%s\n' "Source branch:   $SOURCE_BRANCH"
 printf '%s\n' "Runtime version: $RUNTIME_VERSION"
 printf '%s\n' "Output directory: $OUT"
+printf '%s\n' "Installed-runtime probes use a clean neutral working directory."
 printf '%s\n' "This preparation harness does not invoke Care cleanup, PolicyKit, pkexec, sudo, apt, or network operations."
 
 (
@@ -81,19 +91,19 @@ rm -f \
   "$OUT/installed-status-snapshots-skipped.txt"
 
 if command -v goreecloud-care >/dev/null 2>&1; then
-  INSTALLED_RUNTIME=$(goreecloud-care --version 2>/dev/null || true)
+  INSTALLED_RUNTIME=$(cd "$INSTALLED_PROBE_DIR" && goreecloud-care --version 2>/dev/null || true)
   if [ "$INSTALLED_RUNTIME" = "$EXPECTED_RUNTIME_VERSION" ]; then
     {
       printf 'installed_version=%s\n' "$INSTALLED_RUNTIME"
       printf 'api_version='
-      goreecloud-care --api-version
+      (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --api-version)
     } > "$OUT/installed-version.txt"
 
-    goreecloud-care --report-json > "$OUT/report.json"
-    goreecloud-care --health-json > "$OUT/health.json"
-    goreecloud-care --privacy-status-json > "$OUT/privacy-status.json"
-    goreecloud-care --security-status-json > "$OUT/security-status.json"
-    goreecloud-care --continuity-status-json > "$OUT/continuity-status.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --report-json) > "$OUT/report.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --health-json) > "$OUT/health.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --privacy-status-json) > "$OUT/privacy-status.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --security-status-json) > "$OUT/security-status.json"
+    (cd "$INSTALLED_PROBE_DIR" && goreecloud-care --continuity-status-json) > "$OUT/continuity-status.json"
   else
     {
       printf 'installed_version=%s\n' "$INSTALLED_RUNTIME"
