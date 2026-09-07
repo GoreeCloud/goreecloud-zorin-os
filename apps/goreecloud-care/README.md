@@ -94,6 +94,16 @@ The Development CI runs the GTK runtime probe under Xvfb, inspects the Debian pa
 
 The latest accepted exact-source dev18 repository checkpoint before this README synchronization is `39dee4cd06ebe5cbbf3f7d7a44c909d9700ddeca`. Care Development run `34073262012` explicitly checked out and verified that exact revision, passed 73 tests, XML/platform-integration/source validation, the `GDK_DPI_SCALE=2` headless GTK V1.2 runtime probe, and Debian `0.1.0~dev18` build/package inspection. Care Platform Contract run `34073262272` passed against the synchronized central Platform Contract V1.2 baseline pinned at `c941ce1d8d1eff3c9df994d1e16f83147eadae00`, and theme-source run `34073261976` passed. The exact-source Development package checksum is `c193c7b77ac7f322215272c9cac9ce172bbea8f70455c36dd12ed7b68bac5617`; artifact ID `10001176907` also contains `SOURCE_REVISION` tying the package evidence to the checked-out source. This establishes repository/headless CI evidence only, not representative-device acceptance.
 
+## Representative-device acceptance preparation
+
+A safe preparation harness now consolidates exact-source provenance, local validation/build logs, a package checksum, path-redacted/read-only installed status snapshots when Care is already installed, and a manual checklist for the human/native gates that CI cannot truthfully infer:
+
+```sh
+sh ./scripts/prepare-representative-acceptance.sh
+```
+
+Run it from a clean tracked working tree. The harness refuses to turn a dirty tracked tree into exact-source evidence, does not invoke Care cleanup, PolicyKit, `pkexec`, `sudo`, `apt`, or network operations, and does not mark manual items passed. Its default output is `dist/representative-acceptance/`, including `SOURCE_REVISION`, `package.sha256`, validation/build logs, `MANUAL-CHECKLIST.txt`, and `MANUAL-COMMANDS.txt`.
+
 ## Package lifecycle acceptance
 
 The representative target can exercise the recovery gate as the normal desktop user; the script requests administrator authentication only for package operations:
