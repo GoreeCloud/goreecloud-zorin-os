@@ -66,7 +66,11 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertNotIn("sort | tail", self.source)
 
     def test_preparation_harness_gates_dev19_status_probes_on_installed_runtime(self) -> None:
-        self.assertIn('INSTALLED_RUNTIME=$(goreecloud-care --version 2>/dev/null || true)', self.source)
+        self.assertIn('INSTALLED_PROBE_DIR=$(mktemp -d)', self.source)
+        self.assertIn(
+            'INSTALLED_RUNTIME=$(cd "$INSTALLED_PROBE_DIR" && goreecloud-care --version 2>/dev/null || true)',
+            self.source,
+        )
         self.assertIn(
             'if [ "$INSTALLED_RUNTIME" = "$EXPECTED_RUNTIME_VERSION" ]; then',
             self.source,
@@ -78,6 +82,19 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         )
         self.assertIn("installed-status-snapshots-skipped.txt", self.source)
         self.assertIn("Remove only previously generated read-only snapshot files", self.source)
+
+    def test_installed_snapshot_probes_use_neutral_working_directory(self) -> None:
+        self.assertIn("An older installed Care package may predate dev19's isolated launcher", self.source)
+        self.assertIn("Installed-runtime probes use a clean neutral working directory.", self.source)
+        for mode in (
+            "--api-version",
+            "--report-json",
+            "--health-json",
+            "--privacy-status-json",
+            "--security-status-json",
+            "--continuity-status-json",
+        ):
+            self.assertIn(f'cd "$INSTALLED_PROBE_DIR" && goreecloud-care {mode}', self.source)
 
     def test_preparation_harness_uses_only_read_only_installed_status_modes(self) -> None:
         for mode in (
