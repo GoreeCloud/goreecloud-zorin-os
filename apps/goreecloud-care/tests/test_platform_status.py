@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import stat
 import tempfile
@@ -78,10 +78,61 @@ class PlatformStatusTests(unittest.TestCase):
                 expected_uid=os.geteuid(),
             )
             self.assertEqual(payload["state"], "protected")
+            self.assertEqual(payload["source_state"], "passing")
             self.assertEqual(payload["evidence"]["status"], "current")
-            self.assertIn("valid_until", payload["evidence"])
+            self.assertEqual(
+                payload["evidence"]["reference"],
+                "local-cli://goreecloud-care/security-status",
+            )
+            self.assertEqual(payload["scope"]["id"], "goreecloud-care")
+            self.assertEqual(
+                payload["authority"]["control"],
+                "local-maintenance-privilege-boundary",
+            )
             self.assertTrue(payload["authority"]["authoritative"])
             self.assertFalse(payload["claim"]["protected_by_wardveil"])
+            self.assertEqual(
+                payload["evidence"]["valid_until"],
+                (NOW + timedelta(minutes=15)).isoformat().replace("+00:00", "Z"),
+            )
+
+    def test_wardveil_status_is_minimized_textual_and_not_a_protection_claim(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            helper = root / "helper"
+            policy = root / "policy"
+            pkexec = root / "pkexec"
+            self._make_file(helper, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+            self._make_file(policy, stat.S_IRUSR | stat.S_IWUSR)
+            self._make_file(pkexec, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+            payload = build_wardveil_status(
+                NOW,
+                helper_path=helper,
+                policy_path=policy,
+                pkexec_path=pkexec,
+                expected_uid=os.geteuid(),
+            )
+
+            # State, source state and summary are explicit text semantics; no
+            # consumer needs color or iconography to understand the record.
+            self.assertIsInstance(payload["state"], str)
+            self.assertIsInstance(payload["source_state"], str)
+            self.assertTrue(payload["evidence"]["summary"])
+            self.assertTrue(payload["privacy"]["details_withheld"])
+            self.assertTrue(payload["privacy"]["redactions"])
+            self.assertFalse(payload["claim"]["protected_by_wardveil"])
+
+            serialized = json.dumps(payload, sort_keys=True).lower()
+            for forbidden in (
+                "password",
+                "authentication token",
+                "private key",
+                "recovery code",
+                "/home/",
+                "username",
+                "user_email",
+            ):
+                self.assertNotIn(forbidden, serialized)
 
     def test_privileged_boundary_fails_closed_on_writable_or_missing_evidence(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -100,6 +151,7 @@ class PlatformStatusTests(unittest.TestCase):
                 expected_uid=os.geteuid(),
             )
             self.assertEqual(payload["state"], "attention")
+            self.assertEqual(payload["source_state"], "non-passing")
             self.assertFalse(payload["claim"]["protected_by_wardveil"])
             self.assertNotIn("valid_until", payload["evidence"])
 
