@@ -49,6 +49,36 @@ def make_app() -> Gtk.Application:
     return app
 
 
+def _linear_channel(value: float) -> float:
+    if value <= 0.04045:
+        return value / 12.92
+    return ((value + 0.055) / 1.055) ** 2.4
+
+
+def _relative_luminance(rgba) -> float:
+    red = _linear_channel(float(rgba.red))
+    green = _linear_channel(float(rgba.green))
+    blue = _linear_channel(float(rgba.blue))
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+
+def _contrast_ratio(foreground, background) -> float:
+    first = _relative_luminance(foreground)
+    second = _relative_luminance(background)
+    lighter, darker = max(first, second), min(first, second)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def _descendant_buttons(widget) -> list[Gtk.Button]:
+    found: list[Gtk.Button] = []
+    if isinstance(widget, Gtk.Button):
+        found.append(widget)
+    if isinstance(widget, Gtk.Container):
+        for child in widget.get_children():
+            found.extend(_descendant_buttons(child))
+    return found
+
+
 def test_core_status_accessible_mutation_and_layout(app: Gtk.Application) -> None:
     window = CareWindow(app)
     window.set_status("Synthetic completion state.", "success", "Completed")
@@ -69,6 +99,42 @@ def test_core_status_accessible_mutation_and_layout(app: Gtk.Application) -> Non
     assert window._layout_environment == "expanded"
     assert window.header.get_title() == "GoreeCloud Care"
     assert window.workspace.get_orientation() == Gtk.Orientation.HORIZONTAL
+    window.destroy()
+
+
+def test_dark_headerbar_runtime_contrast(app: Gtk.Application) -> None:
+    appearance = os.environ.get("GOREECLOUD_CARE_APPEARANCE", "").strip().lower()
+    if appearance not in {"dark", "deep-dark"}:
+        return
+
+    window = CareWindow(app)
+    window.show_all()
+    drain_events()
+
+    buttons = [button for button in _descendant_buttons(window.header) if button.get_visible()]
+    assert window.scan_btn in buttons, "Scan button is missing from the realized HeaderBar"
+    assert buttons, "No visible HeaderBar buttons were realized"
+
+    checked = 0
+    for button in buttons:
+        context = button.get_style_context()
+        state = context.get_state()
+        foreground = context.get_color(state)
+        background = context.get_background_color(state)
+        # Dev22 deliberately makes Dark/Deep Dark HeaderBar button surfaces
+        # opaque. If the cascade falls back to a transparent/light theme surface,
+        # fail instead of treating source CSS as sufficient evidence.
+        assert background.alpha >= 0.95, (
+            f"{appearance} HeaderBar button background alpha is {background.alpha:.3f}"
+        )
+        ratio = _contrast_ratio(foreground, background)
+        assert ratio >= 4.5, (
+            f"{appearance} HeaderBar button contrast is only {ratio:.2f}:1 "
+            f"(fg={foreground.to_string()}, bg={background.to_string()})"
+        )
+        checked += 1
+
+    print(f"{appearance} HeaderBar runtime contrast: passed for {checked} visible button(s)")
     window.destroy()
 
 
@@ -148,6 +214,7 @@ def main() -> int:
 
     app = make_app()
     test_core_status_accessible_mutation_and_layout(app)
+    test_dark_headerbar_runtime_contrast(app)
     test_insights_focus_resize_and_rendering(app)
     print(
         "Headless GTK runtime acceptance probe: passed "
