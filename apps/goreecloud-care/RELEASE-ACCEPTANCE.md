@@ -1,145 +1,166 @@
 # GoreeCloud Care Release Acceptance
 
-## Governing rule
+## Governing lifecycle
 
-GoreeCloud Care follows the GoreeCloud lifecycle:
+GoreeCloud Care follows the governed lifecycle:
 
 `Development -> Release Candidate -> Stable`
 
-The lifecycle is evidence-based. A passing build, successful package installation, working feature, registry entry, individual screenshot, or Care-produced platform-status record does not permit a lifecycle promotion by itself.
+Lifecycle status is evidence-based. Source labels, a passing build, successful installation, a registry entry, a screenshot, a Care-produced status record, or an earlier accepted revision cannot independently promote a later candidate.
 
-## Development exit criteria
+## Current Release Candidate source state
 
-Before a Care build may be nominated as a Release Candidate, it must have an exact immutable candidate revision and package artifact and must satisfy all applicable source-level gates. At minimum:
+The current source line is nominated as **Release Candidate / nonconformant** while retaining the pre-release runtime/package version `0.1.0-dev22` / `0.1.0~dev22`.
 
-- all repository tests and source guards pass at the exact candidate revision;
-- the Platform Contract manifest is structurally valid and records no known source-level falsehoods;
-- the Privacy Shield, Wardveil Security, Everkeep, and Glaze UI repository-local integration records are current;
-- all intended RC functionality is source-complete and documented;
-- the official canonical Care application identity/branding exists and is consumed from the branding-assets authority;
-- known release-blocking security, privacy, accessibility, compatibility, recovery, data-integrity, packaging, reproducibility, or visual-quality defects are resolved rather than waived;
-- package build metadata, application metadata, documentation, and lifecycle records agree on the candidate version;
-- installed Python entrypoints are isolated from the invoking working directory, `PYTHONPATH`, and user-site package shadowing, including the privileged PolicyKit helper boundary;
-- package install/remove behavior does not leave stale private Python bytecode or package-owned provenance capable of affecting a later installed revision;
-- every file that can enter the Debian package is part of the exact committed Care source; untracked package inputs fail closed;
-- the exact package is reproducible within one build environment and byte-identical across the supported Ubuntu 22.04 / Ubuntu 24.04 packaging boundary used to represent Zorin OS 17.3 and current CI;
-- the package contains root-controlled build provenance naming the exact source revision, Care source-tree identity, runtime version, package version, and deterministic source timestamp.
+The immediately preceding exact Development candidate `4f7aecd6fa5a6fdd6efb496e606c29457c18fefb` is valuable predecessor evidence, but its Privacy Shield, Wardveil, Everkeep, representative-target and package-SHA acceptance is exact-source/tree/package scoped and does not transfer to the RC source.
 
-The package SHA-256 is deliberately not embedded inside the package whose digest it would describe. Exact package identity is bound externally by target-runtime acceptance and governed platform evidence.
+Release Candidate source status means the intended first-release functionality is frozen enough for final qualification. It does **not** mean RC-complete, Stable, production-approved, Protected by Wardveil, Everkeep-ready for this new exact source, or final Glaze-conformant.
 
-## Release Candidate target acceptance
+## RC source qualification
 
-The exact RC package must then receive representative **Zorin OS 17.3** target acceptance covering the following areas.
+Before the final RC SHA may be accepted as the immutable release candidate, all applicable automatable/source-level gates must pass at that exact revision:
+
+- repository unit/source tests and static guards;
+- Platform Contract structural validation with `lifecycle: release-candidate` and `status: nonconformant` until final production acceptance;
+- canonical application/desktop/AppStream Release Candidate identity without `.dev` runtime identifiers;
+- Privacy Shield, Wardveil, Everkeep and Glaze integration records that truthfully distinguish predecessor evidence from current exact-candidate acceptance;
+- no known source-level security, privacy, recovery, data-integrity, packaging or accessibility blocker;
+- package/runtime/application metadata agreement on `0.1.0-dev22` / `0.1.0~dev22` and Release Candidate lifecycle identity;
+- isolated installed Python application/helper entrypoints that cannot resolve working-directory, `PYTHONPATH`, user-site or same-named-package shadowing;
+- package install/remove behavior that removes fixed private bytecode and package-owned provenance correctly;
+- rejection of dirty tracked Care source and untracked files that could enter the package;
+- deterministic same-environment packaging;
+- byte-identical package output on Ubuntu 22.04 and Ubuntu 24.04;
+- package-owned root-controlled build provenance naming exact source revision, Care source tree, runtime/package version and deterministic source timestamp;
+- immutable CI artifact evidence naming the exact RC source SHA and package SHA-256.
+
+The package SHA-256 is external acceptance evidence because embedding a package's own digest inside itself is circular.
+
+## Representative Zorin OS 17.3 exact-target acceptance
+
+The exact frozen RC source/package must then pass representative Zorin OS 17.3 target qualification.
+
+The authoritative automated runner is:
+
+```sh
+sh ./scripts/run-representative-acceptance.sh
+```
+
+Run it as the normal desktop user, not root. The runner may request `sudo` only for bounded package installation/evidence ownership operations. It must not invoke a Care cleanup action.
 
 ### Package lifecycle
 
-- clean install;
-- Development-to-RC upgrade where relevant;
-- removal and reinstall;
-- downgrade or rollback to the explicitly supported prior package state;
-- post-rollback launch and report validation;
-- package-owned helper/policy/desktop/AppStream/provenance files and directories removed or restored as expected;
-- installed application and helper launchers resolve the installed package even when invoked from a working directory containing a same-named `goreecloud_care` package;
-- private package bytecode/cache residue does not survive removal or cause cross-version execution;
-- final installed package-owned provenance exactly matches the candidate source revision, Care source tree, runtime version, and package version;
-- no user data loss beyond explicitly authorized maintenance actions.
+The exact RC package must demonstrate:
 
-The authoritative automated representative-device runner is `scripts/run-representative-acceptance.sh`. It must be run as the normal desktop user on Zorin OS 17.3. It runs source validation, deterministic package construction, same-environment reproducibility verification, accepted dev17 rollback-package preparation, and the complete install/remove/reinstall/downgrade/restore lifecycle. It does **not** invoke a Care cleanup action and does **not** grant Everkeep promotion.
+- candidate install/upgrade;
+- installed-state validation;
+- complete package removal;
+- fresh reinstall;
+- downgrade/rollback to the immutable accepted dev17 package;
+- post-rollback launch/report validation from a neutral working directory;
+- restoration to the exact RC package;
+- final installed-state validation;
+- canonical desktop/AppStream/helper/policy/icon/provenance installation;
+- application/helper working-directory shadow resistance;
+- removal of private package bytecode/provenance residue when expected;
+- final installed package-owned provenance matching the exact RC source revision, Care tree, runtime version and package version.
 
-Testing destructive flows may use disposable fixtures or purpose-created test data. Acceptance must not require deleting unrelated personal content.
+No unrelated personal content may be used as destructive test data.
 
-### Continuity / Everkeep authority boundary
+## Continuity / Everkeep authority
 
-Care is an evidence producer, not the Everkeep governance authority.
+Care produces evidence; Everkeep owns continuity governance.
 
-After exact representative-device acceptance passes, Care may create and install only its root-controlled target handoff at:
+After exact representative acceptance, Care may install only its target handoff at:
 
 `/var/lib/goreecloud-care/acceptance/representative-target.json`
 
-That Care-owned record must name the exact source revision, Care source tree, runtime/package versions, package SHA-256, representative Zorin target, local test count, and package-lifecycle result. By construction it must leave:
+That record must name the exact RC source revision, Care tree, runtime/package versions, package SHA-256, Zorin target, local test count and package-lifecycle result. It must leave both promotion booleans false.
 
-- `everkeep_integration_promoted = false`
-- `everkeep_ready_promoted = false`
+The Care target handoff alone may establish only:
 
-A Care-owned target record by itself may advance the local continuity explanation only to `attention / target-accepted-governance-pending`. It cannot make Care Everkeep-ready.
+`attention / target-accepted-governance-pending`
 
-`ready / everkeep-promoted` is allowed only when a separate root-controlled **Everkeep-owned** governance record exists at:
+`ready / everkeep-promoted` requires a separate trusted Everkeep-owned record at:
 
 `/var/lib/goreecloud/everkeep/acceptance/goreecloud-care.target-runtime.json`
 
-and that record:
+The Everkeep record must match the installed exact source/tree/runtime/package identity, Zorin OS 17.3 target and the same package SHA-256, and must explicitly promote both integration and readiness. Missing, malformed, oversized, writable, symlinked, mismatched or unpromoted evidence fails closed.
 
-- matches the installed package provenance source revision, Care source tree, runtime version, and package version;
-- names Zorin OS 17.3 as the representative target and records a passing target lifecycle;
-- has the same exact package SHA-256 as the Care-owned representative-target record;
-- explicitly promotes both Everkeep integration and Everkeep readiness;
-- is a regular root-owned file in a root-owned directory with neither file nor immediate parent group/other writable.
+## Privacy Shield exact-candidate acceptance
 
-Missing, malformed, oversized, writable, symlinked, source-mismatched, target-mismatched, package-mismatched, or unpromoted evidence fails closed. `contracts/continuity.status.schema.json` defines the machine-readable Care continuity status boundary.
+The RC must refresh Privacy Shield runtime/application acceptance for the exact RC source/package. Care remains local-first and limited to the declared `telemetry-minimization`, `data-minimization` and `privacy-status` adapter capabilities.
 
-### Core maintenance task flows
+Production approval is a separate Stable/production gate. A passing RC runtime record does not itself authorize production approval.
+
+## Wardveil exact-candidate acceptance
+
+The RC must refresh Wardveil source/target evidence for the exact source/tree/package and provide immutable RC regression evidence required by Wardveil governance.
+
+Care's local security status is evidence for the Care-owned privileged-maintenance boundary only. `protected_by_wardveil=false` remains authoritative until Wardveil explicitly promotes the exact candidate. Wardveil receives no execution authority over Care maintenance actions.
+
+## Glaze UI boundary
+
+The official Stable compatibility baseline remains:
+
+`GLAZE UI V1.2 / 1.2.0`
+
+Care may retain bounded V1.3 Adaptive Resonance preview styling, but upstream V1.3 remains Proposed and consumer-ineligible until governed otherwise. No Care source label may manufacture V1.3 Candidate/Stable status, accepted-v1, or production eligibility.
+
+Human-only visual/usability/accessibility review may remain explicitly pending at RC when permitted by the lifecycle standard; Stable still requires all applicable final Glaze/product acceptance.
+
+## Core task-flow acceptance
+
+The release scope must preserve:
 
 - scan without deletion;
-- routine selected cache/temp cleanup after explicit confirmation;
-- no-selection and stale-preview handling;
-- permanent Trash confirmation and cancellation boundary;
-- APT authorization success, cancellation, denial/failure handling;
-- file-cache reclaim warning, authorization and truthful completion language;
-- post-action refresh preserving the final operation result;
-- symlink-safe behavior and ownership boundary.
+- routine selected cache/temp cleanup only after current preview and explicit confirmation;
+- no-selection/stale-preview failure handling;
+- irreversible Trash confirmation and cancellation boundary;
+- APT PolicyKit success/cancel/denial/failure truthfulness;
+- Linux file-cache warning, PolicyKit boundary and truthful completion;
+- post-action refresh preserving the final result;
+- symlink-safe and user-ownership boundaries.
 
-### Reports and local integration API
+Automated task-flow probes may use mocks/fixtures and must remain non-destructive. Real destructive-flow testing, if release policy requires it, must use disposable data only.
 
-- `--version` and `--api-version`;
-- human and JSON report output;
-- local health output;
-- Privacy Shield status output and data minimization;
-- Wardveil-compatible security status and installed privilege-boundary verification;
-- evidence-derived Everkeep continuity status;
-- malformed/unexpected CLI combinations fail without falling through to the GUI or performing maintenance.
+## Reports and local API
 
-### Accessibility and adaptive behavior
+Qualification includes:
 
-- normal and constrained desktop layout;
-- 200% text / effective large-text layout;
-- HighContrast system palette authority;
-- visible keyboard focus;
-- complete forward and reverse keyboard traversal for core Care and Maintenance Insights;
+- `--version` / `--api-version`;
+- human and JSON reports;
+- health, Privacy Shield, Wardveil-compatible and Everkeep continuity status;
+- path/raw-error minimization;
+- malformed or conflicting CLI mode rejection;
+- no network, authentication or privileged maintenance in read-only modes.
+
+## Accessibility and adaptive behavior
+
+Automatable RC evidence includes:
+
+- constrained/enlarged-text GTK layout;
+- HighContrast authority;
+- visible focus and complete keyboard traversal;
 - no focus trap in selectable findings;
-- AT-SPI application identity, roles, names, descriptions, checked/focused state, and dynamic status state mutation;
-- Orca announcement quality for scan completion, cancellation/failure, successful completion, and Maintenance Insights status where applicable;
-- true-bottom reachability for page and findings surfaces.
+- AT-SPI application identity, roles/names/descriptions and dynamic status mutation;
+- Dark/Deep Dark command contrast;
+- Clear/Balanced/Dense clarity behavior;
+- Reduced Motion application-owned behavior;
+- true-bottom findings/page reachability.
 
-### Performance and resilience
+Final representative Orca spoken-announcement quality is a human acceptance boundary and must not be fabricated from AT-SPI event delivery alone.
 
-- continuous narrow/wide window resizing at the supported large-text condition is responsive enough for ordinary desktop use and does not freeze the UI;
-- scans and maintenance operations do not block GTK interaction for an unreasonable duration;
-- bounded Insights discovery remains bounded and discloses partial results;
-- malformed or unavailable local integration evidence fails closed rather than becoming a passing state.
+## Physical target review
 
-### Appearance and visual quality
-
-- final supported appearance matrix is explicitly documented;
-- normal, compact, enlarged-text, Light/Dark where claimed, HighContrast, Reduced Transparency, Reduced Motion, status, confirmation, failure, empty/no-findings, and privileged-action states are visually complete;
-- the current Stable **GLAZE UI V1.2 / `1.2.0`** native mapping is accepted on the target device for every Care appearance/resilience mode claimed by the release;
-- Proposed GLAZE UI V1.3 Adaptive Resonance development work may be reviewed as forward-looking evidence but cannot be represented as Candidate/Stable conformance until upstream governance activates it and Care becomes eligible;
-- the official canonical Care icon renders correctly in application/desktop surfaces;
-- the authoritative Glaze consumer registry records Care only at the state justified by product-specific evidence. Registration as `adoption-required` is not conformance; promotion requires complete exact-candidate Care acceptance.
+Physical Zorin review may remain explicitly pending at RC when lifecycle policy permits, but must be resolved before Stable wherever applicable. This includes native/compositor/window-control rendering, canonical icon optical quality and representative desktop PolicyKit-agent interaction quality.
 
 ## Stable promotion
 
-Stable promotion occurs only after the accepted RC revision/package completes final production-readiness review without a release blocker. The authoritative Care project specification, repository Platform Contract, changelog, release artifact record, and other material status locations must then be synchronized to Stable.
+Stable promotion requires the accepted immutable RC revision/package to complete production-readiness review with no release blocker. At that point the repository Platform Contract, application metadata, project specification, changelog, release artifact record and other material lifecycle records must be synchronized to Stable.
 
-Stable additionally requires the applicable current approved contracts and application-specific acceptance for:
+Stable additionally requires every applicable current Platform System acceptance, including Glaze UI, Privacy Shield, Wardveil and Everkeep. Manager, Mesh and Identity may remain `not-applicable-justified` only while the released scope genuinely remains local single-user maintenance without their authority.
 
-- GLAZE UI V1.2 / `1.2.0` (or a newer current Stable contract only if governance changes before the candidate is qualified);
-- Privacy Shield;
-- Wardveil Security;
-- Everkeep;
-- any other Platform System classified applicable for that release scope.
+## Fail-closed rule
 
-Manager, Mesh, and Identity may be `not-applicable-justified` only when the released local single-user scope genuinely does not require their runtime authority or integration. Adding remote management, cross-application coordination, accounts, delegated administration, or multi-user behavior reopens those applicability decisions.
-
-## Fail-closed promotion rule
-
-Any unresolved required gate remains a blocker. Care must not be represented as Release Candidate-complete or Stable when required evidence is missing, stale, contradictory, failed, mismatched, untrusted, or not run.
+Any unresolved required gate remains a blocker. Care must not be described as RC-complete or Stable when required evidence is absent, stale, contradictory, failed, mismatched, untrusted or not run.

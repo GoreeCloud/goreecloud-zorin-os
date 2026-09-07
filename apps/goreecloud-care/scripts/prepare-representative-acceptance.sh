@@ -8,7 +8,7 @@ EXPECTED_RUNTIME_VERSION="0.1.0-dev22"
 EXPECTED_PACKAGE_VERSION="0.1.0~dev22"
 EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 
-for command_name in git python3 sha256sum dpkg-deb tee awk rm mktemp; do
+for command_name in git python3 sha256sum dpkg-deb tee awk rm mktemp grep; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
@@ -26,7 +26,11 @@ SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)
 SOURCE_BRANCH=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || printf '%s' detached)
 RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __version__; print(__version__)')
 [ "$RUNTIME_VERSION" = "$EXPECTED_RUNTIME_VERSION" ] || {
-  echo "Representative Development harness expects runtime $EXPECTED_RUNTIME_VERSION; got $RUNTIME_VERSION" >&2
+  echo "Representative Release Candidate harness expects runtime $EXPECTED_RUNTIME_VERSION; got $RUNTIME_VERSION" >&2
+  exit 2
+}
+grep -F 'lifecycle: release-candidate' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
+  echo "Representative Release Candidate preparation requires lifecycle: release-candidate." >&2
   exit 2
 }
 
@@ -41,7 +45,7 @@ trap cleanup EXIT INT TERM
 
 mkdir -p "$OUT"
 
-printf '%s\n' "Preparing read-only/non-destructive representative acceptance evidence."
+printf '%s\n' "Preparing read-only/non-destructive Release Candidate representative acceptance evidence."
 printf '%s\n' "Source revision: $SOURCE_REVISION"
 printf '%s\n' "Source branch:   $SOURCE_BRANCH"
 printf '%s\n' "Runtime version: $RUNTIME_VERSION"
@@ -66,7 +70,7 @@ PACKAGE=$EXPECTED_PACKAGE
 }
 PACKAGE_VERSION=$(dpkg-deb -f "$PACKAGE" Version)
 [ "$PACKAGE_VERSION" = "$EXPECTED_PACKAGE_VERSION" ] || {
-  echo "Representative Development harness expects package $EXPECTED_PACKAGE_VERSION; got $PACKAGE_VERSION" >&2
+  echo "Representative Release Candidate harness expects package $EXPECTED_PACKAGE_VERSION; got $PACKAGE_VERSION" >&2
   exit 2
 }
 sha256sum "$PACKAGE" > "$OUT/package.sha256"
@@ -75,6 +79,7 @@ PACKAGE_SHA256=$(awk '{print $1}' "$OUT/package.sha256")
 cat > "$OUT/SOURCE_REVISION" <<EOF
 source_revision=$SOURCE_REVISION
 source_branch=$SOURCE_BRANCH
+lifecycle=release-candidate
 runtime_version=$RUNTIME_VERSION
 package_version=$PACKAGE_VERSION
 package_sha256=$PACKAGE_SHA256
@@ -111,12 +116,12 @@ if command -v goreecloud-care >/dev/null 2>&1; then
       printf 'api_version=not-probed-runtime-mismatch\n'
     } > "$OUT/installed-version.txt"
     printf '%s\n' \
-      "Installed Care runtime differs from the dev22 source candidate; dev22-only status snapshots were skipped." \
+      "Installed Care runtime differs from the exact RC source candidate; RC-only status snapshots were skipped." \
       > "$OUT/installed-status-snapshots-skipped.txt"
   fi
 else
   printf '%s\n' "GoreeCloud Care is not currently installed; installed read-only status snapshots were skipped." > "$OUT/installed-version.txt"
-  printf '%s\n' "No installed Care executable was found; dev22-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
+  printf '%s\n' "No installed Care executable was found; RC-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
 fi
 
 cat > "$OUT/MANUAL-CHECKLIST.txt" <<'EOF'
@@ -127,7 +132,7 @@ Record PASS or FAIL plus notes for every exercised item. A blank item is NOT acc
 Do not use unrelated personal files for destructive-flow testing; use disposable fixtures/test data.
 Do not promote lifecycle status from this checklist alone.
 
-GLAZE UI lifecycle note: Care dev22 implements the latest Proposed V1.3 Adaptive Resonance development language. V1.3 Candidate is not active and consumer eligibility is not granted upstream; GLAZE UI V1.2 / 1.2.0 remains the official Stable compatibility baseline.
+Lifecycle note: this Care source is a Release Candidate. GLAZE UI V1.3 Adaptive Resonance remains Proposed upstream and consumer eligibility is not granted; GLAZE UI V1.2 / 1.2.0 remains the official Stable compatibility baseline.
 
 A. Large text / continuous resize
 [ ] PASS [ ] FAIL  GDK_DPI_SCALE=2 Care and Maintenance Insights open in compact layouts.
@@ -159,7 +164,7 @@ D. Adaptive Resonance appearance / resilience
 [ ] PASS [ ] FAIL  Show Borders strengthens boundaries without relying on extra saturation.
 [ ] PASS [ ] FAIL  Calm / Balanced / Expressive profiles change emphasis without changing semantic correctness.
 [ ] PASS [ ] FAIL  Clear / Balanced / Dense clarity profiles remain distinct from expression and preserve target size/readability.
-[ ] PASS [ ] FAIL  Deep Dark Development override, if reviewed, is clearly treated as Development evidence and retains readable HeaderBar controls.
+[ ] PASS [ ] FAIL  Deep Dark preview override, if reviewed, is clearly treated as forward-looking preview evidence and retains readable HeaderBar controls.
 Notes:
 
 E. Visual / Glaze discipline / branding
@@ -191,10 +196,10 @@ Previous package:
 Lifecycle log/evidence:
 
 H. Platform-system acceptance
-[ ] PASS [ ] FAIL  Privacy Shield exact-candidate runtime/application review complete (production_approved must remain false until governed approval).
-[ ] PASS [ ] FAIL  Wardveil scoped adoption/runtime review complete (do not claim broad protection unless separately accepted).
-[ ] PASS [ ] FAIL  Everkeep continuity evidence is complete and provenance matches the exact candidate package.
-[ ] PASS [ ] FAIL  Proposed GLAZE UI V1.3 consumer implementation is reviewed against its pinned development source without claiming Candidate activation or consumer conformance; V1.2 remains the Stable baseline.
+[ ] PASS [ ] FAIL  Privacy Shield exact-candidate runtime/application review complete (production approval remains a separate governed gate).
+[ ] PASS [ ] FAIL  Wardveil scoped exact-RC adoption/runtime review complete (do not claim broad protection unless separately accepted).
+[ ] PASS [ ] FAIL  Everkeep exact-RC continuity evidence is complete and provenance matches the candidate package.
+[ ] PASS [ ] FAIL  Proposed GLAZE UI V1.3 preview implementation is reviewed without claiming upstream Candidate activation or consumer conformance; V1.2 remains the Stable baseline.
 Notes:
 EOF
 
@@ -211,7 +216,7 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   GTK_THEME=HighContrast goreecloud-care
   GTK_THEME=HighContrast GDK_DPI_SCALE=2 goreecloud-care --insights-ui
 
-# Explicit Development appearance/resilience probes
+# Explicit pre-release appearance/resilience probes
   GOREECLOUD_CARE_APPEARANCE=light goreecloud-care
   GOREECLOUD_CARE_APPEARANCE=dark goreecloud-care
   GOREECLOUD_CARE_APPEARANCE=deep-dark goreecloud-care
@@ -219,7 +224,7 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   GOREECLOUD_CARE_REDUCE_MOTION=1 goreecloud-care
   GOREECLOUD_CARE_SHOW_BORDERS=1 goreecloud-care
 
-# Proposed V1.3 expression and clarity are separate Development dimensions.
+# Proposed V1.3 expression and clarity remain separate preview dimensions.
   GOREECLOUD_CARE_GLAZE_EXPRESSION=calm goreecloud-care
   GOREECLOUD_CARE_GLAZE_EXPRESSION=balanced goreecloud-care
   GOREECLOUD_CARE_GLAZE_EXPRESSION=expressive goreecloud-care
@@ -244,7 +249,7 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev22_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 EOF
 
-printf '%s\n' "Representative acceptance preparation: passed"
+printf '%s\n' "Release Candidate representative acceptance preparation: passed"
 printf '%s\n' "Package: $PACKAGE_VERSION"
 printf '%s\n' "SHA-256: $PACKAGE_SHA256"
 printf '%s\n' "Manual checklist: $OUT/MANUAL-CHECKLIST.txt"

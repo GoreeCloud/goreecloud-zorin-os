@@ -54,6 +54,11 @@ RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __v
   exit 2
 }
 
+grep -F 'lifecycle: release-candidate' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
+  echo "Representative RC acceptance requires lifecycle: release-candidate in goreecloud.platform.yaml." >&2
+  exit 2
+}
+
 mkdir -p "$OUT"
 rm -f \
   "$OUT/source-validation.log" \
@@ -66,7 +71,7 @@ rm -f \
   "$OUT/continuity-installed.json" \
   "$OUT/SOURCE_REVISION"
 
-printf '%s\n' "GoreeCloud Care exact representative-target acceptance"
+printf '%s\n' "GoreeCloud Care exact Release Candidate representative-target acceptance"
 printf '%s\n' "Target:          ${PRETTY_NAME}"
 printf '%s\n' "Source branch:   $SOURCE_BRANCH"
 printf '%s\n' "Source revision: $SOURCE_REVISION"
@@ -156,6 +161,7 @@ cat > "$OUT/SOURCE_REVISION" <<EOF
 source_revision=$SOURCE_REVISION
 source_tree=$SOURCE_TREE
 source_branch=$SOURCE_BRANCH
+lifecycle=release-candidate
 runtime_version=$EXPECTED_RUNTIME_VERSION
 package_version=$EXPECTED_PACKAGE_VERSION
 package_sha256=$PACKAGE_SHA256
@@ -260,10 +266,10 @@ PY
 
 goreecloud-care --continuity-status-json > "$OUT/continuity-installed.json"
 
-printf '%s\n' "Representative target acceptance: passed"
+printf '%s\n' "Representative Release Candidate target acceptance: passed"
 printf '%s\n' "Local tests: $LOCAL_TESTS"
 printf '%s\n' "Candidate SHA-256: $PACKAGE_SHA256"
 printf '%s\n' "Care-owned target handoff: $OUT/representative-target.json"
 printf '%s\n' "Protected local target handoff: $REPRESENTATIVE_RECORD"
 printf '%s\n' "Everkeep promotion: not performed by this runner"
-printf '%s\n' "The exact candidate remains Development until separate governance, platform, human, and release-lifecycle gates are satisfied."
+printf '%s\n' "The exact source remains Release Candidate / nonconformant until separate platform governance, human-only review where applicable, immutable release evidence, and Stable production gates are satisfied."

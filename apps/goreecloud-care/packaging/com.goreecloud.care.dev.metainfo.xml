@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.goreecloud.care.dev</id>
-  <name>GoreeCloud Care (Development)</name>
+  <id>com.goreecloud.care</id>
+  <name>GoreeCloud Care (Release Candidate)</name>
   <summary>Local-first maintenance utility for GoreeCloud Linux systems</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <description><p>Preview and clean stale user cache, thumbnails, temporary files and Trash, with separately authorized package-cache and Linux file-cache maintenance, privacy-safe read-only reports, bounded local Maintenance Insights review, minimized local platform-status output, and a Development implementation of the latest Proposed GLAZE UI V1.3 Adaptive Resonance design language.</p></description>
-  <launchable type="desktop-id">com.goreecloud.care.dev.desktop</launchable>
+  <description><p>Preview and clean stale user cache, thumbnails, temporary files and Trash, with separately authorized package-cache and Linux file-cache maintenance, privacy-safe read-only reports, bounded local Maintenance Insights review, minimized local platform-status output, and a Release Candidate implementation compatible with the current Stable GLAZE UI V1.2 baseline while retaining bounded V1.3 Adaptive Resonance preview styling.</p></description>
+  <launchable type="desktop-id">com.goreecloud.care.desktop</launchable>
   <icon type="stock">com.goreecloud.care</icon>
   <releases>
     <release version="0.1.0-dev22" date="2026-09-07" type="development"/>

@@ -18,7 +18,7 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
 
     def test_preparation_harness_is_non_destructive_and_unprivileged(self) -> None:
         self.assertIn(
-            "read-only/non-destructive representative acceptance evidence",
+            "read-only/non-destructive Release Candidate representative acceptance evidence",
             self.source,
         )
         self.assertIn(
@@ -39,11 +39,13 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertNotIn("goreecloud-care --empty-trash", self.source)
         self.assertNotIn("goreecloud-care --reclaim", self.source)
 
-    def test_preparation_harness_requires_clean_exact_source(self) -> None:
+    def test_preparation_harness_requires_clean_exact_rc_source(self) -> None:
         self.assertIn('git -C "$REPO_ROOT" status --porcelain --untracked-files=no', self.source)
         self.assertIn("Tracked working-tree changes are present", self.source)
         self.assertIn('git -C "$REPO_ROOT" rev-parse HEAD', self.source)
         self.assertIn('source_branch=$SOURCE_BRANCH', self.source)
+        self.assertIn("Representative Release Candidate preparation requires lifecycle: release-candidate", self.source)
+        self.assertIn("lifecycle=release-candidate", self.source)
 
     def test_preparation_harness_records_exact_source_and_package_provenance(self) -> None:
         self.assertIn('EXPECTED_RUNTIME_VERSION="0.1.0-dev22"', self.source)
@@ -65,7 +67,7 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertNotIn('find "$ROOT/dist"', self.source)
         self.assertNotIn("sort | tail", self.source)
 
-    def test_preparation_harness_gates_dev22_status_probes_on_installed_runtime(self) -> None:
+    def test_preparation_harness_gates_rc_status_probes_on_installed_runtime(self) -> None:
         self.assertIn('INSTALLED_PROBE_DIR=$(mktemp -d)', self.source)
         self.assertIn(
             'INSTALLED_RUNTIME=$(cd "$INSTALLED_PROBE_DIR" && goreecloud-care --version 2>/dev/null || true)',
@@ -77,7 +79,7 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         )
         self.assertIn("api_version=not-probed-runtime-mismatch", self.source)
         self.assertIn(
-            "Installed Care runtime differs from the dev22 source candidate; dev22-only status snapshots were skipped.",
+            "Installed Care runtime differs from the exact RC source candidate; RC-only status snapshots were skipped.",
             self.source,
         )
         self.assertIn("installed-status-snapshots-skipped.txt", self.source)
@@ -125,11 +127,16 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
             "Package lifecycle / continuity",
             "cannot be shadowed by the source working directory",
             "build-dev17-rollback-package.sh",
-            "Proposed GLAZE UI V1.3 consumer implementation",
+            "Proposed GLAZE UI V1.3 preview implementation",
             "V1.2 remains the Stable baseline",
             "No manual item is accepted until a representative-device result is explicitly recorded.",
         ):
             self.assertIn(required, self.source)
+
+    def test_preparation_harness_does_not_regress_to_development_lifecycle(self) -> None:
+        self.assertIn("Release Candidate representative acceptance preparation: passed", self.source)
+        self.assertNotIn("Representative Development harness expects", self.source)
+        self.assertNotIn("dev22-only status snapshots", self.source)
 
 
 if __name__ == "__main__":

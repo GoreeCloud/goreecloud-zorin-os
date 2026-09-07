@@ -22,12 +22,14 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
         self.assertIn('Zorin OS 17.3', self.source)
         self.assertIn('PRETTY_NAME', self.source)
 
-    def test_runner_requires_clean_exact_source_and_tree(self) -> None:
+    def test_runner_requires_clean_exact_rc_source_and_tree(self) -> None:
         self.assertIn('status --porcelain --untracked-files=no -- apps/goreecloud-care .github/workflows/care-ci.yml', self.source)
         self.assertIn('SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)', self.source)
         self.assertIn('SOURCE_TREE=$(git -C "$REPO_ROOT" rev-parse HEAD:apps/goreecloud-care)', self.source)
         self.assertIn('source_revision=$SOURCE_REVISION', self.source)
         self.assertIn('source_tree=$SOURCE_TREE', self.source)
+        self.assertIn('lifecycle=release-candidate', self.source)
+        self.assertIn('Representative RC acceptance requires lifecycle: release-candidate', self.source)
 
     def test_runner_executes_all_automatable_exact_candidate_gates(self) -> None:
         for required in (
@@ -77,6 +79,12 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
         self.assertIn('assert payload["state"] == "attention"', self.source)
         self.assertIn('assert payload["stage"] == "target-accepted-governance-pending"', self.source)
         self.assertIn('Everkeep promotion: not performed by this runner', self.source)
+
+    def test_runner_reports_rc_target_acceptance_without_stable_claim(self) -> None:
+        self.assertIn("Representative Release Candidate target acceptance: passed", self.source)
+        self.assertIn("remains Release Candidate / nonconformant", self.source)
+        self.assertNotIn("remains Development", self.source)
+        self.assertNotIn("Stable / conformant", self.source)
 
     def test_runner_never_invokes_care_cleanup_actions(self) -> None:
         for forbidden in (

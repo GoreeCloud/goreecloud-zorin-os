@@ -19,7 +19,7 @@ from .ui_contract import (
     is_compact_width,
 )
 
-APP_ID = "com.goreecloud.care.dev.insights"
+APP_ID = "com.goreecloud.care.insights"
 RESULTS_MIN_HEIGHT = 320
 REGULAR_SPACING = 12
 COMPACT_SPACING = 8
@@ -27,7 +27,7 @@ RESULTS_MARGIN = 12
 
 
 class InsightsWindow(Gtk.ApplicationWindow):
-    """Read-only maintenance review surface using the V1.3 Development mapping."""
+    """Read-only Release Candidate maintenance review surface."""
 
     def __init__(self, app: Gtk.Application) -> None:
         super().__init__(application=app, title="GoreeCloud Care — Maintenance Insights")
@@ -35,7 +35,7 @@ class InsightsWindow(Gtk.ApplicationWindow):
         self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         self._compact_layout: bool | None = None
 
-        self.header_subtitle = "Development • read-only local review"
+        self.header_subtitle = "Release Candidate • read-only local review"
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
         self.header.props.title = "Maintenance Insights"
