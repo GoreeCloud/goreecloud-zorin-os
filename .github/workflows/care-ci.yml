@@ -48,6 +48,9 @@ jobs:
       - name: Run headless GTK runtime acceptance
         run: xvfb-run -a env GDK_DPI_SCALE=2 python3 tests/runtime_ui_acceptance.py
 
+      - name: Run headless safe task-flow acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 python3 tests/runtime_task_flow_acceptance.py
+
       - name: Run live AT-SPI dynamic status acceptance
         run: |
           dbus-run-session -- xvfb-run -a bash -euc '
