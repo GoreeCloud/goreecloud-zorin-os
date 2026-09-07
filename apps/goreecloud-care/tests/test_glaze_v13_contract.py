@@ -66,6 +66,19 @@ class GlazeV13ContractTests(unittest.TestCase):
         self.assertNotIn("transition:", text)
         self.assertNotIn("animation:", text)
 
+    def test_dark_headerbar_controls_have_explicit_contrast(self) -> None:
+        text = CSS.decode("utf-8")
+        for selector in (
+            "window.care-shell.care-dark headerbar button",
+            "window.care-shell.care-deep-dark headerbar button",
+        ):
+            self.assertIn(selector, text)
+        self.assertIn("background: #34383f;", text)
+        self.assertIn("background: #272a2f;", text)
+        self.assertIn("color: #f7f8fa;", text)
+        self.assertIn("border-color: rgba(255, 255, 255, 0.20);", text)
+        self.assertIn("background-image: none;", text)
+
     def test_accessibility_degradation_is_explicit(self) -> None:
         self.assertTrue(reduced_transparency_requested("1"))
         self.assertTrue(reduced_motion_requested(False, value="0"))
@@ -110,6 +123,8 @@ class GlazeV13ContractTests(unittest.TestCase):
         self.assertIn("window {\n  background: #17191c", data)
         self.assertIn("window .hero-surface", data)
         self.assertIn("window .maintenance-row", data)
+        self.assertIn("window headerbar button", data)
+        self.assertIn("background: #34383f;", data)
 
     def test_development_environment_names_are_product_scoped(self) -> None:
         for name in (
