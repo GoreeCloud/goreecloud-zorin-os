@@ -7,6 +7,18 @@ usage() {
 }
 
 [ "$#" -eq 2 ] || usage
+[ "$(id -u)" -ne 0 ] || {
+  echo "Run this acceptance probe as the representative desktop user, not as root. The script requests sudo only for apt package operations." >&2
+  exit 2
+}
+
+for command_name in sudo apt dpkg dpkg-deb dpkg-query python3 grep sed; do
+  command -v "$command_name" >/dev/null || {
+    echo "Required command not found: $command_name" >&2
+    exit 2
+  }
+done
+
 CANDIDATE=$1
 PREVIOUS=$2
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -22,6 +34,10 @@ previous_name=$(dpkg-deb -f "$PREVIOUS" Package)
 candidate_version=$(dpkg-deb -f "$CANDIDATE" Version)
 previous_version=$(dpkg-deb -f "$PREVIOUS" Version)
 [ "$candidate_version" != "$previous_version" ]
+dpkg --compare-versions "$previous_version" lt "$candidate_version" || {
+  echo "Previous package must sort older than the candidate: previous=$previous_version candidate=$candidate_version" >&2
+  exit 2
+}
 
 candidate_runtime=$(printf '%s' "$candidate_version" | sed 's/~/-/')
 previous_runtime=$(printf '%s' "$previous_version" | sed 's/~/-/')
@@ -34,6 +50,7 @@ esac
 printf '%s\n' "Package lifecycle acceptance will temporarily remove and downgrade GoreeCloud Care."
 printf '%s\n' "Candidate: $candidate_version"
 printf '%s\n' "Previous:  $previous_version"
+printf '%s\n' "Representative user: $(id -un) (uid $(id -u))"
 printf '%s\n' "No Care-owned user data is expected to be removed; this script does not invoke Care cleanup actions."
 printf '%s\n' "Administrator authentication may be requested by apt."
 
@@ -69,7 +86,7 @@ for path in \
   [ ! -e "$path" ] || { echo "Package-owned path remained after removal: $path" >&2; exit 1; }
 done
 
-printf '%s\n' "[3/6] Reinstall candidate"
+printf '%s\n' "[3/6] Reinstall candidate as a fresh package state"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
@@ -85,3 +102,4 @@ sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtim
 printf '%s\n' "[6/6] Final package state"
 assert_version "$candidate_version" "$candidate_runtime"
 printf '%s\n' "Representative package install/remove/reinstall/downgrade/rollback acceptance: passed"
+printf '%s\n' "The candidate is installed at the end of the probe; no Care cleanup action was invoked."
