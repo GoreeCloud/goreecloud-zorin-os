@@ -5,20 +5,34 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 OUT=${1:-"$ROOT/dist/representative-acceptance"}
 
-for command_name in git python3 sha256sum dpkg-deb; do
+for command_name in git python3 sha256sum dpkg-deb tee find sort tail awk; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
   }
 done
 
-mkdir -p "$OUT"
+TRACKED_CHANGES=$(git -C "$REPO_ROOT" status --porcelain --untracked-files=no)
+[ -z "$TRACKED_CHANGES" ] || {
+  echo "Tracked working-tree changes are present. Commit/stash them before preparing exact-source acceptance evidence." >&2
+  printf '%s\n' "$TRACKED_CHANGES" >&2
+  exit 2
+}
+
 SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)
+SOURCE_BRANCH=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || printf '%s' detached)
 RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __version__; print(__version__)')
+[ "$RUNTIME_VERSION" = "0.1.0-dev18" ] || {
+  echo "Representative Development harness expects runtime 0.1.0-dev18; got $RUNTIME_VERSION" >&2
+  exit 2
+}
+
+mkdir -p "$OUT"
 
 printf '%s\n' "Preparing read-only/non-destructive representative acceptance evidence."
 printf '%s\n' "Source revision: $SOURCE_REVISION"
-printf '%s\n' "Runtime version:  $RUNTIME_VERSION"
+printf '%s\n' "Source branch:   $SOURCE_BRANCH"
+printf '%s\n' "Runtime version: $RUNTIME_VERSION"
 printf '%s\n' "Output directory: $OUT"
 printf '%s\n' "This preparation harness does not invoke Care cleanup, PolicyKit, pkexec, sudo, apt, or network operations."
 
@@ -38,11 +52,16 @@ PACKAGE=$(find "$ROOT/dist" -maxdepth 1 -type f -name 'goreecloud-care_*_all.deb
   exit 1
 }
 PACKAGE_VERSION=$(dpkg-deb -f "$PACKAGE" Version)
+[ "$PACKAGE_VERSION" = "0.1.0~dev18" ] || {
+  echo "Representative Development harness expects package 0.1.0~dev18; got $PACKAGE_VERSION" >&2
+  exit 2
+}
 sha256sum "$PACKAGE" > "$OUT/package.sha256"
 PACKAGE_SHA256=$(awk '{print $1}' "$OUT/package.sha256")
 
 cat > "$OUT/SOURCE_REVISION" <<EOF
 source_revision=$SOURCE_REVISION
+source_branch=$SOURCE_BRANCH
 runtime_version=$RUNTIME_VERSION
 package_version=$PACKAGE_VERSION
 package_sha256=$PACKAGE_SHA256
@@ -136,7 +155,6 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
 # Run one mode at a time from the representative desktop session.
 
 # Normal Care
-GoreeCloud Care:
   goreecloud-care
 
 # Maintenance Insights at the large-text acceptance condition
