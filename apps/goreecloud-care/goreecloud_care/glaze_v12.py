@@ -181,9 +181,10 @@ def appearance_from_theme(
     if normalized_override in {"light", "dark", "deep-dark"}:
         return normalized_override
 
-    effective_theme = gtk_theme_override
-    if effective_theme is None:
+    if gtk_theme_override is None:
         effective_theme = os.environ.get("GTK_THEME") or theme_name or ""
+    else:
+        effective_theme = gtk_theme_override or theme_name or ""
     normalized_theme = effective_theme.lower().replace("_", "-")
     return "dark" if "dark" in normalized_theme else "light"
 
