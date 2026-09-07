@@ -8,7 +8,7 @@ EXPECTED_RUNTIME_VERSION="0.1.0-dev18"
 EXPECTED_PACKAGE_VERSION="0.1.0~dev18"
 EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 
-for command_name in git python3 sha256sum dpkg-deb tee awk; do
+for command_name in git python3 sha256sum dpkg-deb tee awk rm; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
@@ -70,21 +70,43 @@ package_version=$PACKAGE_VERSION
 package_sha256=$PACKAGE_SHA256
 EOF
 
-if command -v goreecloud-care >/dev/null 2>&1; then
-  {
-    printf 'installed_version='
-    goreecloud-care --version
-    printf 'api_version='
-    goreecloud-care --api-version
-  } > "$OUT/installed-version.txt"
+# Remove only previously generated read-only snapshot files so a rerun cannot
+# accidentally preserve stale evidence from another installed Care version.
+rm -f \
+  "$OUT/report.json" \
+  "$OUT/health.json" \
+  "$OUT/privacy-status.json" \
+  "$OUT/security-status.json" \
+  "$OUT/continuity-status.json" \
+  "$OUT/installed-status-snapshots-skipped.txt"
 
-  goreecloud-care --report-json > "$OUT/report.json"
-  goreecloud-care --health-json > "$OUT/health.json"
-  goreecloud-care --privacy-status-json > "$OUT/privacy-status.json"
-  goreecloud-care --security-status-json > "$OUT/security-status.json"
-  goreecloud-care --continuity-status-json > "$OUT/continuity-status.json"
+if command -v goreecloud-care >/dev/null 2>&1; then
+  INSTALLED_RUNTIME=$(goreecloud-care --version 2>/dev/null || true)
+  if [ "$INSTALLED_RUNTIME" = "$EXPECTED_RUNTIME_VERSION" ]; then
+    {
+      printf 'installed_version=%s\n' "$INSTALLED_RUNTIME"
+      printf 'api_version='
+      goreecloud-care --api-version
+    } > "$OUT/installed-version.txt"
+
+    goreecloud-care --report-json > "$OUT/report.json"
+    goreecloud-care --health-json > "$OUT/health.json"
+    goreecloud-care --privacy-status-json > "$OUT/privacy-status.json"
+    goreecloud-care --security-status-json > "$OUT/security-status.json"
+    goreecloud-care --continuity-status-json > "$OUT/continuity-status.json"
+  else
+    {
+      printf 'installed_version=%s\n' "$INSTALLED_RUNTIME"
+      printf 'expected_runtime=%s\n' "$EXPECTED_RUNTIME_VERSION"
+      printf 'api_version=not-probed-runtime-mismatch\n'
+    } > "$OUT/installed-version.txt"
+    printf '%s\n' \
+      "Installed Care runtime differs from the dev18 source candidate; dev18-only status snapshots were skipped." \
+      > "$OUT/installed-status-snapshots-skipped.txt"
+  fi
 else
   printf '%s\n' "GoreeCloud Care is not currently installed; installed read-only status snapshots were skipped." > "$OUT/installed-version.txt"
+  printf '%s\n' "No installed Care executable was found; dev18-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
 fi
 
 cat > "$OUT/MANUAL-CHECKLIST.txt" <<'EOF'
