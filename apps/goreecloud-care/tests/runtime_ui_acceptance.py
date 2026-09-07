@@ -57,12 +57,17 @@ def test_core_status_accessible_mutation_and_layout(app: Gtk.Application) -> Non
 
     window._apply_layout(480)
     assert window._layout_environment == "compact"
+    assert window.header.get_title() == "Care"
+    assert window.header.get_subtitle() is None
     assert window.workspace.get_orientation() == Gtk.Orientation.VERTICAL
     window._apply_layout(1800)
     assert window._layout_environment == "medium"
+    assert window.header.get_title() == "GoreeCloud Care"
+    assert window.header.get_subtitle() == window.header_subtitle
     assert window.workspace.get_orientation() == Gtk.Orientation.VERTICAL
     window._apply_layout(2200)
     assert window._layout_environment == "expanded"
+    assert window.header.get_title() == "GoreeCloud Care"
     assert window.workspace.get_orientation() == Gtk.Orientation.HORIZONTAL
     window.destroy()
 
