@@ -18,6 +18,9 @@ from goreecloud_care.platform_status import (
 
 
 NOW = datetime(2026, 9, 6, 18, 30, tzinfo=timezone.utc)
+SOURCE_REVISION = "a" * 40
+SOURCE_TREE = "b" * 40
+PACKAGE_SHA256 = "c" * 64
 
 
 class PlatformStatusTests(unittest.TestCase):
@@ -113,8 +116,6 @@ class PlatformStatusTests(unittest.TestCase):
                 expected_uid=os.geteuid(),
             )
 
-            # State, source state and summary are explicit text semantics; no
-            # consumer needs color or iconography to understand the record.
             self.assertIsInstance(payload["state"], str)
             self.assertIsInstance(payload["source_state"], str)
             self.assertTrue(payload["evidence"]["summary"])
@@ -164,21 +165,206 @@ class PlatformStatusTests(unittest.TestCase):
             )
             self.assertFalse(checks["helper_root_owned_nonwritable"])
 
-    def test_continuity_status_is_non_ready_until_rollback_is_verified(self):
-        pending = build_continuity_status(NOW)
-        self.assertEqual(pending["state"], "attention")
-        self.assertTrue(pending["required_evidence"])
-        self.assertNotIn("fresh_until", pending)
-        self.assertIn("rollback", pending["reason"].lower())
+    def _write_secure_json(self, path: Path, payload: dict) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.parent.chmod(0o755)
+        path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        path.chmod(0o644)
 
-        ready = build_continuity_status(
-            NOW,
-            rollback_verified=True,
-            evidence_reference="evidence://care/rollback/accepted",
+    def _build_provenance(self) -> dict:
+        return {
+            "schema_version": 1,
+            "application": "GoreeCloud Care",
+            "producer": "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care",
+            "source_revision": SOURCE_REVISION,
+            "source_tree": SOURCE_TREE,
+            "runtime_version": "0.1.0-dev22",
+            "package_version": "0.1.0~dev22",
+            "source_date_epoch": 1_788_800_000,
+            "package_sha256_embedded": False,
+        }
+
+    def _acceptance_record(
+        self,
+        *,
+        package_sha256: str = PACKAGE_SHA256,
+        source_revision: str = SOURCE_REVISION,
+        promoted: bool = False,
+    ) -> dict:
+        return {
+            "schema_version": 1,
+            "application": "GoreeCloud Care",
+            "producer": "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care",
+            "candidate": {
+                "source_revision": source_revision,
+                "source_tree": SOURCE_TREE,
+                "runtime_version": "0.1.0-dev22",
+                "package_version": "0.1.0~dev22",
+                "package_sha256": package_sha256,
+            },
+            "target": {
+                "name": "Zorin OS 17.3 representative laptop",
+                "representative": True,
+                "status": "passed",
+            },
+            "dimensions": [
+                "restore_capability",
+                "migration",
+                "documentation",
+                "provenance",
+            ],
+            "evidence": {
+                "local_tests": 110,
+                "source_validation": "passed",
+                "package_lifecycle": "passed",
+                "references": ["representative acceptance fixture"],
+            },
+            "acceptance": {
+                "target_runtime_status": "passed",
+                "exact_revision_accepted": True,
+                "everkeep_integration_promoted": promoted,
+                "everkeep_ready_promoted": promoted,
+                "freshness_rule": "Exact source, source tree, package version, package SHA-256, and target only.",
+            },
+        }
+
+    def _continuity_paths(self, root: Path) -> tuple[Path, Path, Path]:
+        return (
+            root / "package" / "build-provenance.json",
+            root / "representative" / "representative-target.json",
+            root / "everkeep" / "goreecloud-care.target-runtime.json",
         )
-        self.assertEqual(ready["state"], "ready")
-        self.assertIn("fresh_until", ready)
-        self.assertEqual(ready["evidence_reference"], "evidence://care/rollback/accepted")
+
+    def test_continuity_requires_exact_representative_target_acceptance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            provenance, representative, everkeep = self._continuity_paths(root)
+            self._write_secure_json(provenance, self._build_provenance())
+
+            payload = build_continuity_status(
+                NOW,
+                provenance_path=provenance,
+                representative_acceptance_path=representative,
+                everkeep_acceptance_path=everkeep,
+                expected_uid=os.geteuid(),
+            )
+            self.assertEqual(payload["state"], "attention")
+            self.assertEqual(payload["stage"], "target-acceptance-required")
+            self.assertTrue(payload["required_evidence"])
+            self.assertNotIn("freshness", payload)
+            self.assertIn("rollback", payload["reason"].lower())
+
+    def test_care_target_acceptance_cannot_self_promote_everkeep(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            provenance, representative, everkeep = self._continuity_paths(root)
+            self._write_secure_json(provenance, self._build_provenance())
+            self._write_secure_json(representative, self._acceptance_record())
+
+            payload = build_continuity_status(
+                NOW,
+                provenance_path=provenance,
+                representative_acceptance_path=representative,
+                everkeep_acceptance_path=everkeep,
+                expected_uid=os.geteuid(),
+            )
+            self.assertEqual(payload["state"], "attention")
+            self.assertEqual(payload["stage"], "target-accepted-governance-pending")
+            self.assertIn("cannot grant Everkeep readiness", payload["limitations"][0])
+            self.assertEqual(payload["evidence_reference"], f"file://{representative}")
+
+    def test_continuity_ready_requires_separate_promoted_everkeep_record(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            provenance, representative, everkeep = self._continuity_paths(root)
+            self._write_secure_json(provenance, self._build_provenance())
+            self._write_secure_json(representative, self._acceptance_record())
+            self._write_secure_json(everkeep, self._acceptance_record(promoted=True))
+
+            payload = build_continuity_status(
+                NOW,
+                provenance_path=provenance,
+                representative_acceptance_path=representative,
+                everkeep_acceptance_path=everkeep,
+                expected_uid=os.geteuid(),
+            )
+            self.assertEqual(payload["state"], "ready")
+            self.assertEqual(payload["stage"], "everkeep-promoted")
+            self.assertEqual(payload["freshness"], "exact-build-bound")
+            self.assertEqual(payload["limitations"], [])
+            self.assertEqual(payload["evidence_reference"], f"file://{everkeep}")
+
+    def test_continuity_rejects_promoted_record_with_different_package_sha(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            provenance, representative, everkeep = self._continuity_paths(root)
+            self._write_secure_json(provenance, self._build_provenance())
+            self._write_secure_json(representative, self._acceptance_record())
+            self._write_secure_json(
+                everkeep,
+                self._acceptance_record(package_sha256="d" * 64, promoted=True),
+            )
+
+            payload = build_continuity_status(
+                NOW,
+                provenance_path=provenance,
+                representative_acceptance_path=representative,
+                everkeep_acceptance_path=everkeep,
+                expected_uid=os.geteuid(),
+            )
+            self.assertEqual(payload["state"], "attention")
+            self.assertEqual(payload["stage"], "target-accepted-governance-pending")
+            self.assertIn("package SHA-256", payload["limitations"][0])
+
+    def test_continuity_rejects_source_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            provenance, representative, everkeep = self._continuity_paths(root)
+            self._write_secure_json(provenance, self._build_provenance())
+            self._write_secure_json(
+                representative,
+                self._acceptance_record(source_revision="e" * 40),
+            )
+
+            payload = build_continuity_status(
+                NOW,
+                provenance_path=provenance,
+                representative_acceptance_path=representative,
+                everkeep_acceptance_path=everkeep,
+                expected_uid=os.geteuid(),
+            )
+            self.assertEqual(payload["state"], "attention")
+            self.assertEqual(payload["stage"], "target-acceptance-required")
+
+    def test_continuity_rejects_writable_or_malformed_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            provenance, representative, everkeep = self._continuity_paths(root)
+            self._write_secure_json(provenance, self._build_provenance())
+            self._write_secure_json(representative, self._acceptance_record())
+            representative.chmod(0o666)
+
+            writable = build_continuity_status(
+                NOW,
+                provenance_path=provenance,
+                representative_acceptance_path=representative,
+                everkeep_acceptance_path=everkeep,
+                expected_uid=os.geteuid(),
+            )
+            self.assertEqual(writable["state"], "attention")
+            self.assertEqual(writable["stage"], "target-acceptance-required")
+
+            representative.write_text("{not-json\n", encoding="utf-8")
+            representative.chmod(0o644)
+            malformed = build_continuity_status(
+                NOW,
+                provenance_path=provenance,
+                representative_acceptance_path=representative,
+                everkeep_acceptance_path=everkeep,
+                expected_uid=os.geteuid(),
+            )
+            self.assertEqual(malformed["state"], "attention")
+            self.assertEqual(malformed["stage"], "target-acceptance-required")
 
     def test_render_json_is_machine_readable(self):
         payload = build_health_status(NOW)
