@@ -9,7 +9,7 @@ ARCH="all"
 PKG="goreecloud-care"
 OUT=${1:-"$ROOT/dist"}
 
-for command_name in git python3 dpkg-deb find touch install mktemp grep; do
+for command_name in git python3 dpkg-deb find touch install mktemp grep chmod; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
@@ -113,6 +113,7 @@ Homepage: https://goreecloud.com/
 Description: GoreeCloud Care Development maintenance utility
  Local-first GTK maintenance utility for Zorin OS and compatible Linux systems.
 CONTROL
+chmod 0644 "$STAGE/DEBIAN/control"
 install -m 0755 "$ROOT/packaging/postinst" "$STAGE/DEBIAN/postinst"
 install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"
 install -m 0755 "$ROOT/packaging/goreecloud-care" "$STAGE/usr/bin/goreecloud-care"
@@ -128,6 +129,7 @@ install -m 0644 "$ROOT/WARDVEIL-INTEGRATION.md" "$STAGE/usr/share/doc/goreecloud
 cat > "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth" <<'PTH'
 /usr/lib/goreecloud-care
 PTH
+chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"
 mkdir -p "$STAGE/usr/lib/python3/dist-packages"
 install -m 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth" "$STAGE/usr/lib/python3/dist-packages/goreecloud_care.pth"
 
@@ -156,6 +158,11 @@ payload = {
 Path(out).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 PY
 chmod 0644 "$STAGE/usr/share/goreecloud-care/build-provenance.json"
+
+# Caller umask is not part of package identity or the installed trust boundary.
+# mkdir and generated files otherwise inherit it, which can change package bytes
+# and can make the provenance parent directory group-writable on a developer host.
+find "$STAGE" -type d -exec chmod 0755 {} +
 
 # Normalize every staged filesystem timestamp before dpkg-deb sees it. Explicit
 # format 2.0 plus -Znone removes xz/zstd/gzip implementation differences from
