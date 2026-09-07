@@ -96,7 +96,6 @@ class InsightsWindow(Gtk.ApplicationWindow):
         self.intro = Gtk.Label(xalign=0)
         self.intro.set_line_wrap(True)
         self.intro.set_markup(self.intro_regular_markup)
-        self.intro.get_style_context().add_class("hero-mark")
         summary_box.pack_start(self.intro, False, False, 0)
 
         self.privacy_regular_text = (
