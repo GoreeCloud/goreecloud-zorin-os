@@ -41,9 +41,11 @@
   "sensitive_evidence": {
     "forbidden": [
       "passwords",
+      "tokens",
       "authentication tokens",
       "private keys",
       "recovery codes",
+      "secret values",
       "PolicyKit authentication material",
       "raw private file contents",
       "unredacted home-directory inventory",
