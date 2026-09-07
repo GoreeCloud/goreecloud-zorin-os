@@ -4,8 +4,11 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 OUT=${1:-"$ROOT/dist/representative-acceptance"}
+EXPECTED_RUNTIME_VERSION="0.1.0-dev18"
+EXPECTED_PACKAGE_VERSION="0.1.0~dev18"
+EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 
-for command_name in git python3 sha256sum dpkg-deb tee find sort tail awk; do
+for command_name in git python3 sha256sum dpkg-deb tee awk; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
@@ -22,8 +25,8 @@ TRACKED_CHANGES=$(git -C "$REPO_ROOT" status --porcelain --untracked-files=no)
 SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)
 SOURCE_BRANCH=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || printf '%s' detached)
 RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __version__; print(__version__)')
-[ "$RUNTIME_VERSION" = "0.1.0-dev18" ] || {
-  echo "Representative Development harness expects runtime 0.1.0-dev18; got $RUNTIME_VERSION" >&2
+[ "$RUNTIME_VERSION" = "$EXPECTED_RUNTIME_VERSION" ] || {
+  echo "Representative Development harness expects runtime $EXPECTED_RUNTIME_VERSION; got $RUNTIME_VERSION" >&2
   exit 2
 }
 
@@ -46,14 +49,14 @@ printf '%s\n' "This preparation harness does not invoke Care cleanup, PolicyKit,
   sh ./scripts/build-deb.sh dist
 ) 2>&1 | tee "$OUT/package-build.log"
 
-PACKAGE=$(find "$ROOT/dist" -maxdepth 1 -type f -name 'goreecloud-care_*_all.deb' -print | sort | tail -n 1)
-[ -n "$PACKAGE" ] && [ -f "$PACKAGE" ] || {
-  echo "Built package not found" >&2
+PACKAGE=$EXPECTED_PACKAGE
+[ -f "$PACKAGE" ] || {
+  echo "Expected built package not found: $PACKAGE" >&2
   exit 1
 }
 PACKAGE_VERSION=$(dpkg-deb -f "$PACKAGE" Version)
-[ "$PACKAGE_VERSION" = "0.1.0~dev18" ] || {
-  echo "Representative Development harness expects package 0.1.0~dev18; got $PACKAGE_VERSION" >&2
+[ "$PACKAGE_VERSION" = "$EXPECTED_PACKAGE_VERSION" ] || {
+  echo "Representative Development harness expects package $EXPECTED_PACKAGE_VERSION; got $PACKAGE_VERSION" >&2
   exit 2
 }
 sha256sum "$PACKAGE" > "$OUT/package.sha256"
