@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 lifecycle: development
-version: 0.1.0-dev19
+version: 0.1.0-dev20
 
 supported_platforms:
   - linux
@@ -54,7 +54,7 @@ platform_systems:
       - tests/test_reporting.py
       - tests/test_insights.py
       - https://github.com/GoreeCloud/goreecloud-privacy-shield/pull/74
-    notes: Dev18 introduced explicit local-only Privacy Shield application and adapter declarations plus minimized status output for telemetry-minimization, data-minimization, and privacy-status. Dev19 preserves those fail-closed boundaries while hardening installed Python launcher isolation. The authoritative Privacy Shield adapter registration is proposed in Draft PR 74 and preserves runtime_acceptance_required=true and production_approved=false. Exact-candidate runtime/application acceptance remains required.
+    notes: Dev18 introduced explicit local-only Privacy Shield application and adapter declarations plus minimized status output for telemetry-minimization, data-minimization, and privacy-status. Dev19 hardened installed Python launcher isolation and dev20 preserves those fail-closed boundaries while revamping the interface. The authoritative Privacy Shield adapter registration is proposed in Draft PR 74 and preserves runtime_acceptance_required=true and production_approved=false. Exact-candidate runtime/application acceptance remains required.
   wardveil_security:
     result: applicable-blocked
     version: null
@@ -70,7 +70,7 @@ platform_systems:
       - tests/test_helper.py
       - tests/test_privilege.py
       - tests/test_packaging_launchers.py
-    notes: Dev19 strengthens the fail-closed Wardveil-compatible Care privilege boundary by launching both the normal application and the PolicyKit helper with isolated Python path semantics and by preventing/removing private runtime bytecode residue. protected_by_wardveil remains false; no broad Wardveil protection claim or cross-service execution authority is inferred. Exact-candidate source evidence, target-device runtime evidence, and Wardveil adoption acceptance remain required.
+    notes: Dev19 strengthened the fail-closed Wardveil-compatible Care privilege boundary by launching both the normal application and the PolicyKit helper with isolated Python path semantics and by preventing/removing private runtime bytecode residue. Dev20 retains that exact security boundary. protected_by_wardveil remains false; no broad Wardveil protection claim or cross-service execution authority is inferred. Exact-candidate source evidence, target-device runtime evidence, and Wardveil adoption acceptance remain required.
   everkeep:
     result: applicable-blocked
     version: null
@@ -85,7 +85,7 @@ platform_systems:
       - scripts/validate-installed.sh
       - scripts/validate-package-lifecycle.sh
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5564137242
-    notes: Care persists no substantial durable application-owned user dataset. Dev18 declared read-only fail-closed Everkeep adoption and an exact-candidate acceptance policy for restore capability, migration, documentation, and provenance. The representative dev18 lifecycle run failed after downgrade because the installed launcher resolved the dev18 working-tree package instead of the installed dev17 package. Dev19 remediates that package/runtime isolation defect; Everkeep remains non-ready until the full representative install/remove/reinstall/downgrade/restore probe passes for the immutable dev19 candidate package and checksum.
+    notes: Care persists no substantial durable application-owned user dataset. Dev18 declared read-only fail-closed Everkeep adoption and an exact-candidate acceptance policy for restore capability, migration, documentation, and provenance. The representative dev18 lifecycle run failed after downgrade because the installed launcher resolved the dev18 working-tree package instead of the installed dev17 package. Dev19 remediated that package/runtime isolation defect and dev20 retains the fix; Everkeep remains non-ready until the full representative install/remove/reinstall/downgrade/restore probe passes for the immutable dev20 candidate package and checksum.
   glaze_ui:
     result: applicable-blocked
     version: "1.2.0"
@@ -94,8 +94,11 @@ platform_systems:
       - BRANDING.md
       - goreecloud_care/glaze_v12.py
       - goreecloud_care/glaze_v12_global.py
+      - goreecloud_care/glaze_v13.py
+      - goreecloud_care/glaze_v13_global.py
       - packaging/icons/com.goreecloud.care.svg
       - tests/test_glaze_v12_contract.py
+      - tests/test_glaze_v13_contract.py
       - tests/test_ui_contract.py
       - tests/test_focus_resilience.py
       - tests/test_accessibility_identity.py
@@ -111,7 +114,8 @@ platform_systems:
       - https://github.com/GoreeCloud/goreecloud-branding-assets/blob/main/products/care/app-icon.svg
       - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/8a0e21056acd8012a6e7482bf591027359067c81
       - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/f88aa45b4d012dcfcd04a938cb71e96f9bb107d6
-    notes: Current required Stable consumer target is GLAZE UI V1.2 / 1.2.0. Dev18 added a bounded GTK3 V1.2 neutral-material fallback, Light/Dark/Deep Dark state resolution, 48-pixel minimum targets, Reduced Transparency and Reduced Motion degradation paths, system-authoritative HighContrast, and process-level activation for both Care windows without claiming compositor backdrop-blur fidelity. Latest accepted exact-source product repository/headless validation before dev19 passed at Development head ba646235dd12df251a02d728b096d8398a515ab7; Care Development run 34071691286 explicitly verified that immutable revision, Platform Contract run 34071691586 passed against the central V1.2 baseline pinned at c941ce1d8d1eff3c9df994d1e16f83147eadae00, and theme-source run 34071691321 passed. The upstream schemaVersion 6 consumer-registry validation path was repaired at Glaze merge 8a0e21056acd8012a6e7482bf591027359067c81, and Care was registered at Glaze merge f88aa45b4d012dcfcd04a938cb71e96f9bb107d6 as adoption-required with null accepted target/revision/evidence and productionEligible=false. Registration mechanics are complete, but dev19 exact-head repository/target validation plus representative appearance/resilience and drag-resize validation, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final visual/icon/task-flow review, and governed product-specific accepted-v1 V1.2 acceptance remain open.
+      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/dc5ee04b09bd7d2c06d6ac1456618cbd4b1f4b80
+    notes: The required Stable compatibility baseline remains GLAZE UI V1.2 / 1.2.0 because V1.3 Adaptive Resonance is still Proposed, its Candidate is inactive, and upstream consumer eligibility is false. Dev20 nevertheless revamps the Development UI around the latest V1.3 architecture pinned to qualification source dc5ee04b09bd7d2c06d6ac1456618cbd4b1f4b80: content-plane versus chrome-plane separation, grouped rather than repetitive-card maintenance structure, semantic shape roles with capsules restricted to compact command chrome, one dominant resonant primary action, Compact/Medium/Expanded composition, Calm/Balanced/Expressive expression independent from Clear/Balanced/Dense clarity, accessibility-first Reduced Transparency/Reduced Motion/Show Borders degradation, and neutral Light/Dark/Deep Dark mappings. GTK3 remains a bounded Tier 1/Tier 0 native implementation and does not claim compositor backdrop sampling, Living Glaze parity, Candidate activation, V1.3 consumer conformance, or production eligibility. Care remains registered upstream as adoption-required with null accepted target/revision/evidence and productionEligible=false. Exact dev20 repository/headless and representative-device evidence is required before any product-specific acceptance claim.
   mesh:
     result: not-applicable-justified
     version: null
@@ -257,7 +261,7 @@ evidence:
       revision: 7393ee330f8f2344303be44e26fe7ebca8dcf126
       result: blocked
       observed_at: "2026-09-07T02:24:00Z"
-      notes: Representative lifecycle probe installed, removed, reinstalled and downgraded the dev18 package to dev17, then stopped because goreecloud-care --version resolved the dev18 working-tree package while dpkg reported dev17 installed. This exposed non-isolated python3 -m launchers and private bytecode residue; dev19 remediates the boundary and requires full rerun.
+      notes: Representative lifecycle probe installed, removed, reinstalled and downgraded the dev18 package to dev17, then stopped because goreecloud-care --version resolved the dev18 working-tree package while dpkg reported dev17 installed. This exposed non-isolated python3 -m launchers and private bytecode residue; dev19 remediated the boundary and dev20 retains it while requiring a full exact-candidate rerun.
   release: []
 
 conformance:
@@ -267,8 +271,8 @@ conformance:
   blockers:
     - Privacy Shield exact-candidate runtime/application acceptance is incomplete and production_approved remains false.
     - Wardveil Security exact-candidate source/runtime adoption acceptance is incomplete; no broad Protected by Wardveil claim is authorized.
-    - Everkeep package install/remove/reinstall/downgrade/restore acceptance is incomplete; dev18 produced negative lifecycle evidence and dev19 requires exact-head repository plus representative rerun before continuity can become ready.
-    - Dev19 installed application/helper isolation and private bytecode cleanup require exact-head CI and representative target validation before the package/runtime security defect is considered closed.
-    - Current-Stable GLAZE UI V1.2 product acceptance is incomplete, including representative appearance/resilience, continuous large-text drag-resize responsiveness, complete Insights forward/reverse keyboard traversal, dynamic AT-SPI/Orca behavior, final visual/icon review, representative task flows, and governed promotion from registered adoption-required state to accepted-v1.
+    - Everkeep package install/remove/reinstall/downgrade/restore acceptance is incomplete; dev18 produced negative lifecycle evidence and dev20 requires exact-head repository plus representative rerun before continuity can become ready.
+    - Dev20 must preserve and target-validate the dev19 application/helper isolation and private bytecode cleanup before the package/runtime security defect is considered closed for this candidate.
+    - GLAZE UI V1.2 remains the official Stable compatibility baseline and its product acceptance is incomplete; the new V1.3 Adaptive Resonance implementation is Proposed Development work only and additionally requires exact-source repository/headless and representative-device optical, accessibility, performance, personalization/resilience, resize, keyboard, task-flow, and visual-quality evidence without implying V1.3 Candidate activation or consumer eligibility.
     - Canonical GoreeCloud Care branding exists and is packaged, but exact-candidate target rendering and visual-quality acceptance remain open.
     - Release Candidate artifact/release evidence and governed final acceptance are intentionally absent while Development gates remain open.
