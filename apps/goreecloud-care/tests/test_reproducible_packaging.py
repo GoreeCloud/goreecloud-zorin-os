@@ -20,7 +20,15 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
             'find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +',
             BUILD,
         )
-        self.assertIn('dpkg-deb --root-owner-group --build', BUILD)
+        self.assertIn('dpkg-deb --root-owner-group', BUILD)
+
+    def test_build_eliminates_compressor_and_locale_variability(self):
+        self.assertIn('export LC_ALL=C', BUILD)
+        self.assertIn('export TZ=UTC', BUILD)
+        self.assertIn('--deb-format=2.0', BUILD)
+        self.assertIn('-Znone', BUILD)
+        self.assertNotIn('-Zxz', BUILD)
+        self.assertNotIn('-Zzstd', BUILD)
 
     def test_verifier_compares_independent_build_to_reference(self):
         self.assertIn('SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" sh "$ROOT/scripts/build-deb.sh"', VERIFY)
@@ -29,9 +37,16 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('sha256sum "$REBUILT"', VERIFY)
         self.assertIn('Reproducible package verification: passed', VERIFY)
 
-    def test_ci_runs_reproducibility_gate(self):
+    def test_ci_runs_same_environment_reproducibility_gate(self):
         self.assertIn('Verify reproducible GoreeCloud Care package', WORKFLOW)
         self.assertIn('sh ./scripts/verify-reproducible-package.sh', WORKFLOW)
+
+    def test_ci_compares_jammy_and_noble_package_bytes(self):
+        self.assertIn('ubuntu-22.04', WORKFLOW)
+        self.assertIn('ubuntu-24.04', WORKFLOW)
+        self.assertIn('Compare cross-environment package bytes', WORKFLOW)
+        self.assertIn('cmp -s "$JAMMY" "$NOBLE"', WORKFLOW)
+        self.assertIn('cross_environment_reproducibility=passed', WORKFLOW)
 
 
 if __name__ == "__main__":

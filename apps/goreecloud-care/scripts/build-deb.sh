@@ -28,6 +28,14 @@ case "$SOURCE_DATE_EPOCH" in
 esac
 export SOURCE_DATE_EPOCH
 
+# Keep locale/timezone behavior deterministic and avoid compressor-version drift
+# across the supported Zorin/Ubuntu build boundary. dpkg-deb has supported the
+# uncompressed Debian archive mode for the target toolchain generations used by
+# Zorin OS 17.3 (Ubuntu 22.04 base) and current Ubuntu CI. The package is small,
+# so deterministic portability is more important than archive compression here.
+export LC_ALL=C
+export TZ=UTC
+
 STAGE=$(mktemp -d)
 chmod 0755 "$STAGE"
 trap 'rm -rf "$STAGE"' EXIT INT TERM
@@ -73,8 +81,9 @@ install -m 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth" "$STAGE/usr
 # Normalize every staged filesystem timestamp before dpkg-deb sees it. GNU
 # coreutils touch supports -h so any future staged symlink metadata is normalized
 # without dereferencing it. dpkg-deb also consumes SOURCE_DATE_EPOCH for archive
-# metadata, eliminating wall-clock timestamps from the .deb container.
+# metadata. Explicit format 2.0 plus -Znone removes xz/zstd/gzip implementation
+# differences from the byte-for-byte package identity.
 find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +
 
-dpkg-deb --root-owner-group --build "$STAGE" "$OUT/${PKG}_${VERSION}_${ARCH}.deb" >/dev/null
+dpkg-deb --root-owner-group --deb-format=2.0 -Znone --build "$STAGE" "$OUT/${PKG}_${VERSION}_${ARCH}.deb" >/dev/null
 printf '%s\n' "$OUT/${PKG}_${VERSION}_${ARCH}.deb"

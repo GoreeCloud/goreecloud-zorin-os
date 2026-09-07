@@ -155,3 +155,87 @@ jobs:
             apps/goreecloud-care/dist/rollback/goreecloud-care_0.1.0~dev17.SOURCE_REVISION
           if-no-files-found: error
           retention-days: 14
+
+  package-reproducibility:
+    name: Package reproducibility (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    steps:
+      - name: Check out exact source revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Verify exact source revision
+        run: |
+          expected='${{ github.event.pull_request.head.sha || github.sha }}'
+          actual="$(git rev-parse HEAD)"
+          printf 'Expected source revision: %s\nActual source revision:   %s\n' "$expected" "$actual"
+          test "$actual" = "$expected"
+
+      - name: Build portable Development Debian package
+        working-directory: apps/goreecloud-care
+        run: |
+          printf 'Build OS: %s\n' '${{ matrix.os }}'
+          dpkg-deb --version | head -n 1
+          sh ./scripts/build-deb.sh dist-portable
+          sha256sum dist-portable/goreecloud-care_0.1.0~dev22_all.deb
+
+      - name: Preserve cross-environment candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: care-dev22-repro-${{ matrix.os }}
+          path: apps/goreecloud-care/dist-portable/goreecloud-care_0.1.0~dev22_all.deb
+          if-no-files-found: error
+          retention-days: 7
+
+  compare-package-reproducibility:
+    name: Compare cross-environment package reproducibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    needs: package-reproducibility
+    steps:
+      - name: Download Ubuntu 22.04 package
+        uses: actions/download-artifact@v4
+        with:
+          name: care-dev22-repro-ubuntu-22.04
+          path: cross-env/jammy
+
+      - name: Download Ubuntu 24.04 package
+        uses: actions/download-artifact@v4
+        with:
+          name: care-dev22-repro-ubuntu-24.04
+          path: cross-env/noble
+
+      - name: Compare cross-environment package bytes
+        run: |
+          set -eu
+          JAMMY='cross-env/jammy/goreecloud-care_0.1.0~dev22_all.deb'
+          NOBLE='cross-env/noble/goreecloud-care_0.1.0~dev22_all.deb'
+          JAMMY_SHA=$(sha256sum "$JAMMY" | awk '{print $1}')
+          NOBLE_SHA=$(sha256sum "$NOBLE" | awk '{print $1}')
+          printf 'Ubuntu 22.04 SHA-256: %s\nUbuntu 24.04 SHA-256: %s\n' "$JAMMY_SHA" "$NOBLE_SHA"
+          cmp -s "$JAMMY" "$NOBLE" || {
+            echo 'Cross-environment package reproducibility failed.' >&2
+            exit 1
+          }
+          mkdir -p cross-env/evidence
+          printf '%s  goreecloud-care_0.1.0~dev22_all.deb\n' "$JAMMY_SHA" > cross-env/evidence/SHA256SUMS.cross-environment
+          printf 'source_revision=%s\ncross_environment_reproducibility=passed\nubuntu_22_04_sha256=%s\nubuntu_24_04_sha256=%s\n' \
+            '${{ github.event.pull_request.head.sha || github.sha }}' \
+            "$JAMMY_SHA" "$NOBLE_SHA" \
+            > cross-env/evidence/SOURCE_REVISION.cross-environment
+          cat cross-env/evidence/SOURCE_REVISION.cross-environment
+
+      - name: Preserve cross-environment reproducibility evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: goreecloud-care-dev22-cross-environment-${{ github.event.pull_request.head.sha || github.sha }}
+          path: cross-env/evidence/
+          if-no-files-found: error
+          retention-days: 14
