@@ -93,10 +93,17 @@ class EverkeepContractTests(unittest.TestCase):
         source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
         self.assertIn('"$(id -u)" -ne 0', source)
         self.assertIn("Run this acceptance probe as the representative desktop user, not as root", source)
-        self.assertIn('sudo apt install -y --allow-downgrades', source)
+        self.assertIn('sudo apt install -y --reinstall --allow-downgrades', source)
         self.assertIn('sudo apt remove -y goreecloud-care', source)
         self.assertNotIn('sudo goreecloud-care', source)
         self.assertNotIn('sudo sh "$ROOT/scripts/validate-installed.sh"', source)
+
+    def test_package_lifecycle_probe_reinstalls_same_version_candidate_bytes(self) -> None:
+        source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
+        self.assertIn("Exact-candidate acceptance is package-byte scoped", source)
+        self.assertIn("--reinstall", source)
+        self.assertIn("same Debian version", source)
+        self.assertNotIn('sudo apt install -y --allow-downgrades "$package_path"', source)
 
     def test_package_lifecycle_probe_requires_true_older_rollback_package(self) -> None:
         source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
