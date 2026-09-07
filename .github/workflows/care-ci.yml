@@ -18,7 +18,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: apps/goreecloud-care
@@ -27,6 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
 
       - name: Verify exact source revision
         run: |
@@ -119,11 +120,20 @@ jobs:
           dpkg-deb -I dist/goreecloud-care_0.1.0~dev22_all.deb
           dpkg-deb -c dist/goreecloud-care_0.1.0~dev22_all.deb
 
+      - name: Build immutable accepted dev17 rollback package
+        run: sh ./scripts/build-dev17-rollback-package.sh dist/rollback
+
+      - name: Run installed package lifecycle and Wardveil prequalification
+        run: |
+          sh ./scripts/validate-package-lifecycle.sh \
+            dist/goreecloud-care_0.1.0~dev22_all.deb \
+            dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
+
       - name: Record Development package provenance
         run: |
           cd dist
           sha256sum goreecloud-care_0.1.0~dev22_all.deb | tee SHA256SUMS
-          printf 'source_revision=%s\nworkflow_run_id=%s\n' \
+          printf 'source_revision=%s\nworkflow_run_id=%s\ninstalled_lifecycle_prequalification=passed\nwardveil_installed_boundary_prequalification=passed\n' \
             '${{ github.event.pull_request.head.sha || github.sha }}' \
             '${{ github.run_id }}' \
             > SOURCE_REVISION
@@ -137,5 +147,8 @@ jobs:
             apps/goreecloud-care/dist/goreecloud-care_0.1.0~dev22_all.deb
             apps/goreecloud-care/dist/SHA256SUMS
             apps/goreecloud-care/dist/SOURCE_REVISION
+            apps/goreecloud-care/dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
+            apps/goreecloud-care/dist/rollback/goreecloud-care_0.1.0~dev17.sha256
+            apps/goreecloud-care/dist/rollback/goreecloud-care_0.1.0~dev17.SOURCE_REVISION
           if-no-files-found: error
           retention-days: 14
