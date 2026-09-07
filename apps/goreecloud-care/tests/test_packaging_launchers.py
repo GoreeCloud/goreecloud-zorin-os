@@ -61,12 +61,20 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
         )
         self.assertIn('VERSION="0.1.0~dev19"', source)
 
-    def test_lifecycle_probe_keeps_source_directory_shadowing_as_a_regression_gate(self) -> None:
+    def test_lifecycle_probe_keeps_candidate_shadowing_as_a_regression_gate(self) -> None:
         source = LIFECYCLE.read_text(encoding="utf-8")
-        self.assertIn("current source working directory", source)
+        self.assertIn("Dev19 candidate checks deliberately exercise source/working-directory shadow resistance", source)
         self.assertIn("working-directory/PYTHONPATH shadowing", source)
         self.assertIn("Private Python bytecode remained after package removal", source)
         self.assertIn("0.1.0~dev19", source)
+
+    def test_historical_rollback_is_checked_from_a_clean_neutral_directory(self) -> None:
+        source = LIFECYCLE.read_text(encoding="utf-8")
+        self.assertIn("dev17 predates that isolation contract", source)
+        self.assertIn("PREVIOUS_PROBE_DIR=$(mktemp -d)", source)
+        self.assertIn('assert_version_from "$previous_version" "$previous_runtime" "$PREVIOUS_PROBE_DIR"', source)
+        self.assertIn('(cd "$PREVIOUS_PROBE_DIR" && goreecloud-care --report-json >/dev/null)', source)
+        self.assertIn('assert_version_from "$candidate_version" "$candidate_runtime" "$ROOT"', source)
 
 
 if __name__ == "__main__":
