@@ -115,6 +115,9 @@ jobs:
       - name: Build Development Debian package
         run: sh ./scripts/build-deb.sh dist
 
+      - name: Verify reproducible GoreeCloud Care package
+        run: sh ./scripts/verify-reproducible-package.sh ./dist/goreecloud-care_0.1.0~dev22_all.deb
+
       - name: Inspect Development Debian package
         run: |
           dpkg-deb -I dist/goreecloud-care_0.1.0~dev22_all.deb
@@ -133,7 +136,7 @@ jobs:
         run: |
           cd dist
           sha256sum goreecloud-care_0.1.0~dev22_all.deb | tee SHA256SUMS
-          printf 'source_revision=%s\nworkflow_run_id=%s\ninstalled_lifecycle_prequalification=passed\nwardveil_installed_boundary_prequalification=passed\n' \
+          printf 'source_revision=%s\nworkflow_run_id=%s\nreproducible_package_verification=passed\ninstalled_lifecycle_prequalification=passed\nwardveil_installed_boundary_prequalification=passed\n' \
             '${{ github.event.pull_request.head.sha || github.sha }}' \
             '${{ github.run_id }}' \
             > SOURCE_REVISION
