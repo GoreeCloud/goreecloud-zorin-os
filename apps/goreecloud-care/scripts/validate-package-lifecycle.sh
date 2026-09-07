@@ -107,7 +107,9 @@ for path in \
   /usr/share/polkit-1/actions/com.goreecloud.care.policy \
   /usr/share/applications/com.goreecloud.care.dev.desktop \
   /usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg \
-  /usr/share/metainfo/com.goreecloud.care.dev.metainfo.xml; do
+  /usr/share/metainfo/com.goreecloud.care.dev.metainfo.xml \
+  /usr/share/goreecloud-care/build-provenance.json \
+  /usr/share/goreecloud-care; do
   [ ! -e "$path" ] || { echo "Package-owned path remained after removal: $path" >&2; exit 1; }
 done
 [ ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ ] || {
