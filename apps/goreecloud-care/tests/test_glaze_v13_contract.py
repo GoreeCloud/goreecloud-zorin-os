@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import unittest
 from unittest.mock import patch
 
@@ -27,6 +28,34 @@ from goreecloud_care.glaze_v13 import (
     show_borders_requested,
 )
 from goreecloud_care.glaze_v13_global import _runtime_css
+
+
+def _srgb_channel(value: int) -> float:
+    channel = value / 255.0
+    if channel <= 0.04045:
+        return channel / 12.92
+    return ((channel + 0.055) / 1.055) ** 2.4
+
+
+def _relative_luminance(hex_color: str) -> float:
+    match = re.fullmatch(r"#([0-9a-fA-F]{6})", hex_color)
+    if not match:
+        raise AssertionError(f"Expected six-digit hex color, got {hex_color!r}")
+    raw = match.group(1)
+    red, green, blue = (
+        int(raw[0:2], 16),
+        int(raw[2:4], 16),
+        int(raw[4:6], 16),
+    )
+    r, g, b = map(_srgb_channel, (red, green, blue))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def _contrast_ratio(foreground: str, background: str) -> float:
+    first = _relative_luminance(foreground)
+    second = _relative_luminance(background)
+    lighter, darker = max(first, second), min(first, second)
+    return (lighter + 0.05) / (darker + 0.05)
 
 
 class GlazeV13ContractTests(unittest.TestCase):
@@ -78,6 +107,23 @@ class GlazeV13ContractTests(unittest.TestCase):
         self.assertIn("color: #f7f8fa;", text)
         self.assertIn("border-color: rgba(255, 255, 255, 0.20);", text)
         self.assertIn("background-image: none;", text)
+
+        # Quantify the exact command-chrome remediation instead of relying only
+        # on the presence of CSS declarations. The stricter 4.5:1 text target is
+        # applied to Scan and inherited symbolic window-control foregrounds.
+        expected_pairs = {
+            "dark-normal": ("#f7f8fa", "#34383f"),
+            "dark-hover": ("#f7f8fa", "#3d424a"),
+            "deep-dark-normal": ("#f7f8fa", "#272a2f"),
+            "deep-dark-hover": ("#f7f8fa", "#30343a"),
+        }
+        for state, (foreground, background) in expected_pairs.items():
+            ratio = _contrast_ratio(foreground, background)
+            self.assertGreaterEqual(
+                ratio,
+                4.5,
+                f"{state} HeaderBar contrast is only {ratio:.2f}:1",
+            )
 
     def test_accessibility_degradation_is_explicit(self) -> None:
         self.assertTrue(reduced_transparency_requested("1"))
