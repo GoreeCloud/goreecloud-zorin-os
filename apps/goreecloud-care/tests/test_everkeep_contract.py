@@ -64,7 +64,13 @@ class EverkeepContractTests(unittest.TestCase):
         source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
         self.assertIn('dpkg --compare-versions "$previous_version" lt "$candidate_version"', source)
         self.assertIn("Previous package must sort older than the candidate", source)
-        self.assertIn("This Development lifecycle probe expects candidate 0.1.0~dev18", source)
+        self.assertIn("This Development lifecycle probe expects candidate 0.1.0~dev19", source)
+
+    def test_package_lifecycle_probe_guards_runtime_isolation_and_bytecode_cleanup(self) -> None:
+        source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
+        self.assertIn("current source working directory", source)
+        self.assertIn("working-directory/PYTHONPATH shadowing", source)
+        self.assertIn("Private Python bytecode remained after package removal", source)
 
 
 if __name__ == "__main__":
