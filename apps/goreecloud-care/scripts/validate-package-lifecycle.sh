@@ -12,7 +12,7 @@ usage() {
   exit 2
 }
 
-for command_name in sudo apt dpkg dpkg-deb dpkg-query python3 grep sed; do
+for command_name in sudo apt dpkg dpkg-deb dpkg-query python3 grep sed mktemp rm; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
@@ -47,11 +47,21 @@ case "$candidate_version" in
   *) echo "This Development lifecycle probe expects candidate 0.1.0~dev19; got $candidate_version" >&2; exit 2 ;;
 esac
 
+# The accepted historical dev17 package predates dev19's isolated launcher.
+# Validate that historical rollback from a clean neutral directory, while all
+# dev19 candidate validations deliberately exercise working-directory shadowing.
+PREVIOUS_PROBE_DIR=$(mktemp -d)
+cleanup() {
+  rm -rf "$PREVIOUS_PROBE_DIR"
+}
+trap cleanup EXIT INT TERM
+
 printf '%s\n' "Package lifecycle acceptance will temporarily remove and downgrade GoreeCloud Care."
 printf '%s\n' "Candidate: $candidate_version"
 printf '%s\n' "Previous:  $previous_version"
 printf '%s\n' "Representative user: $(id -un) (uid $(id -u))"
-printf '%s\n' "The probe intentionally executes installed runtime checks from the current source working directory; dev19 must remain isolated from that source tree."
+printf '%s\n' "Dev19 candidate checks deliberately exercise source/working-directory shadow resistance."
+printf '%s\n' "The immutable historical rollback package is validated from a clean neutral directory because dev17 predates that isolation contract."
 printf '%s\n' "No Care-owned user data is expected to be removed; this script does not invoke Care cleanup actions."
 printf '%s\n' "Administrator authentication may be requested by apt."
 
@@ -60,18 +70,20 @@ install_package() {
   sudo apt install -y --allow-downgrades "$package_path"
 }
 
-assert_version() {
+assert_version_from() {
   expected_package=$1
   expected_runtime=$2
+  runtime_dir=$3
   installed=$(dpkg-query -W -f='${Status} ${Version}' goreecloud-care)
   [ "$installed" = "install ok installed $expected_package" ] || {
     echo "Installed package state mismatch: expected='install ok installed $expected_package' actual='$installed'" >&2
     exit 1
   }
-  actual_runtime=$(goreecloud-care --version)
+  actual_runtime=$(cd "$runtime_dir" && goreecloud-care --version)
   [ "$actual_runtime" = "$expected_runtime" ] || {
     echo "Installed runtime mismatch: package=$expected_package expected_runtime=$expected_runtime actual_runtime=$actual_runtime" >&2
-    echo "This may indicate working-directory/PYTHONPATH shadowing or stale installed bytecode." >&2
+    echo "Runtime probe directory: $runtime_dir" >&2
+    echo "For dev19 this may indicate working-directory/PYTHONPATH shadowing or stale installed bytecode." >&2
     exit 1
   }
 }
@@ -105,14 +117,14 @@ sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtim
 
 printf '%s\n' "[4/6] Downgrade to previous Development package"
 install_package "$PREVIOUS"
-assert_version "$previous_version" "$previous_runtime"
-goreecloud-care --report-json >/dev/null
+assert_version_from "$previous_version" "$previous_runtime" "$PREVIOUS_PROBE_DIR"
+(cd "$PREVIOUS_PROBE_DIR" && goreecloud-care --report-json >/dev/null)
 
 printf '%s\n' "[5/6] Restore candidate after downgrade"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
 printf '%s\n' "[6/6] Final package state"
-assert_version "$candidate_version" "$candidate_runtime"
+assert_version_from "$candidate_version" "$candidate_runtime" "$ROOT"
 printf '%s\n' "Representative package install/remove/reinstall/downgrade/rollback acceptance: passed"
 printf '%s\n' "The candidate is installed at the end of the probe; no Care cleanup action was invoked."
