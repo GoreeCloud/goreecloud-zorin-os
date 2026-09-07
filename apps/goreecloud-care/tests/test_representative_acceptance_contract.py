@@ -88,6 +88,7 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
             "Reduced Motion",
             "Canonical Care icon",
             "Package lifecycle / continuity",
+            "build-dev17-rollback-package.sh",
             "GLAZE UI V1.2 product-specific acceptance",
             "No manual item is accepted until a representative-device result is explicitly recorded.",
         ):
