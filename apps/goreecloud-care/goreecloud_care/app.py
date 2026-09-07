@@ -396,6 +396,9 @@ class CareWindow(Gtk.ApplicationWindow):
 
         self.root.set_border_width(COMPACT_BORDER if compact else REGULAR_BORDER)
         self.root.set_spacing(12 if compact else 16)
+        # Keep the compact HeaderBar identity intentionally short so Scan and
+        # native window controls cannot force an ellipsized product title.
+        self.header.set_title("Care" if compact else "GoreeCloud Care")
         self.header.set_subtitle(None if compact else self.header_subtitle)
         self.workspace.set_orientation(
             Gtk.Orientation.HORIZONTAL
