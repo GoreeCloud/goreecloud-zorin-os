@@ -46,6 +46,12 @@ jobs:
       - name: Run headless GTK runtime acceptance
         run: xvfb-run -a env GDK_DPI_SCALE=2 python3 tests/runtime_ui_acceptance.py
 
+      - name: Run Dark HeaderBar runtime contrast acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_APPEARANCE=dark python3 tests/runtime_ui_acceptance.py
+
+      - name: Run Deep Dark HeaderBar runtime contrast acceptance
+        run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_APPEARANCE=deep-dark python3 tests/runtime_ui_acceptance.py
+
       - name: Build Development Debian package
         run: sh ./scripts/build-deb.sh dist
 
