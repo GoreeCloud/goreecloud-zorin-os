@@ -10,17 +10,39 @@ GoreeCloud Care is an original, local-first GoreeCloud desktop maintenance appli
 
 ## Dev22 — Dark / Deep Dark HeaderBar contrast remediation
 
-Dev22 is a focused appearance-quality follow-up to the accepted dev21 compact/wide HeaderBar identity remediation. Representative dev21 appearance screenshots showed the Light/default and HighContrast presentations remaining readable, and Reduced Transparency, Show Borders, and the submitted Calm/Balanced/Expressive expression slices remaining visually coherent. They also exposed one real defect: in both **Dark** and Development **Deep Dark**, the HeaderBar Scan and native window-control buttons could inherit very light button fills while the foreground text/glyphs were also near-white, leaving command chrome insufficiently legible.
+Dev22 follows the representative dev21 appearance pass, which exposed one concrete command-chrome defect: explicit Dark and Development Deep Dark could leave the HeaderBar Scan/native window-control surfaces very light while foreground text/glyphs were also near-white.
 
-Dev22 fixes that boundary by giving Dark and Deep Dark HeaderBar buttons explicit neutral dark surfaces, light foreground text/glyphs, visible borders, no inherited light background image, and bounded hover states. Regression coverage now requires those selectors and colors in both the component CSS and the global resolved Development CSS.
+The Development CSS now gives Dark HeaderBar buttons an explicit `#34383f` neutral surface and Deep Dark HeaderBar buttons an explicit `#272a2f` neutral surface, both with `#f7f8fa` foreground, visible borders, no inherited background image, and bounded darker hover states. This preserves the accepted Adaptive Resonance workspace rather than redesigning it again.
 
-The evidence remains fail-closed. Dev21 Dark/Deep Dark screenshots are negative evidence and do not become passing merely because dev22 source is corrected. Dev22 requires exact-head CI and fresh representative Dark/Deep Dark screenshots before that appearance gate is accepted. Static Reduced Motion imagery also does not establish behavioral motion suppression, and Clear/Balanced/Dense clarity-profile evidence remains pending.
+The acceptance strategy is now automated so routine contrast validation no longer depends on repeated manual screenshots. Exact dev22 head `078f4b39b6c1dd8fee505182be2fb71d0cb80907` passed:
+
+- 105 unit/source tests, including numerical contrast checks against a 4.5:1 minimum for Dark/Deep Dark normal and hover HeaderBar pairs;
+- XML/platform-integration/source validation;
+- the normal `GDK_DPI_SCALE=2` headless GTK runtime acceptance probe;
+- a dedicated Dark headless GTK runtime pass that verifies the realized visible HeaderBar Scan control remains on an opaque surface and meets the 4.5:1 minimum;
+- the same dedicated Deep Dark headless GTK runtime pass;
+- Debian `0.1.0~dev22` build and package inspection;
+- Platform Contract and theme-source validation.
+
+Current exact Dev22 CI evidence:
+
+```text
+source:   078f4b39b6c1dd8fee505182be2fb71d0cb80907
+Care CI:  34135667452
+Contract: 34135667957
+Theme:    34135667449
+package:  0.1.0~dev22
+sha256:   95f3cb9d2e1446a0ae31d133cc684386be14ae7571d97972cba6149f10c12194
+artifact: 10023895346
+```
+
+Xvfb realizes the application-owned Scan command but not the representative Zorin desktop's full native window-control composition, so this evidence closes the automated application-owned Dark/Deep Dark command-chrome contrast gate without pretending to be a physical Zorin screenshot. Native/compositor-specific optical review can remain part of final representative release QA rather than requiring a separate manual loop for every Development revision.
 
 ## Dev21 — compact HeaderBar identity remediation
 
-Dev21 was a focused follow-up to the dev20 **GLAZE UI V1.3 — Adaptive Resonance** revamp. Representative dev20 screenshots accepted the new wide/compact content architecture but exposed one remaining compact visual defect: `GoreeCloud Care` visibly truncated to `GoreeCloud …` beside the Scan capsule and native window controls.
+Dev21 is a focused follow-up to the dev20 **GLAZE UI V1.3 — Adaptive Resonance** revamp. Representative dev20 screenshots accepted the new wide/compact content architecture but exposed one remaining compact visual defect: `GoreeCloud Care` visibly truncated to `GoreeCloud …` beside the Scan capsule and native window controls.
 
-The compact main HeaderBar now intentionally uses the short product identity **`Care`**, matching the already-successful compact strategy used by Maintenance Insights. Medium/Expanded layouts restore the full **`GoreeCloud Care`** title and Development subtitle. Representative dev21 evidence at exact head `2836a700935a019f21a4e19612a2609c21fd874c`, package `0.1.0~dev21`, runtime `0.1.0-dev21` accepted both the compact and widened transitions.
+The compact main HeaderBar intentionally uses the short product identity **`Care`**, matching the already-successful compact strategy used by Maintenance Insights. Medium/Expanded layouts restore the full **`GoreeCloud Care`** title and Development subtitle. Representative dev21 evidence accepted both transitions at exact head `2836a700935a019f21a4e19612a2609c21fd874c`.
 
 ## Dev20 — GLAZE UI V1.3 Adaptive Resonance revamp
 
@@ -40,7 +62,7 @@ The revamp changes the product structure rather than merely recoloring the old i
 - **Accessibility-first degradation.** HighContrast stays system-authoritative; Reduced Transparency resolves optical surfaces to solid equivalents; Reduced Motion removes nonessential optical emphasis; Show Borders strengthens boundaries without requiring extra saturation.
 - **Maintenance Insights is part of the same system.** Its read-only summary, semantic status, stable findings plane, command-capsule Refresh, selectable Pango findings, and true-bottom scrolling share the Adaptive Resonance hierarchy while preserving dev17 copy-integrity behavior.
 
-Representative dev20 evidence accepted the package lifecycle/rollback and launcher-isolation slice, Maintenance Insights/main Care visual slices, continuous `GDK_DPI_SCALE=2` narrow↔wide resizing, and complete forward/reverse keyboard traversal through the redesigned core controls and through/beyond selectable findings without a focus trap.
+Representative dev20 evidence already accepted the package lifecycle/rollback and launcher-isolation slice, Maintenance Insights/main Care visual slices, continuous `GDK_DPI_SCALE=2` narrow↔wide resizing, and complete forward/reverse keyboard traversal through the redesigned core controls and through/beyond selectable findings without a focus trap.
 
 ## Current Development features
 
@@ -64,7 +86,7 @@ Representative dev20 evidence accepted the package lifecycle/rollback and launch
 
 Representative dev18 package-lifecycle testing exposed a real packaging/security-boundary defect: after downgrade, `dpkg-query` reported dev17 while a pre-dev19 ambient `python3 -m` launcher invoked from the dev18 source checkout resolved dev18. Removal also left private Python residue. Dev19 corrected both normal and PolicyKit helper launchers to `/usr/bin/python3 -I -B -m ...`, added fixed private `__pycache__` cleanup, and added working-directory shadowing regression probes.
 
-Dev20 preserved and representative-device validated that boundary through the full dev20 ↔ pinned dev17 install/remove/reinstall/downgrade/restore/final-state lifecycle. Dev21 and dev22 retain the same package/runtime isolation implementation; dev22 is scoped to the Dark/Deep Dark command-chrome contrast defect plus aligned Development metadata/tests.
+Dev20 preserved and representative-device validated that boundary through the full dev20 ↔ pinned dev17 install/remove/reinstall/downgrade/restore/final-state lifecycle. Dev22 retains the same package/runtime isolation implementation.
 
 ## Privacy-safe read-only reports
 
@@ -96,7 +118,7 @@ goreecloud-care --insights-ui
 
 Maintenance Insights reviews stale application-cache groups, large regular files of at least 250 MB in standard user folders, Downloads at least 30 days old, aggregate scan errors, and bounded-discovery state. Symlinks are not followed and standard-folder discovery is capped at 50,000 visited entries per refresh. Home-relative paths appear only in this explicit local review surface. No finding is automatically selected for deletion and the Insights modules contain no cleanup, PolicyKit, helper, subprocess, or network execution path.
 
-Historical representative evidence remains revision-scoped. Dev17 exact head `0fda6f90a545eaf3d1bed525aae98c6529ebbf7b` accepted the submitted compact/wide typography, synthetic-hyphen remediation, true-bottom reachability, visible Refresh focus, and selectable findings rendering. Dev20 exact head `9da1107527bb4d7627e4940bd5b1b752cf318e83` accepted the submitted Adaptive Resonance visual slices, continuous enlarged-text resizing, and complete keyboard traversal. Dev21 exact head `2836a700935a019f21a4e19612a2609c21fd874c` accepted the compact/full HeaderBar identity transition but produced negative Dark/Deep Dark control-contrast evidence later remediated in dev22 source.
+Historical representative evidence remains revision-scoped. Dev17 exact head `0fda6f90a545eaf3d1bed525aae98c6529ebbf7b` accepted the submitted compact/wide typography, synthetic-hyphen remediation, true-bottom reachability, visible Refresh focus, and selectable findings rendering. Dev20 exact head `9da1107527bb4d7627e4940bd5b1b752cf318e83` accepted the submitted Adaptive Resonance visual slices, continuous enlarged-text resizing, and complete keyboard traversal. Dev21 exact head `2836a700935a019f21a4e19612a2609c21fd874c` accepted the compact/full HeaderBar identity remediation.
 
 ## Glaze UI lifecycle boundary
 
@@ -139,7 +161,7 @@ sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
 ```
 
-Development CI verifies the exact PR source revision, runs unit/source validation and the headless GTK enlarged-text probe, builds/inspects the Debian package, records SHA-256 provenance, and preserves the package/checksum/source-revision artifact. Green CI is evidence only; it does not manufacture human optical, physical-device, assistive-technology, performance, personalization, or lifecycle acceptance.
+Development CI verifies the exact PR source revision, runs unit/source validation and enlarged-text headless GTK runtime acceptance, now exercises Dark and Deep Dark realized HeaderBar contrast under Xvfb, builds/inspects the Debian package, records SHA-256 provenance, and preserves the package/checksum/source-revision artifact. Green CI is evidence only; it does not manufacture live screen-reader, physical-device compositor, destructive-flow, or governance acceptance.
 
 ## Representative-device acceptance preparation
 
@@ -147,7 +169,7 @@ Development CI verifies the exact PR source revision, runs unit/source validatio
 sh ./scripts/prepare-representative-acceptance.sh
 ```
 
-The harness requires a clean tracked tree, records exact dev22 source/package/checksum provenance, performs only read-only installed snapshots when the installed runtime exactly matches `0.1.0-dev22`, and generates explicit human/manual checklists for Adaptive Resonance, accessibility, resizing, visual discipline, task flow, branding, package lifecycle, and platform-system review. It never marks a manual item passed.
+The harness requires a clean tracked tree, records exact dev22 source/package/checksum provenance, performs only read-only installed snapshots when the installed runtime exactly matches `0.1.0-dev22`, and generates explicit human/manual checklists. Routine Development contrast checks are now automated in CI rather than requiring repeated screenshot submissions.
 
 ## Package lifecycle acceptance
 
@@ -158,7 +180,7 @@ sh ./scripts/validate-package-lifecycle.sh \
   ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 ```
 
-The lifecycle probe can perform candidate install, removal, fresh reinstall, downgrade to the pinned accepted dev17 package, dev22 restoration, and final-state validation. Dev20 already accepted the underlying package/runtime boundary; a full dev22 lifecycle rerun is required only if final immutable Release Candidate qualification requires exact-candidate package lifecycle evidence after this appearance-only revision.
+The lifecycle probe can perform candidate install, removal, fresh reinstall, downgrade to the pinned accepted dev17 package, dev22 restoration, and final-state validation. Dev20 already accepted the underlying package/runtime boundary; exact-candidate reruns remain available when governed qualification requires them.
 
 ## Install or upgrade a locally built Development package
 
@@ -174,4 +196,4 @@ sudo apt remove goreecloud-care
 
 ## Release boundary
 
-GoreeCloud Care remains **Development / nonconformant**. Dev22 requires exact-head repository/CI validation plus representative Dark and Deep Dark revalidation of the remediated HeaderBar controls. Broader remaining gates include behavioral Reduced Motion evidence, Clear/Balanced/Dense clarity profiles, live AT-SPI/Orca, final icon/visual-quality and task-flow review, exact-candidate Privacy Shield/Wardveil/Everkeep governance, the applicable future governed Glaze consumer gate, immutable Release Candidate evidence, and governed lifecycle promotion. V1.3’s upstream Proposed status must not be bypassed by a downstream Care claim.
+GoreeCloud Care remains **Development / nonconformant**. The application-owned Dark/Deep Dark HeaderBar contrast remediation now has automated exact-source numerical and realized GTK runtime evidence, so no additional manual screenshot loop is required for that narrow Development gate. Remaining release work includes live AT-SPI/Orca, behavioral Reduced Motion, clarity-profile acceptance, final representative optical/compositor QA, status/confirmation/empty/failure-state review, destructive/PolicyKit task-flow acceptance, exact-candidate Privacy Shield/Wardveil/Everkeep governance, the applicable future governed Glaze consumer gate, immutable Release Candidate evidence, and governed lifecycle promotion. V1.3’s upstream Proposed status must not be bypassed by a downstream Care claim.
