@@ -38,7 +38,7 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
         self.assertIn("PolicyKit", source)
         self.assertNotIn("PYTHONPATH=", source)
 
-    def test_package_maintainer_scripts_only_clean_fixed_private_bytecode(self) -> None:
+    def test_package_maintainer_scripts_stay_on_fixed_package_paths(self) -> None:
         for path in (POSTINST, POSTRM):
             source = path.read_text(encoding="utf-8")
             self.assertIn(
@@ -48,6 +48,20 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
             self.assertNotIn("$HOME", source)
             self.assertNotIn("/home/", source)
             self.assertNotIn("find ", source)
+
+    def test_postinst_repairs_fixed_provenance_trust_path(self) -> None:
+        source = POSTINST.read_text(encoding="utf-8")
+        self.assertIn("/usr/share/goreecloud-care/build-provenance.json", source)
+        self.assertIn("chown root:root /usr/share/goreecloud-care", source)
+        self.assertIn("chmod 0755 /usr/share/goreecloud-care", source)
+        self.assertIn(
+            "chown root:root /usr/share/goreecloud-care/build-provenance.json",
+            source,
+        )
+        self.assertIn(
+            "chmod 0644 /usr/share/goreecloud-care/build-provenance.json",
+            source,
+        )
 
     def test_debian_build_installs_bytecode_cleanup_maintainer_scripts(self) -> None:
         source = BUILD.read_text(encoding="utf-8")
