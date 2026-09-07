@@ -55,11 +55,18 @@ assert everkeep_acceptance['acceptance']['exact_revision_acceptance_required'] i
 print('Platform integration contract validation: passed')
 PY
 # Exact Development version alignment.
-grep -F '__version__ = "0.1.0-dev18"' goreecloud_care/__init__.py >/dev/null
-grep -F 'version = "0.1.0.dev18"' pyproject.toml >/dev/null
-grep -F 'VERSION="0.1.0~dev18"' scripts/build-deb.sh >/dev/null
-grep -F '<release version="0.1.0-dev18"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
-grep -F 'version: 0.1.0-dev18' goreecloud.platform.yaml >/dev/null
+grep -F '__version__ = "0.1.0-dev19"' goreecloud_care/__init__.py >/dev/null
+grep -F 'version = "0.1.0.dev19"' pyproject.toml >/dev/null
+grep -F 'VERSION="0.1.0~dev19"' scripts/build-deb.sh >/dev/null
+grep -F '<release version="0.1.0-dev19"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
+grep -F 'version: 0.1.0-dev19' goreecloud.platform.yaml >/dev/null
+# Installed Python entrypoints must be isolated from source/CWD/user path shadowing.
+grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care "$@"' packaging/goreecloud-care >/dev/null
+grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"' packaging/goreecloud-care-helper >/dev/null
+grep -F '/usr/lib/goreecloud-care/goreecloud_care/__pycache__' packaging/postinst >/dev/null
+grep -F '/usr/lib/goreecloud-care/goreecloud_care/__pycache__' packaging/postrm >/dev/null
+grep -F 'install -m 0755 "$ROOT/packaging/postinst" "$STAGE/DEBIAN/postinst"' scripts/build-deb.sh >/dev/null
+grep -F 'install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"' scripts/build-deb.sh >/dev/null
 # Security/source invariants for the privileged boundary.
 grep -F '["/usr/bin/apt-get", "clean"]' goreecloud_care/helper.py >/dev/null
 ! grep -R --line-number -E 'shell[[:space:]]*=[[:space:]]*True|os\.system\(' goreecloud_care packaging scripts
@@ -137,7 +144,7 @@ grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
 grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
 grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
 # Mandatory GoreeCloud component documentation and integration records.
-for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json contracts/everkeep.acceptance.json scripts/validate-installed.sh scripts/validate-package-lifecycle.sh; do
+for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json contracts/everkeep.acceptance.json scripts/validate-installed.sh scripts/validate-package-lifecycle.sh packaging/postinst packaging/postrm; do
   test -s "$f"
 done
 echo 'Local source validation: passed'
