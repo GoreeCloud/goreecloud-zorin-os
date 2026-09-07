@@ -55,12 +55,12 @@ assert everkeep_acceptance['acceptance']['exact_revision_acceptance_required'] i
 print('Platform integration contract validation: passed')
 PY
 # Exact Development version alignment.
-grep -F '__version__ = "0.1.0-dev19"' goreecloud_care/__init__.py >/dev/null
-grep -F 'version = "0.1.0.dev19"' pyproject.toml >/dev/null
-grep -F 'VERSION="0.1.0~dev19"' scripts/build-deb.sh >/dev/null
-grep -F '<release version="0.1.0-dev19"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
-grep -F 'version: 0.1.0-dev19' goreecloud.platform.yaml >/dev/null
-# Installed Python entrypoints must be isolated from source/CWD/user path shadowing.
+grep -F '__version__ = "0.1.0-dev20"' goreecloud_care/__init__.py >/dev/null
+grep -F 'version = "0.1.0.dev20"' pyproject.toml >/dev/null
+grep -F 'VERSION="0.1.0~dev20"' scripts/build-deb.sh >/dev/null
+grep -F '<release version="0.1.0-dev20"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
+grep -F 'version: 0.1.0-dev20' goreecloud.platform.yaml >/dev/null
+# Installed Python entrypoints must remain isolated from source/CWD/user path shadowing.
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care "$@"' packaging/goreecloud-care >/dev/null
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"' packaging/goreecloud-care-helper >/dev/null
 grep -F '/usr/lib/goreecloud-care/goreecloud_care/__pycache__' packaging/postinst >/dev/null
@@ -74,13 +74,14 @@ grep -F '["/usr/bin/apt-get", "clean"]' goreecloud_care/helper.py >/dev/null
 grep -F 'self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)' goreecloud_care/app.py >/dev/null
 grep -F 'def _apply_layout(' goreecloud_care/app.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/app.py >/dev/null
+grep -F 'layout_environment(' goreecloud_care/app.py >/dev/null
+grep -F 'effective_layout_width(width)' goreecloud_care/app.py >/dev/null
 grep -F 'self.header.set_subtitle(None if compact else self.header_subtitle)' goreecloud_care/app.py >/dev/null
 grep -F 'COMPACT_WIDTH = 820' goreecloud_care/ui_contract.py >/dev/null
 grep -F 'GDK_DPI_SCALE' goreecloud_care/ui_contract.py >/dev/null
 grep -F 'def effective_layout_width(' goreecloud_care/ui_contract.py >/dev/null
 grep -F 'Atk.Role.STATUSBAR' goreecloud_care/app.py >/dev/null
 grep -F 'visible-data-changed' goreecloud_care/app.py >/dev/null
-grep -F 'is_high_contrast_theme' goreecloud_care/app.py >/dev/null
 grep -F 'GTK_THEME' goreecloud_care/ui_contract.py >/dev/null
 grep -F 'gtk_theme_override' goreecloud_care/ui_contract.py >/dev/null
 grep -F 'GLib.set_prgname("GoreeCloud Care")' goreecloud_care/__main__.py >/dev/null
@@ -90,20 +91,43 @@ grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION - 1' goreecloud_care/focus_resi
 grep -F '@theme_fg_color' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'button:focus, checkbutton:focus' goreecloud_care/focus_resilience.py >/dev/null
 grep -F 'gir1.2-atk-1.0' scripts/build-deb.sh >/dev/null
-# Current Stable GLAZE UI V1.2 native fallback invariants.
+# Official Stable GLAZE UI V1.2 compatibility baseline remains explicit.
 grep -F 'GLAZE_UI_VERSION = "1.2.0"' goreecloud_care/glaze_v12.py >/dev/null
 grep -F 'GLAZE_UI_LABEL = "GLAZE UI V1.2"' goreecloud_care/glaze_v12.py >/dev/null
-grep -F 'MIN_TARGET_PX = 48' goreecloud_care/glaze_v12.py >/dev/null
-grep -F 'button, checkbutton { min-height: 48px; }' goreecloud_care/glaze_v12.py >/dev/null
-grep -F 'reduced-transparency' goreecloud_care/glaze_v12.py >/dev/null
-grep -F 'reduced-motion' goreecloud_care/glaze_v12.py >/dev/null
-grep -F 'install_glaze_v12_global_style' goreecloud_care/__main__.py >/dev/null
-grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_USER - 1' goreecloud_care/glaze_v12_global.py >/dev/null
-grep -F 'is_high_contrast_theme' goreecloud_care/glaze_v12_global.py >/dev/null
-! grep -E 'transition[[:space:]]*:|animation[[:space:]]*:' goreecloud_care/glaze_v12.py >/dev/null
 grep -F 'version: "1.2.0"' goreecloud.platform.yaml >/dev/null
 grep -F 'glaze_ui_required: "1.2.0"' goreecloud.platform.yaml >/dev/null
 grep -F 'glaze-ui==1.2.0' goreecloud.platform.yaml >/dev/null
+# Latest Proposed GLAZE UI V1.3 Adaptive Resonance Development mapping.
+grep -F 'GLAZE_UI_LABEL = "GLAZE UI V1.3 — Adaptive Resonance"' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'GLAZE_UI_TARGET_VERSION = "1.3.0-candidate"' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'GLAZE_UI_LIFECYCLE = "proposed"' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'GLAZE_UI_CONSUMER_ELIGIBLE = False' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'GLAZE_UI_SOURCE_REVISION = "dc5ee04b09bd7d2c06d6ac1456618cbd4b1f4b80"' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'GLAZE_UI_STABLE_BASELINE = "1.2.0"' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'MIN_TARGET_PX = 48' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'EXPRESSION_ENV = "GOREECLOUD_CARE_GLAZE_EXPRESSION"' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'CLARITY_ENV = "GOREECLOUD_CARE_GLAZE_CLARITY"' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'button.command-capsule { border-radius: 999px; }' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'button.resonant-action' goreecloud_care/glaze_v13.py >/dev/null
+grep -F '.content-plane' goreecloud_care/glaze_v13.py >/dev/null
+grep -F '.maintenance-collection' goreecloud_care/glaze_v13.py >/dev/null
+grep -F '.findings-plane' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'reduced-transparency' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'reduced-motion' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'show-borders' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'install_glaze_v13_global_style' goreecloud_care/__main__.py >/dev/null
+! grep -F 'install_glaze_v12_global_style' goreecloud_care/__main__.py >/dev/null
+grep -F 'Gtk.STYLE_PROVIDER_PRIORITY_USER - 1' goreecloud_care/glaze_v13_global.py >/dev/null
+grep -F 'is_high_contrast_theme' goreecloud_care/glaze_v13_global.py >/dev/null
+! grep -E 'transition[[:space:]]*:|animation[[:space:]]*:' goreecloud_care/glaze_v13.py >/dev/null
+# The revamp must not regress into universal pill geometry or repetitive cardification.
+! grep -F 'button {' goreecloud_care/glaze_v13.py | grep -F '999px' >/dev/null
+! grep -F 'self._category_card(' goreecloud_care/app.py >/dev/null
+grep -F 'self.maintenance_collection' goreecloud_care/app.py >/dev/null
+grep -F 'self.system_panel' goreecloud_care/app.py >/dev/null
+grep -F 'self.workspace.set_orientation(' goreecloud_care/app.py >/dev/null
+grep -F 'self.clean.get_style_context().add_class("resonant-action")' goreecloud_care/app.py >/dev/null
+grep -F 'self.scan_btn.get_style_context().add_class("command-capsule")' goreecloud_care/app.py >/dev/null
 # Privacy-safe read-only report and local integration API invariants.
 for flag in --report --report-json --api-version --health-json --privacy-status-json --security-status-json --continuity-status-json; do
   grep -F -- "\"$flag\"" goreecloud_care/__main__.py >/dev/null
@@ -116,7 +140,7 @@ grep -F 'production_approved: bool = False' goreecloud_care/platform_status.py >
 grep -F 'rollback_verified: bool = False' goreecloud_care/platform_status.py >/dev/null
 grep -F '"protected_by_wardveil": False' goreecloud_care/platform_status.py >/dev/null
 grep -F 'stat.S_IWGRP | stat.S_IWOTH' goreecloud_care/platform_status.py >/dev/null
-# Maintenance Insights must remain bounded, local, review-only, and large-text reachable.
+# Maintenance Insights must remain bounded, local, review-only, large-text reachable and content-first.
 grep -F -- '"--insights-ui"' goreecloud_care/__main__.py >/dev/null
 grep -F 'MAX_VISITED_ENTRIES = 50_000' goreecloud_care/insights.py >/dev/null
 grep -F 'STANDARD_USER_DIRS' goreecloud_care/insights.py >/dev/null
@@ -136,6 +160,8 @@ grep -F 'view-refresh-symbolic' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.refresh.get_accessible().set_name("Refresh")' goreecloud_care/insights_window.py >/dev/null
 grep -F "<span weight='bold'>Review storage safely</span>" goreecloud_care/insights_window.py >/dev/null
 grep -F 'Refreshing read-only insights…' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.findings_plane.get_style_context().add_class("findings-plane")' goreecloud_care/insights_window.py >/dev/null
+grep -F 'self.refresh.get_style_context().add_class("command-capsule")' goreecloud_care/insights_window.py >/dev/null
 grep -F 'Maintenance Insights (Read-only)' packaging/com.goreecloud.care.dev.desktop >/dev/null
 ! grep -R --line-number -E '\.unlink\(|shutil\.rmtree|os\.remove|subprocess|pkexec' goreecloud_care/insights.py goreecloud_care/insights_window.py
 # Post-action completion must survive the automatic values refresh.
