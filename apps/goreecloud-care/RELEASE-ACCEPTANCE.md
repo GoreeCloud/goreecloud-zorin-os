@@ -17,8 +17,10 @@ Before a Care build may be nominated as a Release Candidate, it must have an exa
 - the Privacy Shield, Wardveil Security, Everkeep, and Glaze UI repository-local integration records are current;
 - all intended RC functionality is source-complete and documented;
 - the official canonical Care application identity/branding exists and is consumed from the branding-assets authority;
-- known release-blocking security, privacy, accessibility, compatibility, recovery, data-integrity, or visual-quality defects are resolved rather than waived;
-- package build metadata, application metadata, documentation, and lifecycle records agree on the candidate version.
+- known release-blocking security, privacy, accessibility, compatibility, recovery, data-integrity, packaging, or visual-quality defects are resolved rather than waived;
+- package build metadata, application metadata, documentation, and lifecycle records agree on the candidate version;
+- installed Python entrypoints are isolated from the invoking working directory, `PYTHONPATH`, and user-site package shadowing, including the privileged PolicyKit helper boundary;
+- package install/remove behavior does not leave stale private Python bytecode capable of affecting a later installed revision.
 
 ## Release Candidate target acceptance
 
@@ -32,6 +34,8 @@ The exact RC package must then receive representative Zorin OS target acceptance
 - downgrade or rollback to the explicitly supported prior package state;
 - post-rollback launch and report validation;
 - package-owned helper/policy/desktop/AppStream files removed or restored as expected;
+- installed application and helper launchers resolve the installed package even when invoked from a working directory containing a same-named `goreecloud_care` package;
+- private package bytecode/cache residue does not survive removal or cause cross-version execution;
 - no user data loss beyond explicitly authorized maintenance actions.
 
 ### Core maintenance task flows
