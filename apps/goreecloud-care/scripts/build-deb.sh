@@ -28,6 +28,35 @@ if ! git -C "$REPO_ROOT" diff --quiet -- apps/goreecloud-care || \
   echo "Tracked GoreeCloud Care source changes are present; commit/stash them before packaging." >&2
   exit 2
 fi
+
+require_tracked() {
+  source_path=$1
+  relative=${source_path#"$REPO_ROOT"/}
+  git -C "$REPO_ROOT" ls-files --error-unmatch -- "$relative" >/dev/null 2>&1 || {
+    echo "Package input is not part of the exact committed Care source: $relative" >&2
+    exit 2
+  }
+}
+
+# Every working-tree file that can enter the package must itself be tracked.
+# This specifically prevents an untracked *.py dropped into goreecloud_care/
+# from being globbed into a package whose provenance names only committed source.
+for packaged_source in \
+  "$ROOT/packaging/postinst" \
+  "$ROOT/packaging/postrm" \
+  "$ROOT/packaging/goreecloud-care" \
+  "$ROOT/packaging/goreecloud-care-helper" \
+  "$ROOT/goreecloud_care/"*.py \
+  "$ROOT/packaging/com.goreecloud.care.dev.desktop" \
+  "$ROOT/packaging/icons/com.goreecloud.care.svg" \
+  "$ROOT/packaging/com.goreecloud.care.dev.metainfo.xml" \
+  "$ROOT/packaging/com.goreecloud.care.policy" \
+  "$ROOT/LICENSE" \
+  "$ROOT/API.md" \
+  "$ROOT/WARDVEIL-INTEGRATION.md"; do
+  require_tracked "$packaged_source"
+done
+
 SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)
 SOURCE_TREE=$(git -C "$REPO_ROOT" rev-parse HEAD:apps/goreecloud-care)
 printf '%s\n' "$SOURCE_REVISION" | grep -Eq '^[0-9a-f]{40}$' || {
