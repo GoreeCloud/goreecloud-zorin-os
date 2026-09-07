@@ -126,8 +126,8 @@ jobs:
       - name: Run installed package lifecycle and Wardveil prequalification
         run: |
           sh ./scripts/validate-package-lifecycle.sh \
-            dist/goreecloud-care_0.1.0~dev22_all.deb \
-            dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
+            ./dist/goreecloud-care_0.1.0~dev22_all.deb \
+            ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 
       - name: Record Development package provenance
         run: |
