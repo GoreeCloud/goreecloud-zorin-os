@@ -22,7 +22,7 @@ from .ui_contract import (
     is_compact_width,
 )
 
-APP_ID = "com.goreecloud.care.dev"
+APP_ID = "com.goreecloud.care"
 HELPER = "/usr/lib/goreecloud-care/goreecloud-care-helper"
 
 STATUS_STYLES = ("status-info", "status-attention", "status-success", "status-error")
@@ -41,10 +41,10 @@ STATUS_TITLES = {
 
 
 class CareWindow(Gtk.ApplicationWindow):
-    """Content-first GoreeCloud Care surface using the V1.3 Development mapping."""
+    """Content-first GoreeCloud Care Release Candidate surface."""
 
     def __init__(self, app: Gtk.Application) -> None:
-        super().__init__(application=app, title="GoreeCloud Care — Development")
+        super().__init__(application=app, title="GoreeCloud Care — Release Candidate")
         self.set_default_size(1060, 720)
         self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         self.set_border_width(0)
@@ -56,7 +56,7 @@ class CareWindow(Gtk.ApplicationWindow):
 
         # Chrome Plane: identity plus one transient scan command. The command is
         # the deliberate capsule; ordinary controls use the standard shape role.
-        self.header_subtitle = "Development • Adaptive Resonance preview"
+        self.header_subtitle = "Release Candidate • Adaptive Resonance preview"
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
         self.header.props.title = "GoreeCloud Care"
