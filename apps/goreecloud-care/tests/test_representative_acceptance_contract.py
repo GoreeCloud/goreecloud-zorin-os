@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -11,6 +12,9 @@ SCRIPT = ROOT / "scripts" / "prepare-representative-acceptance.sh"
 class RepresentativeAcceptanceContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.source = SCRIPT.read_text(encoding="utf-8")
+
+    def test_preparation_harness_has_valid_posix_shell_syntax(self) -> None:
+        subprocess.run(["sh", "-n", str(SCRIPT)], check=True)
 
     def test_preparation_harness_is_non_destructive_and_unprivileged(self) -> None:
         self.assertIn("read-only/non-destructive representative acceptance evidence", self.source)
