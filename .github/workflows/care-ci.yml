@@ -51,13 +51,13 @@ jobs:
 
       - name: Inspect Development Debian package
         run: |
-          dpkg-deb -I dist/goreecloud-care_0.1.0~dev19_all.deb
-          dpkg-deb -c dist/goreecloud-care_0.1.0~dev19_all.deb
+          dpkg-deb -I dist/goreecloud-care_0.1.0~dev20_all.deb
+          dpkg-deb -c dist/goreecloud-care_0.1.0~dev20_all.deb
 
       - name: Record Development package provenance
         run: |
           cd dist
-          sha256sum goreecloud-care_0.1.0~dev19_all.deb | tee SHA256SUMS
+          sha256sum goreecloud-care_0.1.0~dev20_all.deb | tee SHA256SUMS
           printf 'source_revision=%s\nworkflow_run_id=%s\n' \
             '${{ github.event.pull_request.head.sha || github.sha }}' \
             '${{ github.run_id }}' \
@@ -67,9 +67,9 @@ jobs:
       - name: Preserve Development package evidence
         uses: actions/upload-artifact@v4
         with:
-          name: goreecloud-care-dev19-${{ github.event.pull_request.head.sha || github.sha }}
+          name: goreecloud-care-dev20-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
-            apps/goreecloud-care/dist/goreecloud-care_0.1.0~dev19_all.deb
+            apps/goreecloud-care/dist/goreecloud-care_0.1.0~dev20_all.deb
             apps/goreecloud-care/dist/SHA256SUMS
             apps/goreecloud-care/dist/SOURCE_REVISION
           if-no-files-found: error
