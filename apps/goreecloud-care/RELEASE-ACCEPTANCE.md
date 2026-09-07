@@ -6,7 +6,7 @@ GoreeCloud Care follows the GoreeCloud lifecycle:
 
 `Development -> Release Candidate -> Stable`
 
-The lifecycle is evidence-based. A passing build, successful package installation, working feature, or individual screenshot does not permit a lifecycle promotion by itself.
+The lifecycle is evidence-based. A passing build, successful package installation, working feature, registry entry, or individual screenshot does not permit a lifecycle promotion by itself.
 
 ## Development exit criteria
 
@@ -79,10 +79,12 @@ Testing destructive flows may use disposable fixtures or purpose-created test da
 ### Appearance and visual quality
 
 - final supported appearance matrix is explicitly documented;
-- normal, compact, enlarged-text, HighContrast, status, confirmation, failure, empty/no-findings, and privileged-action states are visually complete;
-- the current Stable GLAZE UI V1.1 mapping is accepted on the target device;
+- normal, compact, enlarged-text, Light/Dark where claimed, HighContrast, Reduced Transparency, Reduced Motion, status, confirmation, failure, empty/no-findings, and privileged-action states are visually complete;
+- the current Stable **GLAZE UI V1.2 / `1.2.0`** native mapping is accepted on the target device for every Care appearance/resilience mode claimed by the release;
 - the official canonical Care icon renders correctly in application/desktop surfaces;
-- no Candidate Glaze UI V1.2 behavior is required for RC/Stable acceptance while V1.1 remains current Stable.
+- the authoritative Glaze consumer registry records Care only at the state justified by product-specific evidence. Registration as `adoption-required` is not conformance; promotion to `accepted-v1` requires the complete exact-candidate Care acceptance record.
+
+The current authoritative Glaze registry already contains GoreeCloud Care as `adoption-required` at merged Glaze revision `f88aa45b4d012dcfcd04a938cb71e96f9bb107d6`. Its accepted `targetVersion`, `referenceRevision`, and `evidence` remain unset and `productionEligible=false`; these values must remain fail-closed until governed product-specific V1.2 acceptance is complete.
 
 ## Stable promotion
 
@@ -90,7 +92,7 @@ Stable promotion occurs only after the accepted RC revision/package completes fi
 
 Stable additionally requires the applicable current approved contracts and application-specific acceptance for:
 
-- GLAZE UI;
+- GLAZE UI V1.2 / `1.2.0` (or a newer current Stable contract only if governance changes before the candidate is qualified);
 - Privacy Shield;
 - Wardveil Security;
 - Everkeep;
