@@ -59,14 +59,14 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
             'install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"',
             source,
         )
-        self.assertIn('VERSION="0.1.0~dev19"', source)
+        self.assertIn('VERSION="0.1.0~dev20"', source)
 
     def test_lifecycle_probe_keeps_candidate_shadowing_as_a_regression_gate(self) -> None:
         source = LIFECYCLE.read_text(encoding="utf-8")
-        self.assertIn("Dev19 candidate checks deliberately exercise source/working-directory shadow resistance", source)
+        self.assertIn("Dev20 candidate checks deliberately exercise source/working-directory shadow resistance", source)
         self.assertIn("working-directory/PYTHONPATH shadowing", source)
         self.assertIn("Private Python bytecode remained after package removal", source)
-        self.assertIn("0.1.0~dev19", source)
+        self.assertIn("0.1.0~dev20", source)
 
     def test_historical_rollback_is_checked_from_a_clean_neutral_directory(self) -> None:
         source = LIFECYCLE.read_text(encoding="utf-8")
