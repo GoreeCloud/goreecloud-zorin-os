@@ -91,8 +91,10 @@ def test_core_status_accessible_mutation_and_layout(app: Gtk.Application) -> Non
         "visible-data-changed",
         lambda accessible: visible_data_events.append(accessible.get_name() or ""),
     )
+    # set_status emits visible-data-changed synchronously. Assert before draining
+    # the constructor's idle initial-scan source, which intentionally updates the
+    # same status surface afterward.
     window.set_status("Synthetic completion state.", "success", "Completed")
-    drain_events()
     name = window.status_accessible.get_name()
     assert name == "Completed. Synthetic completion state.", name
     assert visible_data_events, "status accessible did not emit visible-data-changed"
