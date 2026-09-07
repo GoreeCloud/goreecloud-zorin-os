@@ -100,13 +100,12 @@ The dev18 source line adds automated evidence for:
 - process-level activation across both Care GTK windows;
 - headless enlarged-text compact/regular adaptation and focus traversal.
 
-Exact-head CI must still be recorded after the complete V1.2 migration settles.
+Repository validation is now accepted for exact Development head `23d2cf54643197bd5eca132bc71882a181eb9ca6`: Care Development run `34071149359` passed all 73 tests, XML/platform-integration/source validation, the `GDK_DPI_SCALE=2` headless GTK V1.2 runtime probe, Debian `0.1.0~dev18` build and package inspection; Platform Contract run `34071149673` passed against the synchronized central V1.2 baseline; and theme-source run `34071149358` passed. The generated Development package checksum for that run was `ce9d1a5a9ec2d14a09c3ecd0dbe64b8af86d29a7a70ac8b6bc840e2db0252da2`. This is repository/CI evidence only and does not replace representative-device visual, input, assistive-technology, resilience, or package-lifecycle acceptance.
 
 ## Current blockers
 
 Care remains nonconformant against the complete Stable V1.2 consumer gate until all required exact-candidate evidence is resolved and recorded, including:
 
-- fully green exact-head V1.2 source/runtime/package CI;
 - representative continuous drag-resize responsiveness under the supported 200%-text condition;
 - complete Maintenance Insights forward/reverse keyboard traversal through and beyond selectable findings on the representative target;
 - broader Maintenance Insights AT-SPI/Orca behavior and dynamic core status event/announcement acceptance;
