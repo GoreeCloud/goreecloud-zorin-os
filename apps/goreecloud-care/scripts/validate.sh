@@ -52,6 +52,15 @@ assert everkeep_acceptance['acceptance']['everkeep_integrated'] is False
 assert everkeep_acceptance['acceptance']['everkeep_ready'] is False
 assert everkeep_acceptance['acceptance']['target_runtime_acceptance_required'] is True
 assert everkeep_acceptance['acceptance']['exact_revision_acceptance_required'] is True
+assert everkeep_acceptance['acceptance']['separate_everkeep_governance_required'] is True
+assert everkeep_acceptance['authority']['care_may_promote_everkeep'] is False
+assert everkeep_acceptance['authority']['ready_requires_exact_match_between_records'] is True
+
+continuity_schema = json.loads(Path('contracts/continuity.status.schema.json').read_text(encoding='utf-8'))
+assert continuity_schema['properties']['producer']['const'] == 'GoreeCloud Care'
+assert continuity_schema['properties']['dimension']['const'] == 'restore_capability'
+assert set(continuity_schema['properties']['state']['enum']) == {'attention', 'ready'}
+assert 'everkeep-promoted' in continuity_schema['properties']['stage']['enum']
 print('Platform integration contract validation: passed')
 PY
 # Exact Development version alignment.
@@ -142,7 +151,14 @@ grep -F 'contains_raw_scan_errors' goreecloud_care/reporting.py >/dev/null
 grep -F 'read-only-local-maintenance-report' goreecloud_care/reporting.py >/dev/null
 grep -F 'classify_disk_headroom' goreecloud_care/reporting.py >/dev/null
 grep -F 'production_approved: bool = False' goreecloud_care/platform_status.py >/dev/null
-grep -F 'rollback_verified: bool = False' goreecloud_care/platform_status.py >/dev/null
+grep -F 'REPRESENTATIVE_ACCEPTANCE_PATH = Path(' goreecloud_care/platform_status.py >/dev/null
+grep -F 'EVERKEEP_ACCEPTANCE_PATH = Path(' goreecloud_care/platform_status.py >/dev/null
+grep -F '"target-accepted-governance-pending"' goreecloud_care/platform_status.py >/dev/null
+grep -F '"everkeep-promoted"' goreecloud_care/platform_status.py >/dev/null
+grep -F '"freshness"] = "exact-build-bound"' goreecloud_care/platform_status.py >/dev/null
+grep -F 'decision.get("everkeep_integration_promoted") is True' goreecloud_care/platform_status.py >/dev/null
+grep -F 'decision.get("everkeep_ready_promoted") is True' goreecloud_care/platform_status.py >/dev/null
+! grep -F 'rollback_verified' goreecloud_care/platform_status.py >/dev/null
 grep -F '"protected_by_wardveil": False' goreecloud_care/platform_status.py >/dev/null
 grep -F 'stat.S_IWGRP | stat.S_IWOTH' goreecloud_care/platform_status.py >/dev/null
 # Maintenance Insights must remain bounded, local, review-only, large-text reachable and content-first.
@@ -175,7 +191,7 @@ grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
 grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
 grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
 # Mandatory GoreeCloud component documentation and integration records.
-for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json contracts/everkeep.acceptance.json scripts/validate-installed.sh scripts/validate-package-lifecycle.sh packaging/postinst packaging/postrm; do
+for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json contracts/everkeep.acceptance.json contracts/continuity.status.schema.json scripts/validate-installed.sh scripts/validate-package-lifecycle.sh scripts/run-representative-acceptance.sh packaging/postinst packaging/postrm; do
   test -s "$f"
 done
 echo 'Local source validation: passed'
