@@ -43,14 +43,15 @@ candidate_runtime=$(printf '%s' "$candidate_version" | sed 's/~/-/')
 previous_runtime=$(printf '%s' "$previous_version" | sed 's/~/-/')
 
 case "$candidate_version" in
-  0.1.0~dev18) ;;
-  *) echo "This Development lifecycle probe expects candidate 0.1.0~dev18; got $candidate_version" >&2; exit 2 ;;
+  0.1.0~dev19) ;;
+  *) echo "This Development lifecycle probe expects candidate 0.1.0~dev19; got $candidate_version" >&2; exit 2 ;;
 esac
 
 printf '%s\n' "Package lifecycle acceptance will temporarily remove and downgrade GoreeCloud Care."
 printf '%s\n' "Candidate: $candidate_version"
 printf '%s\n' "Previous:  $previous_version"
 printf '%s\n' "Representative user: $(id -un) (uid $(id -u))"
+printf '%s\n' "The probe intentionally executes installed runtime checks from the current source working directory; dev19 must remain isolated from that source tree."
 printf '%s\n' "No Care-owned user data is expected to be removed; this script does not invoke Care cleanup actions."
 printf '%s\n' "Administrator authentication may be requested by apt."
 
@@ -63,8 +64,16 @@ assert_version() {
   expected_package=$1
   expected_runtime=$2
   installed=$(dpkg-query -W -f='${Status} ${Version}' goreecloud-care)
-  [ "$installed" = "install ok installed $expected_package" ]
-  [ "$(goreecloud-care --version)" = "$expected_runtime" ]
+  [ "$installed" = "install ok installed $expected_package" ] || {
+    echo "Installed package state mismatch: expected='install ok installed $expected_package' actual='$installed'" >&2
+    exit 1
+  }
+  actual_runtime=$(goreecloud-care --version)
+  [ "$actual_runtime" = "$expected_runtime" ] || {
+    echo "Installed runtime mismatch: package=$expected_package expected_runtime=$expected_runtime actual_runtime=$actual_runtime" >&2
+    echo "This may indicate working-directory/PYTHONPATH shadowing or stale installed bytecode." >&2
+    exit 1
+  }
 }
 
 printf '%s\n' "[1/6] Install/upgrade candidate"
@@ -85,6 +94,10 @@ for path in \
   /usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg; do
   [ ! -e "$path" ] || { echo "Package-owned path remained after removal: $path" >&2; exit 1; }
 done
+[ ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ ] || {
+  echo "Private Python bytecode remained after package removal" >&2
+  exit 1
+}
 
 printf '%s\n' "[3/6] Reinstall candidate as a fresh package state"
 install_package "$CANDIDATE"
