@@ -30,6 +30,22 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertNotIn('-Zxz', BUILD)
         self.assertNotIn('-Zzstd', BUILD)
 
+    def test_build_rejects_dirty_or_untracked_package_inputs(self):
+        self.assertIn('git -C "$REPO_ROOT" diff --quiet -- apps/goreecloud-care', BUILD)
+        self.assertIn('git -C "$REPO_ROOT" diff --cached --quiet -- apps/goreecloud-care', BUILD)
+        self.assertIn('git -C "$REPO_ROOT" ls-files --error-unmatch', BUILD)
+        self.assertIn('Package input is not part of the exact committed Care source', BUILD)
+        self.assertIn('"$ROOT/goreecloud_care/"*.py', BUILD)
+
+    def test_build_embeds_exact_source_provenance_without_circular_package_hash(self):
+        self.assertIn('/usr/share/goreecloud-care/build-provenance.json', BUILD)
+        self.assertIn('SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)', BUILD)
+        self.assertIn('SOURCE_TREE=$(git -C "$REPO_ROOT" rev-parse HEAD:apps/goreecloud-care)', BUILD)
+        self.assertIn('"source_revision": revision', BUILD)
+        self.assertIn('"source_tree": tree', BUILD)
+        self.assertIn('"package_sha256_embedded": False', BUILD)
+        self.assertIn("embedding a package's own hash is circular", BUILD)
+
     def test_verifier_compares_independent_build_to_reference(self):
         self.assertIn('SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" sh "$ROOT/scripts/build-deb.sh"', VERIFY)
         self.assertIn('cmp -s "$REFERENCE" "$REBUILT"', VERIFY)
