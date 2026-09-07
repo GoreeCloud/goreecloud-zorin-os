@@ -35,16 +35,39 @@ jobs:
           printf 'Expected source revision: %s\nActual source revision:   %s\n' "$expected" "$actual"
           test "$actual" = "$expected"
 
-      - name: Install native GTK test dependencies
+      - name: Install native GTK and accessibility test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-gi gir1.2-gtk-3.0 gir1.2-atk-1.0 xvfb
+          sudo apt-get install -y \
+            python3-gi gir1.2-gtk-3.0 gir1.2-atk-1.0 xvfb \
+            at-spi2-core python3-pyatspi dbus-x11
 
       - name: Validate Care source
         run: sh ./scripts/validate.sh
 
       - name: Run headless GTK runtime acceptance
         run: xvfb-run -a env GDK_DPI_SCALE=2 python3 tests/runtime_ui_acceptance.py
+
+      - name: Run live AT-SPI dynamic status acceptance
+        run: |
+          dbus-run-session -- xvfb-run -a bash -euc '
+            export NO_AT_BRIDGE=0
+            export GDK_DPI_SCALE=2
+            export GSETTINGS_BACKEND=memory
+            gsettings set org.gnome.desktop.interface toolkit-accessibility true
+            python3 -m goreecloud_care >/tmp/goreecloud-care-atspi.log 2>&1 &
+            care_pid=$!
+            cleanup() {
+              kill "$care_pid" 2>/dev/null || true
+              wait "$care_pid" 2>/dev/null || true
+            }
+            trap cleanup EXIT INT TERM
+            sleep 1
+            if ! python3 tests/atspi_runtime_acceptance.py; then
+              cat /tmp/goreecloud-care-atspi.log >&2 || true
+              exit 1
+            fi
+          '
 
       - name: Run Dark HeaderBar runtime contrast acceptance
         run: xvfb-run -a env GDK_DPI_SCALE=2 GOREECLOUD_CARE_APPEARANCE=dark python3 tests/runtime_ui_acceptance.py
