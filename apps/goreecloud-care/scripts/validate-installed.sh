@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
-EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev21}
-EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev21}
+EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev22}
+EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev22}
 
 for command_name in goreecloud-care dpkg-query mktemp mkdir rm; do
   command -v "$command_name" >/dev/null
