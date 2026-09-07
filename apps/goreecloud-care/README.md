@@ -29,7 +29,9 @@ Current dev22 work includes:
 - installed Wardveil-compatible privilege-boundary prequalification with current/fresh/scoped/minimized evidence and an explicit `protected_by_wardveil=false` invariant;
 - immutable Development package/rollback-package provenance preservation in CI artifacts.
 
-The exact current branch revision, workflow run IDs, package digest and artifact ID are maintained in PR #2 and the canonical Care project/change records so this README does not become self-stale when documentation-only commits advance the branch.
+The separate `hardening/care-reproducible-package` branch adds deterministic Debian package construction for the same Development version. It binds package timestamps to `SOURCE_DATE_EPOCH` derived from the exact Git revision when not supplied, normalizes staged filesystem mtimes, and adds a byte-for-byte independent rebuild comparison in CI. This is a hardening candidate until its exact-head workflows pass; it does not retroactively make the already accepted `a0eeac5...` package reproducible.
+
+The exact accepted branch revision, workflow run IDs, package digest and artifact ID are maintained in PR #2 and the canonical Care project/change records so this README does not become self-stale when documentation-only commits advance a Development branch.
 
 ## Current features
 
@@ -88,7 +90,7 @@ runtime_acceptance_required=true
 production_approved=false
 ```
 
-Registration or Development evidence does not constitute production approval.
+Exact dev22 representative runtime acceptance is centrally recorded for the accepted revision, but production approval remains a separate governed release gate. A later hardening revision does not inherit exact-revision acceptance automatically.
 
 ### Wardveil Security
 
@@ -106,7 +108,7 @@ See [`WARDVEIL-INTEGRATION.md`](WARDVEIL-INTEGRATION.md).
 
 ### Everkeep
 
-Care has package-lifecycle and restore-path evidence, including accepted representative dev20 history and repeatable CI prequalification. Governed Everkeep readiness remains fail-closed until the exact release candidate satisfies the authoritative target-runtime acceptance policy and is explicitly promoted. `--continuity-status-json` therefore remains `attention` in Development.
+Care has package-lifecycle and restore-path evidence, including accepted representative dev20 history, exact dev22 representative lifecycle evidence, and repeatable CI prequalification. Governed Everkeep readiness remains fail-closed until the exact release candidate satisfies the authoritative target-runtime acceptance policy and is explicitly promoted. `--continuity-status-json` therefore remains `attention` in Development.
 
 ## Maintenance Insights
 
@@ -171,7 +173,10 @@ These are reproducible Development controls, not a claim that cross-device Perso
 ```sh
 sh ./scripts/validate.sh
 sh ./scripts/build-deb.sh
+sh ./scripts/verify-reproducible-package.sh ./dist/goreecloud-care_0.1.0~dev22_all.deb
 ```
+
+`build-deb.sh` never uses the wall clock for package metadata. In a Git checkout it derives `SOURCE_DATE_EPOCH` from the exact repository `HEAD`; outside a Git checkout an explicit `SOURCE_DATE_EPOCH` is required. The staged package tree is normalized to that timestamp before `dpkg-deb` builds the archive. The verifier independently rebuilds with the same epoch and requires byte-for-byte identity with the reference package.
 
 Development CI verifies the exact PR head and currently exercises:
 
@@ -183,7 +188,8 @@ Development CI verifies the exact PR head and currently exercises:
 - Dark/Deep Dark command contrast;
 - clarity profiles;
 - Reduced Motion behavior;
-- Debian package inspection;
+- Debian package construction and inspection;
+- byte-for-byte reproducible-package verification on the hardening branch;
 - immutable dev17 rollback construction;
 - full installed dev22↔dev17 lifecycle prequalification;
 - installed Wardveil-compatible boundary prequalification;
@@ -235,12 +241,13 @@ Care remains **Development / nonconformant**. Automated Development evidence has
 
 Remaining release boundaries include:
 
+- exact-head validation of the deterministic package hardening branch and, if integrated, exact-candidate representative target acceptance for the resulting new source revision;
 - final representative Orca speech/announcement-quality acceptance;
 - final physical Zorin optical/compositor review for native window controls and canonical Care icon rendering, including Dark/Deep Dark;
 - actual desktop PolicyKit-agent success/cancellation/failure UX and any controlled destructive-flow evidence required by release policy;
-- exact-candidate representative-target acceptance required by Privacy Shield, Wardveil and Everkeep governance;
-- central/guided Wardveil consumer evidence registration and governed promotion;
-- exact-candidate Privacy Shield approval while `production_approved=false` remains authoritative until then;
+- Privacy Shield governed production approval for an eligible exact candidate;
+- governed Wardveil runtime/adoption promotion while `protected_by_wardveil=false` remains authoritative until accepted;
+- governed Everkeep integration/readiness promotion after the exact candidate satisfies the required evidence;
 - applicable future Glaze consumer acceptance only when upstream V1.3 lifecycle permits it;
 - immutable Release Candidate regression/evidence and explicit governed lifecycle promotion.
 
