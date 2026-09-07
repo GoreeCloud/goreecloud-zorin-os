@@ -55,7 +55,7 @@ goreecloud-care --continuity-status-json
 
 The API version is `1`. `--health-json` produces minimized readiness/status information. `--privacy-status-json` uses the current Privacy Shield status shape and remains `development` / `production_approved=false` until runtime acceptance is completed. `--security-status-json` emits a narrowly scoped Wardveil-compatible status for Care’s installed helper/PolicyKit boundary and deliberately keeps `protected_by_wardveil=false`. `--continuity-status-json` fails closed to `attention` until representative-device package rollback has actually been accepted.
 
-Repository-local Privacy Shield application/adapter declarations, Everkeep adoption and acceptance declarations, and the Wardveil integration boundary live in `contracts/`, `API.md`, and `WARDVEIL-INTEGRATION.md`. These source declarations are integration foundations, not production approval. The authoritative Privacy Shield-side Care adapter registration is currently proposed in Draft PR 17 and intentionally remains `production_approved=false`.
+Repository-local Privacy Shield application/adapter declarations, Everkeep adoption and acceptance declarations, and the Wardveil integration boundary live in `contracts/`, `API.md`, and `WARDVEIL-INTEGRATION.md`. These source declarations are integration foundations, not production approval. The authoritative Privacy Shield-side Care adapter registration is currently proposed in Draft PR 74 and intentionally remains `production_approved=false`.
 
 ## Maintenance Insights — dev14 foundation through dev17 refinement
 
