@@ -21,6 +21,19 @@ class EverkeepContractTests(unittest.TestCase):
         self.assertIn("restore_capability", adoption["dimensions"])
         self.assertIn("provenance", adoption["dimensions"])
 
+    def test_continuity_status_schema_exists_and_blocks_unpromoted_ready(self) -> None:
+        schema_path = CONTRACTS / "continuity.status.schema.json"
+        self.assertTrue(schema_path.is_file())
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        self.assertEqual(schema["properties"]["producer"]["const"], "GoreeCloud Care")
+        self.assertEqual(schema["properties"]["dimension"]["const"], "restore_capability")
+        self.assertEqual(set(schema["properties"]["state"]["enum"]), {"attention", "ready"})
+        self.assertIn("everkeep-promoted", schema["properties"]["stage"]["enum"])
+        ready_rule = schema["allOf"][0]["then"]
+        self.assertEqual(ready_rule["properties"]["stage"]["const"], "everkeep-promoted")
+        self.assertEqual(ready_rule["properties"]["freshness"]["const"], "exact-build-bound")
+        self.assertEqual(ready_rule["properties"]["limitations"]["maxItems"], 0)
+
     def test_acceptance_policy_cannot_claim_ready_before_target_acceptance(self) -> None:
         policy = json.loads((CONTRACTS / "everkeep.acceptance.json").read_text(encoding="utf-8"))
         self.assertEqual(policy["schema_version"], 1)
@@ -32,6 +45,17 @@ class EverkeepContractTests(unittest.TestCase):
         self.assertFalse(policy["acceptance"]["everkeep_ready"])
         self.assertTrue(policy["acceptance"]["target_runtime_acceptance_required"])
         self.assertTrue(policy["acceptance"]["exact_revision_acceptance_required"])
+        self.assertTrue(policy["acceptance"]["separate_everkeep_governance_required"])
+        self.assertFalse(policy["authority"]["care_may_promote_everkeep"])
+        self.assertTrue(policy["authority"]["ready_requires_exact_match_between_records"])
+        self.assertEqual(
+            policy["authority"]["care_owned_target_record"],
+            "/var/lib/goreecloud-care/acceptance/representative-target.json",
+        )
+        self.assertEqual(
+            policy["authority"]["everkeep_governance_record"],
+            "/var/lib/goreecloud/everkeep/acceptance/goreecloud-care.target-runtime.json",
+        )
         self.assertFalse(
             policy["acceptance"]["everkeep_ready"]
             and not policy["acceptance"]["everkeep_integrated"]
@@ -43,8 +67,16 @@ class EverkeepContractTests(unittest.TestCase):
         provenance = "\n".join(policy["required_ready_evidence"]["provenance"]).lower()
         for required in ("installs", "removal", "reinstalls", "downgrade", "restored", "sha-256"):
             self.assertIn(required, restore)
-        for required in ("source revision", "sha-256", "ci workflow", "goreecloud/goreecloud-zorin-os"):
+        for required in (
+            "source revision",
+            "source tree",
+            "sha-256",
+            "ci workflow",
+            "goreecloud/goreecloud-zorin-os",
+            "untracked package inputs",
+        ):
             self.assertIn(required, provenance)
+        self.assertIn("separate everkeep-owned governance record", restore)
 
     def test_sensitive_recovery_material_is_forbidden(self) -> None:
         policy = json.loads((CONTRACTS / "everkeep.acceptance.json").read_text(encoding="utf-8"))
@@ -72,13 +104,15 @@ class EverkeepContractTests(unittest.TestCase):
         self.assertIn("Previous package must sort older than the candidate", source)
         self.assertIn("This Development lifecycle probe expects candidate 0.1.0~dev22", source)
 
-    def test_package_lifecycle_probe_guards_runtime_isolation_and_bytecode_cleanup(self) -> None:
+    def test_package_lifecycle_probe_guards_runtime_isolation_bytecode_and_provenance_cleanup(self) -> None:
         source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
         self.assertIn("Dev22 candidate checks deliberately exercise source/working-directory shadow resistance", source)
         self.assertIn("working-directory/PYTHONPATH shadowing", source)
         self.assertIn("Private Python bytecode remained after package removal", source)
         self.assertIn("PREVIOUS_PROBE_DIR=$(mktemp -d)", source)
         self.assertIn("dev17 predates that isolation contract", source)
+        self.assertIn("/usr/share/goreecloud-care/build-provenance.json", source)
+        self.assertIn("/usr/share/goreecloud-care", source)
 
 
 if __name__ == "__main__":
