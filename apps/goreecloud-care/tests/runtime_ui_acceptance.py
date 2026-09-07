@@ -21,6 +21,7 @@ from gi.repository import Gio, Gtk  # noqa: E402
 
 from goreecloud_care.app import CareWindow
 from goreecloud_care.glaze_v13 import (
+    CSS,
     GLAZE_UI_CONSUMER_ELIGIBLE,
     GLAZE_UI_LIFECYCLE,
     GLAZE_UI_STABLE_BASELINE,
@@ -47,6 +48,10 @@ def make_app() -> Gtk.Application:
     )
     app.register(None)
     return app
+
+
+def _truthy(value: str | None) -> bool:
+    return (value or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _linear_channel(value: float) -> float:
@@ -81,9 +86,17 @@ def _descendant_buttons(widget) -> list[Gtk.Button]:
 
 def test_core_status_accessible_mutation_and_layout(app: Gtk.Application) -> None:
     window = CareWindow(app)
+    visible_data_events: list[str] = []
+    window.status_accessible.connect(
+        "visible-data-changed",
+        lambda accessible: visible_data_events.append(accessible.get_name() or ""),
+    )
     window.set_status("Synthetic completion state.", "success", "Completed")
+    drain_events()
     name = window.status_accessible.get_name()
     assert name == "Completed. Synthetic completion state.", name
+    assert visible_data_events, "status accessible did not emit visible-data-changed"
+    assert visible_data_events[-1] == name, visible_data_events[-1]
 
     window._apply_layout(480)
     assert window._layout_environment == "compact"
@@ -135,6 +148,70 @@ def test_dark_headerbar_runtime_contrast(app: Gtk.Application) -> None:
         checked += 1
 
     print(f"{appearance} HeaderBar runtime contrast: passed for {checked} visible button(s)")
+    window.destroy()
+
+
+def test_clarity_runtime_geometry(app: Gtk.Application) -> None:
+    clarity = os.environ.get("GOREECLOUD_CARE_GLAZE_CLARITY", "").strip().lower()
+    if clarity not in {"clear", "balanced", "dense"}:
+        return
+
+    window = CareWindow(app)
+    window.show_all()
+    drain_events()
+
+    row = window.category_layouts["cache"][0]
+    context = row.get_style_context()
+    padding = context.get_padding(context.get_state())
+    expected = {
+        "clear": (15, 16),
+        "balanced": (12, 14),
+        "dense": (9, 12),
+    }[clarity]
+    vertical, horizontal = expected
+    assert (padding.top, padding.bottom) == (vertical, vertical), (
+        clarity,
+        padding.top,
+        padding.bottom,
+    )
+    assert (padding.left, padding.right) == (horizontal, horizontal), (
+        clarity,
+        padding.left,
+        padding.right,
+    )
+    assert window.clean.get_can_focus()
+    assert window.trash.get_can_focus()
+    assert window.apt.get_can_focus()
+    assert window.memory_btn.get_can_focus()
+
+    print(
+        f"{clarity} clarity runtime geometry: passed "
+        f"(vertical={vertical}px, horizontal={horizontal}px)"
+    )
+    window.destroy()
+
+
+def test_reduced_motion_runtime_contract(app: Gtk.Application) -> None:
+    if not _truthy(os.environ.get("GOREECLOUD_CARE_REDUCE_MOTION")):
+        return
+
+    # Care currently owns no timed animation or transition. Reduced Motion also
+    # suppresses the only application-owned expressive hover/elevation effect.
+    # This makes the gate deterministic instead of relying on a screenshot.
+    css = CSS.decode("utf-8")
+    assert "transition:" not in css
+    assert "animation:" not in css
+    assert (
+        "window.care-shell.reduced-motion button:hover,\n"
+        "window.care-shell.reduced-motion .hero-surface { box-shadow: none; }"
+    ) in css
+
+    window = CareWindow(app)
+    window.show_all()
+    drain_events()
+    assert window.scan_btn.get_can_focus()
+    assert window.clean.get_can_focus()
+    print("Reduced Motion application-owned behavior: passed (no timed motion; elevation suppressed)")
     window.destroy()
 
 
@@ -215,6 +292,8 @@ def main() -> int:
     app = make_app()
     test_core_status_accessible_mutation_and_layout(app)
     test_dark_headerbar_runtime_contrast(app)
+    test_clarity_runtime_geometry(app)
+    test_reduced_motion_runtime_contract(app)
     test_insights_focus_resize_and_rendering(app)
     print(
         "Headless GTK runtime acceptance probe: passed "
