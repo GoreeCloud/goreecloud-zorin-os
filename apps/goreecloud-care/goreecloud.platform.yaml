@@ -209,14 +209,14 @@ evidence:
     - id: care-dev12-atspi-application-identity-static-semantics-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cbec094dd3cbec094dd3cbec0
+      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
       result: passed
       observed_at: "2026-09-06T14:14:00Z"
       notes: Representative-device AT-SPI inspection exposed GoreeCloud Care as the application root and verified expected static status-bar, selector/action roles, names/descriptions, checked state, and focused state for the accepted static semantic slice.
     - id: care-dev12-atspi-dynamic-listener-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cbec094dd3cbec094dd3cbec0
+      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
       result: blocked
       observed_at: "2026-09-06T14:40:00Z"
       notes: Dynamic status event/Orca quality remains open; one listener run also reported a stale/unavailable AT-SPI socket.
