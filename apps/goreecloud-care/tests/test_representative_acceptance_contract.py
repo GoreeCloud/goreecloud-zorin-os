@@ -46,8 +46,8 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertIn('source_branch=$SOURCE_BRANCH', self.source)
 
     def test_preparation_harness_records_exact_source_and_package_provenance(self) -> None:
-        self.assertIn('EXPECTED_RUNTIME_VERSION="0.1.0-dev20"', self.source)
-        self.assertIn('EXPECTED_PACKAGE_VERSION="0.1.0~dev20"', self.source)
+        self.assertIn('EXPECTED_RUNTIME_VERSION="0.1.0-dev21"', self.source)
+        self.assertIn('EXPECTED_PACKAGE_VERSION="0.1.0~dev21"', self.source)
         self.assertIn('"$RUNTIME_VERSION" = "$EXPECTED_RUNTIME_VERSION"', self.source)
         self.assertIn('"$PACKAGE_VERSION" = "$EXPECTED_PACKAGE_VERSION"', self.source)
         self.assertIn('sha256sum "$PACKAGE"', self.source)
@@ -65,7 +65,7 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertNotIn('find "$ROOT/dist"', self.source)
         self.assertNotIn("sort | tail", self.source)
 
-    def test_preparation_harness_gates_dev20_status_probes_on_installed_runtime(self) -> None:
+    def test_preparation_harness_gates_dev21_status_probes_on_installed_runtime(self) -> None:
         self.assertIn('INSTALLED_PROBE_DIR=$(mktemp -d)', self.source)
         self.assertIn(
             'INSTALLED_RUNTIME=$(cd "$INSTALLED_PROBE_DIR" && goreecloud-care --version 2>/dev/null || true)',
@@ -77,7 +77,7 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         )
         self.assertIn("api_version=not-probed-runtime-mismatch", self.source)
         self.assertIn(
-            "Installed Care runtime differs from the dev20 source candidate; dev20-only status snapshots were skipped.",
+            "Installed Care runtime differs from the dev21 source candidate; dev21-only status snapshots were skipped.",
             self.source,
         )
         self.assertIn("installed-status-snapshots-skipped.txt", self.source)
