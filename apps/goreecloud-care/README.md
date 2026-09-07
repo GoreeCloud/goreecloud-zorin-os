@@ -90,6 +90,8 @@ sh ./scripts/build-deb.sh
 
 The Development CI also runs the GTK runtime probe under Xvfb, inspects the Debian package, generates a SHA-256 file, and preserves the exact package/checksum as a short-lived workflow artifact. A successful Development artifact remains evidence only; it is not a Release Candidate or Stable release by itself.
 
+Repository validation is accepted for exact dev18 head `23d2cf54643197bd5eca132bc71882a181eb9ca6`: Care Development run `34071149359` passed 73 tests, XML/platform-integration/source validation, the `GDK_DPI_SCALE=2` headless GTK V1.2 runtime probe, Debian `0.1.0~dev18` build and package inspection; Care Platform Contract run `34071149673` passed after repinning to central Platform Contract revision `c941ce1d8d1eff3c9df994d1e16f83147eadae00`; and theme-source run `34071149358` passed. The Development package checksum for that run is `ce9d1a5a9ec2d14a09c3ecd0dbe64b8af86d29a7a70ac8b6bc840e2db0252da2`. This establishes repository/CI evidence only, not representative-device acceptance.
+
 ## Package lifecycle acceptance
 
 The representative target can exercise the recovery gate with:
@@ -116,6 +118,6 @@ sudo apt remove goreecloud-care
 
 ## Release boundary
 
-The generated Debian package remains Development software. Exact-head dev18 V1.2 regression CI, representative appearance/resilience and drag-resize checks, live keyboard/AT-SPI/Orca acceptance, package rollback, canonical icon target rendering, current-Stable GLAZE UI V1.2 consumer acceptance, Privacy Shield runtime acceptance, Wardveil adoption/runtime acceptance, Everkeep continuity acceptance, and governed immutable Release Candidate qualification remain required before Stable consideration.
+The generated Debian package remains Development software. Repository-level dev18 V1.2 validation is green, but representative appearance/resilience and drag-resize checks, live keyboard/AT-SPI/Orca acceptance, package rollback, canonical icon target rendering, current-Stable GLAZE UI V1.2 consumer acceptance, Privacy Shield runtime acceptance, Wardveil adoption/runtime acceptance, Everkeep continuity acceptance, exact release-candidate regression, and governed immutable Release Candidate qualification remain required before Stable consideration.
 
 The canonical source-control authority is `GoreeCloud/goreecloud-zorin-os`. GoreeCloud Care is maintained as the `apps/goreecloud-care/` component so its Zorin OS packaging, desktop integration, target-device acceptance, and Platform Contract evidence remain coupled to the GoreeCloud Zorin OS development surface while preserving a distinct application boundary.
