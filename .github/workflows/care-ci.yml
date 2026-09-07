@@ -23,8 +23,17 @@ jobs:
       run:
         working-directory: apps/goreecloud-care
     steps:
-      - name: Check out repository
+      - name: Check out exact source revision
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Verify exact source revision
+        run: |
+          expected='${{ github.event.pull_request.head.sha || github.sha }}'
+          actual="$(git rev-parse HEAD)"
+          printf 'Expected source revision: %s\nActual source revision:   %s\n' "$expected" "$actual"
+          test "$actual" = "$expected"
 
       - name: Install native GTK test dependencies
         run: |
@@ -45,10 +54,15 @@ jobs:
           dpkg-deb -I dist/goreecloud-care_0.1.0~dev18_all.deb
           dpkg-deb -c dist/goreecloud-care_0.1.0~dev18_all.deb
 
-      - name: Record Development package checksum
+      - name: Record Development package provenance
         run: |
           cd dist
           sha256sum goreecloud-care_0.1.0~dev18_all.deb | tee SHA256SUMS
+          printf 'source_revision=%s\nworkflow_run_id=%s\n' \
+            '${{ github.event.pull_request.head.sha || github.sha }}' \
+            '${{ github.run_id }}' \
+            > SOURCE_REVISION
+          cat SOURCE_REVISION
 
       - name: Preserve Development package evidence
         uses: actions/upload-artifact@v4
@@ -57,5 +71,6 @@ jobs:
           path: |
             apps/goreecloud-care/dist/goreecloud-care_0.1.0~dev18_all.deb
             apps/goreecloud-care/dist/SHA256SUMS
+            apps/goreecloud-care/dist/SOURCE_REVISION
           if-no-files-found: error
           retention-days: 14
