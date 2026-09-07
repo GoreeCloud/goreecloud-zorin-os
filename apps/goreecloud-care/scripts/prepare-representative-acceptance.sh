@@ -4,8 +4,8 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 OUT=${1:-"$ROOT/dist/representative-acceptance"}
-EXPECTED_RUNTIME_VERSION="0.1.0-dev21"
-EXPECTED_PACKAGE_VERSION="0.1.0~dev21"
+EXPECTED_RUNTIME_VERSION="0.1.0-dev22"
+EXPECTED_PACKAGE_VERSION="0.1.0~dev22"
 EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 
 for command_name in git python3 sha256sum dpkg-deb tee awk rm mktemp; do
@@ -111,12 +111,12 @@ if command -v goreecloud-care >/dev/null 2>&1; then
       printf 'api_version=not-probed-runtime-mismatch\n'
     } > "$OUT/installed-version.txt"
     printf '%s\n' \
-      "Installed Care runtime differs from the dev21 source candidate; dev21-only status snapshots were skipped." \
+      "Installed Care runtime differs from the dev22 source candidate; dev22-only status snapshots were skipped." \
       > "$OUT/installed-status-snapshots-skipped.txt"
   fi
 else
   printf '%s\n' "GoreeCloud Care is not currently installed; installed read-only status snapshots were skipped." > "$OUT/installed-version.txt"
-  printf '%s\n' "No installed Care executable was found; dev21-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
+  printf '%s\n' "No installed Care executable was found; dev22-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
 fi
 
 cat > "$OUT/MANUAL-CHECKLIST.txt" <<'EOF'
@@ -127,7 +127,7 @@ Record PASS or FAIL plus notes for every exercised item. A blank item is NOT acc
 Do not use unrelated personal files for destructive-flow testing; use disposable fixtures/test data.
 Do not promote lifecycle status from this checklist alone.
 
-GLAZE UI lifecycle note: Care dev21 implements the latest Proposed V1.3 Adaptive Resonance development language. V1.3 Candidate is not active and consumer eligibility is not granted upstream; GLAZE UI V1.2 / 1.2.0 remains the official Stable compatibility baseline.
+GLAZE UI lifecycle note: Care dev22 implements the latest Proposed V1.3 Adaptive Resonance development language. V1.3 Candidate is not active and consumer eligibility is not granted upstream; GLAZE UI V1.2 / 1.2.0 remains the official Stable compatibility baseline.
 
 A. Large text / continuous resize
 [ ] PASS [ ] FAIL  GDK_DPI_SCALE=2 Care and Maintenance Insights open in compact layouts.
@@ -152,14 +152,14 @@ Notes:
 
 D. Adaptive Resonance appearance / resilience
 [ ] PASS [ ] FAIL  System Light presentation is readable, neutral, and visually complete.
-[ ] PASS [ ] FAIL  System/Dark presentation is readable, neutral, and visually complete.
+[ ] PASS [ ] FAIL  System/Dark presentation is readable, neutral, and visually complete, including HeaderBar Scan/window-control contrast.
 [ ] PASS [ ] FAIL  HighContrast remains system-authoritative and focus is visible.
 [ ] PASS [ ] FAIL  Reduced Transparency converts glazed chrome/signature surfaces to solid equivalents.
 [ ] PASS [ ] FAIL  Reduced Motion does not remove required state feedback.
 [ ] PASS [ ] FAIL  Show Borders strengthens boundaries without relying on extra saturation.
 [ ] PASS [ ] FAIL  Calm / Balanced / Expressive profiles change emphasis without changing semantic correctness.
 [ ] PASS [ ] FAIL  Clear / Balanced / Dense clarity profiles remain distinct from expression and preserve target size/readability.
-[ ] PASS [ ] FAIL  Deep Dark Development override, if reviewed, is clearly treated as Development evidence rather than an automatically released mode.
+[ ] PASS [ ] FAIL  Deep Dark Development override, if reviewed, is clearly treated as Development evidence and retains readable HeaderBar controls.
 Notes:
 
 E. Visual / Glaze discipline / branding
@@ -241,7 +241,7 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   sh ./scripts/build-dev17-rollback-package.sh
 
 # Package lifecycle (run as the normal desktop user; the script requests sudo only for apt operations)
-  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev21_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
+  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev22_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 EOF
 
 printf '%s\n' "Representative acceptance preparation: passed"
