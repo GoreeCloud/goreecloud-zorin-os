@@ -43,13 +43,13 @@ candidate_runtime=$(printf '%s' "$candidate_version" | sed 's/~/-/')
 previous_runtime=$(printf '%s' "$previous_version" | sed 's/~/-/')
 
 case "$candidate_version" in
-  0.1.0~dev21) ;;
-  *) echo "This Development lifecycle probe expects candidate 0.1.0~dev21; got $candidate_version" >&2; exit 2 ;;
+  0.1.0~dev22) ;;
+  *) echo "This Development lifecycle probe expects candidate 0.1.0~dev22; got $candidate_version" >&2; exit 2 ;;
 esac
 
 # The accepted historical dev17 package predates dev19's isolated launcher.
 # Validate that historical rollback from a clean neutral directory, while the
-# dev21 candidate retains the dev19+ source/working-directory isolation gate.
+# dev22 candidate retains the dev19+ source/working-directory isolation gate.
 PREVIOUS_PROBE_DIR=$(mktemp -d)
 cleanup() {
   rm -rf "$PREVIOUS_PROBE_DIR"
@@ -60,7 +60,7 @@ printf '%s\n' "Package lifecycle acceptance will temporarily remove and downgrad
 printf '%s\n' "Candidate: $candidate_version"
 printf '%s\n' "Previous:  $previous_version"
 printf '%s\n' "Representative user: $(id -un) (uid $(id -u))"
-printf '%s\n' "Dev21 candidate checks deliberately exercise source/working-directory shadow resistance inherited from dev19 hardening."
+printf '%s\n' "Dev22 candidate checks deliberately exercise source/working-directory shadow resistance inherited from dev19 hardening."
 printf '%s\n' "The immutable historical rollback package is validated from a clean neutral directory because dev17 predates that isolation contract."
 printf '%s\n' "No Care-owned user data is expected to be removed; this script does not invoke Care cleanup actions."
 printf '%s\n' "Administrator authentication may be requested by apt."
@@ -83,7 +83,7 @@ assert_version_from() {
   [ "$actual_runtime" = "$expected_runtime" ] || {
     echo "Installed runtime mismatch: package=$expected_package expected_runtime=$expected_runtime actual_runtime=$actual_runtime" >&2
     echo "Runtime probe directory: $runtime_dir" >&2
-    echo "For dev21 this may indicate working-directory/PYTHONPATH shadowing or stale installed bytecode." >&2
+    echo "For dev22 this may indicate working-directory/PYTHONPATH shadowing or stale installed bytecode." >&2
     exit 1
   }
 }
