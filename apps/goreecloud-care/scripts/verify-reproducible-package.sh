@@ -6,7 +6,7 @@ REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 PACKAGE_NAME="goreecloud-care_0.1.0~dev22_all.deb"
 REFERENCE=${1:-"$ROOT/dist/$PACKAGE_NAME"}
 
-for command_name in git cmp sha256sum mktemp rm sh; do
+for command_name in git cmp sha256sum awk mktemp mkdir rm sh; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
