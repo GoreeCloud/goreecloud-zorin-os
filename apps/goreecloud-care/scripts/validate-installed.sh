@@ -3,7 +3,7 @@ set -eu
 EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev22}
 EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev22}
 
-for command_name in goreecloud-care dpkg-query mktemp mkdir rm; do
+for command_name in goreecloud-care dpkg-query mktemp mkdir rm python3; do
   command -v "$command_name" >/dev/null
  done
 
@@ -11,6 +11,8 @@ installed=$(dpkg-query -W -f='${Status} ${Version}' goreecloud-care)
 [ "$installed" = "install ok installed $EXPECTED_PACKAGE_VERSION" ]
 [ "$(goreecloud-care --version)" = "$EXPECTED_RUNTIME_VERSION" ]
 [ "$(goreecloud-care --api-version)" = "1" ]
+
+test -f /usr/share/goreecloud-care/build-provenance.json
 
 report_json=$(goreecloud-care --report-json)
 health_json=$(goreecloud-care --health-json)
@@ -23,16 +25,21 @@ HEALTH_JSON=$health_json \
 PRIVACY_JSON=$privacy_json \
 SECURITY_JSON=$security_json \
 CONTINUITY_JSON=$continuity_json \
+EXPECTED_PACKAGE_VERSION=$EXPECTED_PACKAGE_VERSION \
+EXPECTED_RUNTIME_VERSION=$EXPECTED_RUNTIME_VERSION \
 python3 - <<'PY'
 import json
 import os
+import re
 from datetime import datetime, timezone
+from pathlib import Path
 
 report = json.loads(os.environ['REPORT_JSON'])
 health = json.loads(os.environ['HEALTH_JSON'])
 privacy = json.loads(os.environ['PRIVACY_JSON'])
 security = json.loads(os.environ['SECURITY_JSON'])
 continuity = json.loads(os.environ['CONTINUITY_JSON'])
+provenance = json.loads(Path('/usr/share/goreecloud-care/build-provenance.json').read_text(encoding='utf-8'))
 
 assert report['product'] == 'GoreeCloud Care'
 assert report['privacy']['contains_file_paths'] is False
@@ -54,9 +61,17 @@ assert privacy['acceptance']['runtime_acceptance_required'] is True
 assert privacy['acceptance']['production_approved'] is False
 assert privacy['state'] == 'development'
 
-# Installed Wardveil-compatible status must be explicit, scoped, current and
-# fail-closed without ever turning Care-owned boundary evidence into a broad
-# "Protected by Wardveil" claim.
+assert provenance['schema_version'] == 1
+assert provenance['application'] == 'GoreeCloud Care'
+assert provenance['producer'] == 'GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care'
+assert provenance['runtime_version'] == os.environ['EXPECTED_RUNTIME_VERSION']
+assert provenance['package_version'] == os.environ['EXPECTED_PACKAGE_VERSION']
+assert re.fullmatch(r'[0-9a-f]{40}', provenance['source_revision'])
+assert re.fullmatch(r'[0-9a-f]{40}', provenance['source_tree'])
+assert isinstance(provenance['source_date_epoch'], int)
+assert provenance['source_date_epoch'] >= 0
+assert provenance['package_sha256_embedded'] is False
+
 assert security['contract_version'] == '0.1.0'
 assert security['scope'] == {
     'kind': 'application',
@@ -85,8 +100,6 @@ assert valid_until > datetime.now(timezone.utc)
 assert security['privacy']['details_withheld'] is True
 assert security['privacy']['redactions']
 
-# Shared Wardveil evidence must not leak reusable secrets, user identity,
-# arbitrary home paths or raw privileged output.
 security_text = json.dumps(security, sort_keys=True).lower()
 for forbidden in (
     'password', 'authentication token', 'private key', 'recovery code',
@@ -96,7 +109,19 @@ for forbidden in (
 
 assert continuity['producer'] == 'GoreeCloud Care'
 assert continuity['dimension'] == 'restore_capability'
-assert continuity['state'] == 'attention'
+assert continuity['state'] in {'attention', 'ready'}
+assert continuity['stage'] in {
+    'target-acceptance-required',
+    'target-accepted-governance-pending',
+    'everkeep-promoted',
+}
+if continuity['state'] == 'ready':
+    assert continuity['stage'] == 'everkeep-promoted'
+    assert continuity['freshness'] == 'exact-build-bound'
+    assert continuity['limitations'] == []
+else:
+    assert continuity['stage'] != 'everkeep-promoted'
+    assert continuity['limitations']
 PY
 
 test -f /usr/lib/goreecloud-care/goreecloud-care-helper
@@ -108,9 +133,6 @@ test -f /usr/share/doc/goreecloud-care/API.md
 test -f /usr/share/doc/goreecloud-care/WARDVEIL-INTEGRATION.md
 grep -F 'Icon=com.goreecloud.care' /usr/share/applications/com.goreecloud.care.dev.desktop >/dev/null
 
-# Prove the installed launchers cannot be shadowed by a package with the same
-# name in the invoking working directory. This directly guards the dev18
-# representative lifecycle failure and the PolicyKit helper boundary.
 SHADOW_ROOT=$(mktemp -d)
 cleanup() {
   rm -rf "$SHADOW_ROOT"
@@ -150,7 +172,6 @@ case "$helper_output" in
     ;;
 esac
 
-# -B plus package maintainer cleanup must leave no private runtime bytecode.
 test ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ || {
   echo "Private Care bytecode cache exists after installed-runtime validation" >&2
   exit 1
@@ -158,6 +179,7 @@ test ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ || {
 
 printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe acceptance probe: passed"
 printf '%s\n' "Installed application/helper launchers are isolated from working-directory Python shadowing."
+printf '%s\n' "Installed package-owned exact-source provenance is present and structurally valid."
 printf '%s\n' "Installed Wardveil-compatible privilege-boundary evidence is passing, current, minimized, scoped, and does not claim Wardveil protection."
 printf '%s\n' "Canonical Care icon derivative is installed and referenced by the desktop entry."
-printf '%s\n' "Continuity remains attention until governed Everkeep readiness is explicitly promoted from accepted restore evidence."
+printf '%s\n' "Continuity is evidence-derived and cannot become ready without exact governed Everkeep promotion."
