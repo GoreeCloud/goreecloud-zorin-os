@@ -30,12 +30,19 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, self.source)
 
-    def test_preparation_harness_records_exact_source_and_package_provenance(self) -> None:
+    def test_preparation_harness_requires_clean_exact_source(self) -> None:
+        self.assertIn('git -C "$REPO_ROOT" status --porcelain --untracked-files=no', self.source)
+        self.assertIn("Tracked working-tree changes are present", self.source)
         self.assertIn('git -C "$REPO_ROOT" rev-parse HEAD', self.source)
+        self.assertIn('source_branch=$SOURCE_BRANCH', self.source)
+
+    def test_preparation_harness_records_exact_source_and_package_provenance(self) -> None:
         self.assertIn('sha256sum "$PACKAGE"', self.source)
         self.assertIn("source_revision=$SOURCE_REVISION", self.source)
         self.assertIn("package_sha256=$PACKAGE_SHA256", self.source)
         self.assertIn("SOURCE_REVISION", self.source)
+        self.assertIn('"$RUNTIME_VERSION" = "0.1.0-dev18"', self.source)
+        self.assertIn('"$PACKAGE_VERSION" = "0.1.0~dev18"', self.source)
 
     def test_preparation_harness_uses_only_read_only_installed_status_modes(self) -> None:
         for mode in (
