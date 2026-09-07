@@ -33,6 +33,6 @@ permissions:
 
 jobs:
   platform-contract:
-    uses: GoreeCloud/GoreeCloud/.github/workflows/reusable-platform-manifest.yml@4a0ebf20ffb669e3d5680ab6c8d34583f1712966
+    uses: GoreeCloud/GoreeCloud/.github/workflows/reusable-platform-manifest.yml@c941ce1d8d1eff3c9df994d1e16f83147eadae00
     with:
       manifest-path: apps/goreecloud-care/goreecloud.platform.yaml
