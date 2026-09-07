@@ -53,8 +53,8 @@ platform_systems:
       - tests/test_platform_status.py
       - tests/test_reporting.py
       - tests/test_insights.py
-      - https://github.com/GoreeCloud/goreecloud-privacy-shield/pull/17
-    notes: Dev18 adds explicit local-only Privacy Shield application and adapter declarations plus minimized status output for telemetry-minimization, data-minimization, and privacy-status. The authoritative Privacy Shield adapter registration is proposed in Draft PR 17 and preserves runtime_acceptance_required=true and production_approved=false. Exact-candidate runtime/application acceptance remains required.
+      - https://github.com/GoreeCloud/goreecloud-privacy-shield/pull/74
+    notes: Dev18 adds explicit local-only Privacy Shield application and adapter declarations plus minimized status output for telemetry-minimization, data-minimization, and privacy-status. The authoritative Privacy Shield adapter registration is proposed in Draft PR 74 and preserves runtime_acceptance_required=true and production_approved=false. Exact-candidate runtime/application acceptance remains required.
   wardveil_security:
     result: applicable-blocked
     version: null
