@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +23,18 @@ def drain_events(limit: int = 500) -> None:
     while Gtk.events_pending() and count < limit:
         Gtk.main_iteration_do(False)
         count += 1
+
+
+def wait_for_initial_scan(window: CareWindow, timeout: float = 8.0) -> None:
+    """Let the constructor's read-only idle scan finish before task-flow assertions."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        drain_events()
+        name = window.status_accessible.get_name() or ""
+        if name.startswith("Scan complete.") or name.startswith("Scan complete with exceptions."):
+            return
+        time.sleep(0.02)
+    raise AssertionError(f"initial read-only scan did not settle: {window.status_accessible.get_name()!r}")
 
 
 def make_app() -> Gtk.Application:
@@ -65,14 +78,15 @@ def cancel_confirmation(handler, *, label: str) -> None:
     observations: dict[str, object] = {}
     GLib.timeout_add(10, _respond_to_next_dialog, Gtk.ResponseType.CANCEL, observations)
     handler(None)
-    drain_events()
+    # Gtk.Dialog.run() has already processed the response. Do not drain unrelated
+    # idle sources here; the caller asserts the cancellation status immediately.
     assert observations.get("dialog_seen"), f"{label}: confirmation dialog did not appear"
     assert observations.get("cancel_present"), f"{label}: confirmation lacks Cancel"
     assert observations.get("cancel_focused"), f"{label}: Cancel was not initially focused"
     assert observations.get("cancel_default"), f"{label}: Cancel was not the default response"
 
 
-def close_next_notice() -> None:
+def close_next_notice() -> dict[str, object]:
     observations: dict[str, object] = {}
     GLib.timeout_add(10, _respond_to_next_dialog, Gtk.ResponseType.CLOSE, observations)
     return observations
@@ -81,6 +95,7 @@ def close_next_notice() -> None:
 def test_safe_confirmation_and_cancellation_boundaries(app: Gtk.Application) -> None:
     window = CareWindow(app)
     window.show_all()
+    wait_for_initial_scan(window)
     window.scans = synthetic_scans()
 
     # Never permit a cancellation-path regression to touch the filesystem or
@@ -139,6 +154,7 @@ def test_selection_guardrails(app: Gtk.Application) -> None:
 def test_privileged_outcome_ui_mapping(app: Gtk.Application) -> None:
     window = CareWindow(app)
     window.show_all()
+    wait_for_initial_scan(window)
 
     # Cancellation: no success claim, explicit no-change status and notice.
     close_observation = close_next_notice()
@@ -147,7 +163,6 @@ def test_privileged_outcome_ui_mapping(app: Gtk.Application) -> None:
         subprocess.CompletedProcess(["pkexec"], 126, "", "request dismissed"),
         None,
     )
-    drain_events()
     assert close_observation.get("dialog_seen"), "PolicyKit cancellation notice did not appear"
     assert window.status_accessible.get_name().startswith("Authorization cancelled. ")
     assert "made no privileged changes" in window.status_accessible.get_name()
@@ -159,7 +174,6 @@ def test_privileged_outcome_ui_mapping(app: Gtk.Application) -> None:
         subprocess.CompletedProcess(["pkexec"], 127, "", "authorization error"),
         None,
     )
-    drain_events()
     assert close_observation.get("dialog_seen"), "PolicyKit failure notice did not appear"
     assert window.status_accessible.get_name().startswith(
         "Privileged maintenance did not complete. "
@@ -175,7 +189,6 @@ def test_privileged_outcome_ui_mapping(app: Gtk.Application) -> None:
         subprocess.CompletedProcess(["pkexec"], 0, "", ""),
         None,
     )
-    drain_events()
     assert close_observation.get("dialog_seen"), "PolicyKit success notice did not appear"
     assert window.status_accessible.get_name() == (
         "APT cache cleanup complete. APT cache cleanup completed successfully."
