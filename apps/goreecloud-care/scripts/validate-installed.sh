@@ -1,10 +1,11 @@
 #!/bin/sh
 set -eu
-EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev18}
-EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev18}
+EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev19}
+EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev19}
 
-command -v goreecloud-care >/dev/null
-command -v dpkg-query >/dev/null
+for command_name in goreecloud-care dpkg-query mktemp mkdir rm; do
+  command -v "$command_name" >/dev/null
+ done
 
 installed=$(dpkg-query -W -f='${Status} ${Version}' goreecloud-care)
 [ "$installed" = "install ok installed $EXPECTED_PACKAGE_VERSION" ]
@@ -72,6 +73,55 @@ test -f /usr/share/doc/goreecloud-care/API.md
 test -f /usr/share/doc/goreecloud-care/WARDVEIL-INTEGRATION.md
 grep -F 'Icon=com.goreecloud.care' /usr/share/applications/com.goreecloud.care.dev.desktop >/dev/null
 
+# Prove the installed launchers cannot be shadowed by a package with the same
+# name in the invoking working directory. This directly guards the dev18
+# representative lifecycle failure and the PolicyKit helper boundary.
+SHADOW_ROOT=$(mktemp -d)
+cleanup() {
+  rm -rf "$SHADOW_ROOT"
+}
+trap cleanup EXIT INT TERM
+mkdir -p "$SHADOW_ROOT/goreecloud_care"
+cat > "$SHADOW_ROOT/goreecloud_care/__init__.py" <<'PY'
+__version__ = 'SHADOWED'
+PY
+cat > "$SHADOW_ROOT/goreecloud_care/__main__.py" <<'PY'
+print('SHADOWED-APP')
+PY
+cat > "$SHADOW_ROOT/goreecloud_care/helper.py" <<'PY'
+print('SHADOWED-HELPER')
+PY
+
+shadow_runtime=$(cd "$SHADOW_ROOT" && goreecloud-care --version)
+[ "$shadow_runtime" = "$EXPECTED_RUNTIME_VERSION" ] || {
+  echo "Installed application launcher was shadowed by the working directory: $shadow_runtime" >&2
+  exit 1
+}
+
+HELPER=/usr/lib/goreecloud-care/goreecloud-care-helper
+if helper_output=$(cd "$SHADOW_ROOT" && "$HELPER" invalid-action 2>&1); then
+  helper_status=0
+else
+  helper_status=$?
+fi
+[ "$helper_status" -eq 64 ] || {
+  echo "Installed helper launcher did not execute the real fixed helper (status=$helper_status): $helper_output" >&2
+  exit 1
+}
+case "$helper_output" in
+  *SHADOWED-HELPER*)
+    echo "Installed privileged helper launcher was shadowed by the working directory" >&2
+    exit 1
+    ;;
+esac
+
+# -B plus package maintainer cleanup must leave no private runtime bytecode.
+test ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ || {
+  echo "Private Care bytecode cache exists after installed-runtime validation" >&2
+  exit 1
+}
+
 printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe acceptance probe: passed"
+printf '%s\n' "Installed application/helper launchers are isolated from working-directory Python shadowing."
 printf '%s\n' "Canonical Care icon derivative is installed and referenced by the desktop entry."
 printf '%s\n' "Continuity remains attention until destructive package lifecycle rollback testing is separately completed."
