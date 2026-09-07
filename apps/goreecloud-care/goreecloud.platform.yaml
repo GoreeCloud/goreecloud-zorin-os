@@ -96,14 +96,14 @@ platform_systems:
       - tests/test_accessibility_identity.py
       - tests/test_insights_window_contract.py
       - tests/runtime_ui_acceptance.py
-      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071149359
-      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071149673
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071450218
+      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071450603
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560656873
       - https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5561183405
       - https://github.com/GoreeCloud/goreecloud-branding-assets/blob/main/products/care/app-icon.svg
-    notes: Current required Stable consumer target is GLAZE UI V1.2 / 1.2.0. Dev18 adds a bounded GTK3 V1.2 neutral-material fallback, Light/Dark/Deep Dark state resolution, 48-pixel minimum targets, Reduced Transparency and Reduced Motion degradation paths, system-authoritative HighContrast, and process-level activation for both Care windows without claiming compositor backdrop-blur fidelity. Repository validation passed at exact Development head 23d2cf54643197bd5eca132bc71882a181eb9ca6 after the central Platform Contract baseline was synchronized to V1.2. Historical revision-scoped evidence remains provenance only. Representative appearance/resilience and drag-resize validation, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final visual/icon/task-flow review, registry registration, and governed product-specific V1.2 acceptance remain open.
+    notes: Current required Stable consumer target is GLAZE UI V1.2 / 1.2.0. Dev18 adds a bounded GTK3 V1.2 neutral-material fallback, Light/Dark/Deep Dark state resolution, 48-pixel minimum targets, Reduced Transparency and Reduced Motion degradation paths, system-authoritative HighContrast, and process-level activation for both Care windows without claiming compositor backdrop-blur fidelity. Exact-source repository validation passed at Development head 1e91e3f7267ce159958ba53e5536f12a68d7ddef after the central Platform Contract baseline was synchronized to V1.2; Care CI now verifies the pull-request head SHA before validation and preserves source-revision provenance with the package artifact. Historical revision-scoped evidence remains provenance only. Representative appearance/resilience and drag-resize validation, complete Insights keyboard traversal, broader AT-SPI/Orca behavior, final visual/icon/task-flow review, registry registration, and governed product-specific V1.2 acceptance remain open.
   mesh:
     result: not-applicable-justified
     version: null
@@ -231,11 +231,11 @@ evidence:
       notes: Representative laptop passed 50 tests plus XML/source validation, built and installed 0.1.0~dev17, removed the prior synthetic mid-word hyphenation, retained compact/wide readability and visible Refresh focus, and reached the true findings bottom. Complete selectable-results keyboard traversal and continuous drag-resize responsiveness remain separate open gates.
     - id: care-dev18-v12-repository-validation
       category: glaze-ui
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071149359
-      revision: 23d2cf54643197bd5eca132bc71882a181eb9ca6
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071450218
+      revision: 1e91e3f7267ce159958ba53e5536f12a68d7ddef
       result: passed
-      observed_at: "2026-09-07T00:52:25Z"
-      notes: Exact Development head passed 73 tests, XML/platform-integration/source validation, GDK_DPI_SCALE=2 headless GTK V1.2 runtime acceptance, Debian 0.1.0~dev18 build/inspection, Platform Contract run 34071149673 against central V1.2 baseline revision c941ce1d8d1eff3c9df994d1e16f83147eadae00, and theme-source run 34071149358. Package SHA-256 was ce9d1a5a9ec2d14a09c3ecd0dbe64b8af86d29a7a70ac8b6bc840e2db0252da2. Representative-device acceptance remains separate.
+      observed_at: "2026-09-07T00:58:05Z"
+      notes: Exact source revision was explicitly checked out and verified before validation. It passed 73 tests, XML/platform-integration/source validation, GDK_DPI_SCALE=2 headless GTK V1.2 runtime acceptance, Debian 0.1.0~dev18 build/inspection, Platform Contract run 34071450603 against central V1.2 baseline revision c941ce1d8d1eff3c9df994d1e16f83147eadae00, and theme-source run 34071450272. Package SHA-256 was 11a44c66e4eb4346c3c3f4569bd53cafeec9ebf87cb6773ca31023094813ddf5; artifact ID 10000591580 includes SOURCE_REVISION. Representative-device acceptance remains separate.
   release: []
 
 conformance:
