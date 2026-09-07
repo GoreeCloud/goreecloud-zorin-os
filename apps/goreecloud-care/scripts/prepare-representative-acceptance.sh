@@ -4,8 +4,8 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 OUT=${1:-"$ROOT/dist/representative-acceptance"}
-EXPECTED_RUNTIME_VERSION="0.1.0-dev18"
-EXPECTED_PACKAGE_VERSION="0.1.0~dev18"
+EXPECTED_RUNTIME_VERSION="0.1.0-dev19"
+EXPECTED_PACKAGE_VERSION="0.1.0~dev19"
 EXPECTED_PACKAGE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 
 for command_name in git python3 sha256sum dpkg-deb tee awk rm; do
@@ -101,12 +101,12 @@ if command -v goreecloud-care >/dev/null 2>&1; then
       printf 'api_version=not-probed-runtime-mismatch\n'
     } > "$OUT/installed-version.txt"
     printf '%s\n' \
-      "Installed Care runtime differs from the dev18 source candidate; dev18-only status snapshots were skipped." \
+      "Installed Care runtime differs from the dev19 source candidate; dev19-only status snapshots were skipped." \
       > "$OUT/installed-status-snapshots-skipped.txt"
   fi
 else
   printf '%s\n' "GoreeCloud Care is not currently installed; installed read-only status snapshots were skipped." > "$OUT/installed-version.txt"
-  printf '%s\n' "No installed Care executable was found; dev18-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
+  printf '%s\n' "No installed Care executable was found; dev19-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
 fi
 
 cat > "$OUT/MANUAL-CHECKLIST.txt" <<'EOF'
@@ -164,6 +164,7 @@ Notes:
 G. Package lifecycle / continuity
 Build the pinned accepted dev17 rollback package locally with scripts/build-dev17-rollback-package.sh, then run the separate package lifecycle probe as the normal desktop user.
 [ ] PASS [ ] FAIL  dev17 rollback package build/checksum/provenance preparation passed.
+[ ] PASS [ ] FAIL  installed application/helper cannot be shadowed by the source working directory and leaves no private bytecode cache.
 [ ] PASS [ ] FAIL  install/remove/reinstall/downgrade/restore/final-state probe passed.
 Candidate package:
 Previous package:
@@ -211,7 +212,7 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   sh ./scripts/build-dev17-rollback-package.sh
 
 # Package lifecycle (run as the normal desktop user; the script requests sudo only for apt operations)
-  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev18_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
+  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev19_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 EOF
 
 printf '%s\n' "Representative acceptance preparation: passed"
