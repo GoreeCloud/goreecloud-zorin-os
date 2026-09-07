@@ -140,7 +140,8 @@ F. Representative task flows
 Notes:
 
 G. Package lifecycle / continuity
-Run the separate package lifecycle probe as the normal desktop user, with a retained genuinely older Development package.
+Build the pinned accepted dev17 rollback package locally with scripts/build-dev17-rollback-package.sh, then run the separate package lifecycle probe as the normal desktop user.
+[ ] PASS [ ] FAIL  dev17 rollback package build/checksum/provenance preparation passed.
 [ ] PASS [ ] FAIL  install/remove/reinstall/downgrade/restore/final-state probe passed.
 Candidate package:
 Previous package:
@@ -184,8 +185,11 @@ cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
   goreecloud-care --security-status-json
   goreecloud-care --continuity-status-json
 
+# Build the accepted dev17 rollback package locally; no install/remove/network action occurs here.
+  sh ./scripts/build-dev17-rollback-package.sh
+
 # Package lifecycle (run as the normal desktop user; the script requests sudo only for apt operations)
-  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev18_all.deb /path/to/retained/older-development-package.deb
+  sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0~dev18_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 EOF
 
 printf '%s\n' "Representative acceptance preparation: passed"
