@@ -4,21 +4,46 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 VERSION="0.1.0~dev22"
+RUNTIME_VERSION="0.1.0-dev22"
 ARCH="all"
 PKG="goreecloud-care"
 OUT=${1:-"$ROOT/dist"}
 
+for command_name in git python3 dpkg-deb find touch install mktemp grep; do
+  command -v "$command_name" >/dev/null || {
+    echo "Required command not found: $command_name" >&2
+    exit 2
+  }
+done
+
+# Release/acceptance provenance is bound to one exact committed source revision.
+# The package intentionally refuses tracked dirty source so the embedded identity
+# cannot describe different bytes than the files actually staged into the .deb.
+if ! git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "GoreeCloud Care package builds require the authoritative Git checkout." >&2
+  exit 2
+fi
+if ! git -C "$REPO_ROOT" diff --quiet -- apps/goreecloud-care || \
+   ! git -C "$REPO_ROOT" diff --cached --quiet -- apps/goreecloud-care; then
+  echo "Tracked GoreeCloud Care source changes are present; commit/stash them before packaging." >&2
+  exit 2
+fi
+SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)
+SOURCE_TREE=$(git -C "$REPO_ROOT" rev-parse HEAD:apps/goreecloud-care)
+printf '%s\n' "$SOURCE_REVISION" | grep -Eq '^[0-9a-f]{40}$' || {
+  echo "Unable to resolve exact GoreeCloud Care source revision." >&2
+  exit 2
+}
+printf '%s\n' "$SOURCE_TREE" | grep -Eq '^[0-9a-f]{40}$' || {
+  echo "Unable to resolve exact GoreeCloud Care source tree." >&2
+  exit 2
+}
+
 # Debian package output must be reproducible for an exact source revision. Use an
 # explicit SOURCE_DATE_EPOCH when supplied; otherwise bind the package timestamp
-# to the exact repository HEAD being built. Outside a Git checkout, callers must
-# provide SOURCE_DATE_EPOCH rather than falling back to wall-clock time.
+# to the exact repository HEAD being built.
 if [ -z "${SOURCE_DATE_EPOCH:-}" ]; then
-  if command -v git >/dev/null 2>&1 && git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    SOURCE_DATE_EPOCH=$(git -C "$REPO_ROOT" show -s --format=%ct HEAD)
-  else
-    echo "SOURCE_DATE_EPOCH is required when building outside a Git checkout." >&2
-    exit 2
-  fi
+  SOURCE_DATE_EPOCH=$(git -C "$REPO_ROOT" show -s --format=%ct HEAD)
 fi
 case "$SOURCE_DATE_EPOCH" in
   ''|*[!0-9]*)
@@ -29,10 +54,8 @@ esac
 export SOURCE_DATE_EPOCH
 
 # Keep locale/timezone behavior deterministic and avoid compressor-version drift
-# across the supported Zorin/Ubuntu build boundary. dpkg-deb has supported the
-# uncompressed Debian archive mode for the target toolchain generations used by
-# Zorin OS 17.3 (Ubuntu 22.04 base) and current Ubuntu CI. The package is small,
-# so deterministic portability is more important than archive compression here.
+# across the supported Zorin/Ubuntu build boundary. The package is small, so
+# deterministic portability is more important than archive compression here.
 export LC_ALL=C
 export TZ=UTC
 
@@ -47,7 +70,8 @@ mkdir -p "$OUT" \
   "$STAGE/usr/share/icons/hicolor/scalable/apps" \
   "$STAGE/usr/share/metainfo" \
   "$STAGE/usr/share/polkit-1/actions" \
-  "$STAGE/usr/share/doc/goreecloud-care"
+  "$STAGE/usr/share/doc/goreecloud-care" \
+  "$STAGE/usr/share/goreecloud-care"
 cat > "$STAGE/DEBIAN/control" <<CONTROL
 Package: $PKG
 Version: $VERSION
@@ -78,11 +102,35 @@ PTH
 mkdir -p "$STAGE/usr/lib/python3/dist-packages"
 install -m 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth" "$STAGE/usr/lib/python3/dist-packages/goreecloud_care.pth"
 
-# Normalize every staged filesystem timestamp before dpkg-deb sees it. GNU
-# coreutils touch supports -h so any future staged symlink metadata is normalized
-# without dereferencing it. dpkg-deb also consumes SOURCE_DATE_EPOCH for archive
-# metadata. Explicit format 2.0 plus -Znone removes xz/zstd/gzip implementation
-# differences from the byte-for-byte package identity.
+# Package-owned build provenance lets installed Care bind later target/runtime
+# acceptance to the exact Git source without relying on the invoking directory,
+# user-writable state, or a retained .deb archive. The package SHA-256 remains an
+# external acceptance property because embedding a package's own hash is circular.
+python3 - "$STAGE/usr/share/goreecloud-care/build-provenance.json" \
+  "$SOURCE_REVISION" "$SOURCE_TREE" "$RUNTIME_VERSION" "$VERSION" "$SOURCE_DATE_EPOCH" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+out, revision, tree, runtime_version, package_version, epoch = sys.argv[1:]
+payload = {
+    "schema_version": 1,
+    "application": "GoreeCloud Care",
+    "producer": "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care",
+    "source_revision": revision,
+    "source_tree": tree,
+    "runtime_version": runtime_version,
+    "package_version": package_version,
+    "source_date_epoch": int(epoch),
+    "package_sha256_embedded": False,
+}
+Path(out).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+PY
+chmod 0644 "$STAGE/usr/share/goreecloud-care/build-provenance.json"
+
+# Normalize every staged filesystem timestamp before dpkg-deb sees it. Explicit
+# format 2.0 plus -Znone removes xz/zstd/gzip implementation differences from
+# the byte-for-byte package identity.
 find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +
 
 dpkg-deb --root-owner-group --deb-format=2.0 -Znone --build "$STAGE" "$OUT/${PKG}_${VERSION}_${ARCH}.deb" >/dev/null
