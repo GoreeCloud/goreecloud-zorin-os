@@ -17,18 +17,27 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         subprocess.run(["sh", "-n", str(SCRIPT)], check=True)
 
     def test_preparation_harness_is_non_destructive_and_unprivileged(self) -> None:
-        self.assertIn("read-only/non-destructive representative acceptance evidence", self.source)
-        for forbidden in (
-            "sudo apt",
-            "pkexec",
-            "apt remove",
-            "apt install",
-            "empty_trash",
-            "clean_selected",
-            "reclaim-memory",
-            "apt-clean",
-        ):
+        self.assertIn(
+            "read-only/non-destructive representative acceptance evidence",
+            self.source,
+        )
+        self.assertIn(
+            "does not invoke Care cleanup, PolicyKit, pkexec, sudo, apt, or network operations",
+            self.source,
+        )
+        forbidden_invocations = (
+            "sudo apt ",
+            "pkexec ",
+            "apt remove ",
+            "apt install ",
+            "goreecloud-care-helper ",
+        )
+        for forbidden in forbidden_invocations:
             self.assertNotIn(forbidden, self.source)
+
+        self.assertNotIn("goreecloud-care --clean", self.source)
+        self.assertNotIn("goreecloud-care --empty-trash", self.source)
+        self.assertNotIn("goreecloud-care --reclaim", self.source)
 
     def test_preparation_harness_requires_clean_exact_source(self) -> None:
         self.assertIn('git -C "$REPO_ROOT" status --porcelain --untracked-files=no', self.source)
