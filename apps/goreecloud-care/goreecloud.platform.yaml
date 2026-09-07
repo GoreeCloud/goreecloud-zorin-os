@@ -200,14 +200,14 @@ evidence:
     - id: care-dev12-atspi-application-identity-static-semantics-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cbec094dd3cbec094dd3cbec
+      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
       result: passed
       observed_at: "2026-09-06T14:14:00Z"
       notes: Representative-device AT-SPI inspection exposed GoreeCloud Care as the application root and verified expected static status-bar, selector/action roles, names/descriptions, checked state, and focused state for the accepted static semantic slice.
     - id: care-dev12-atspi-dynamic-listener-target
       category: accessibility
       path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cbec094dd3cbec094dd3cbec
+      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
       result: blocked
       observed_at: "2026-09-06T14:40:00Z"
       notes: Dynamic status event/Orca quality remains open; one listener run also reported a stale/unavailable AT-SPI socket.
@@ -243,9 +243,9 @@ evidence:
       category: glaze-ui
       path: https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/f88aa45b4d012dcfcd04a938cb71e96f9bb107d6
       revision: ba646235dd12df251a02d728b096d8398a515ab7
-      result: blocked
+      result: passed
       observed_at: "2026-09-07T01:23:00Z"
-      notes: Upstream registration mechanics are complete and the authoritative Glaze registry now contains GoreeCloud Care as adoption-required. targetVersion, referenceRevision, and evidence remain null and productionEligible remains false. This is intentionally blocked for accepted-v1 until product-specific exact-candidate representative acceptance is complete.
+      notes: Upstream registration mechanics are complete and the authoritative Glaze registry now contains GoreeCloud Care as adoption-required. targetVersion, referenceRevision, and evidence remain null and productionEligible remains false. This passed record covers registration mechanics only; accepted-v1 remains blocked until product-specific exact-candidate representative acceptance is complete.
   release: []
 
 conformance:
