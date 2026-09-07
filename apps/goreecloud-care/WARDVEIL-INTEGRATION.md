@@ -12,9 +12,19 @@ GoreeCloud Care is authoritative only for these Care-owned facts:
 - the installed Care PolicyKit policy location;
 - whether those fixed files satisfy the expected root-ownership and write-permission constraints;
 - whether `/usr/bin/pkexec` is available for the existing PolicyKit flow;
-- the source-enforced helper action allowlist and no-arbitrary-shell/path boundary.
+- the source-enforced helper action allowlist and no-arbitrary-shell/path boundary;
+- whether the installed application/helper launchers use isolated Python path semantics so a user-controlled working directory, `PYTHONPATH`, or user site cannot shadow the installed Care package;
+- whether the fixed private Care Python package directory is free of stale runtime bytecode that could affect cross-version execution.
 
 PolicyKit, the operating system, and APT remain authoritative for their own behavior. Wardveil Security remains authoritative for Wardveil security semantics and any future Wardveil-native policy, scanning, quarantine, incident, or audit service.
+
+## Installed launcher isolation
+
+Dev18 representative package-lifecycle testing found that the pre-dev19 launchers used plain `python3 -m goreecloud_care...`. When the installed package had been downgraded to dev17 but the command was launched from the dev18 source directory, Python resolved the working-tree dev18 package and reported the wrong runtime version. The privileged helper used the same ambient import pattern, so this is treated as a security-boundary defect rather than merely a test-harness issue.
+
+Dev19 requires both installed entrypoints to use `/usr/bin/python3 -I -B -m ...`. `-I` excludes the current working directory, `PYTHONPATH`, and user site from import resolution; `-B` prevents new runtime bytecode writes. Debian `postinst`/`postrm` scripts remove only the fixed private Care `__pycache__` path so bytecode created by earlier Development versions cannot survive an install/remove transition. Installed acceptance deliberately attempts same-named working-directory shadowing against both entrypoints.
+
+This hardening is Care-owned evidence only. It does not authorize a `Protected by Wardveil` claim and remains target-unaccepted until the exact dev19 candidate completes representative lifecycle/runtime validation.
 
 ## Local status API
 
@@ -38,4 +48,4 @@ Care does not currently accept Wardveil runtime-authorization envelopes for `apt
 
 ## Acceptance boundary
 
-Source-level tests must cover passing and non-passing installation evidence, sensitive-field minimization, normalized state, freshness, and the absence of a false `Protected by Wardveil` claim. Exact-revision target-device acceptance remains required before Care may mark Wardveil integration as production-conformant in `goreecloud.platform.yaml`.
+Source-level tests must cover passing and non-passing installation evidence, sensitive-field minimization, normalized state, freshness, launcher isolation, private bytecode cleanup, and the absence of a false `Protected by Wardveil` claim. Exact-revision target-device acceptance remains required before Care may mark Wardveil integration as production-conformant in `goreecloud.platform.yaml`.
