@@ -68,9 +68,11 @@ class EverkeepContractTests(unittest.TestCase):
 
     def test_package_lifecycle_probe_guards_runtime_isolation_and_bytecode_cleanup(self) -> None:
         source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
-        self.assertIn("current source working directory", source)
+        self.assertIn("Dev19 candidate checks deliberately exercise source/working-directory shadow resistance", source)
         self.assertIn("working-directory/PYTHONPATH shadowing", source)
         self.assertIn("Private Python bytecode remained after package removal", source)
+        self.assertIn("PREVIOUS_PROBE_DIR=$(mktemp -d)", source)
+        self.assertIn("dev17 predates that isolation contract", source)
 
 
 if __name__ == "__main__":
