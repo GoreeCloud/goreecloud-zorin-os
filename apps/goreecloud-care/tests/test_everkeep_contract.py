@@ -32,6 +32,10 @@ class EverkeepContractTests(unittest.TestCase):
         self.assertFalse(policy["acceptance"]["everkeep_ready"])
         self.assertTrue(policy["acceptance"]["target_runtime_acceptance_required"])
         self.assertTrue(policy["acceptance"]["exact_revision_acceptance_required"])
+        self.assertFalse(
+            policy["acceptance"]["everkeep_ready"]
+            and not policy["acceptance"]["everkeep_integrated"]
+        )
 
     def test_restore_ready_requires_full_package_lifecycle_and_provenance(self) -> None:
         policy = json.loads((CONTRACTS / "everkeep.acceptance.json").read_text(encoding="utf-8"))
@@ -46,9 +50,11 @@ class EverkeepContractTests(unittest.TestCase):
         policy = json.loads((CONTRACTS / "everkeep.acceptance.json").read_text(encoding="utf-8"))
         forbidden = {item.lower() for item in policy["sensitive_evidence"]["forbidden"]}
         self.assertIn("passwords", forbidden)
+        self.assertIn("tokens", forbidden)
         self.assertIn("authentication tokens", forbidden)
         self.assertIn("private keys", forbidden)
         self.assertIn("recovery codes", forbidden)
+        self.assertIn("secret values", forbidden)
         self.assertIn("reusable credentials", forbidden)
 
     def test_package_lifecycle_probe_runs_as_representative_user(self) -> None:
