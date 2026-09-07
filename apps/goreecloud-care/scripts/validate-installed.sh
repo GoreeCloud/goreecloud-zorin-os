@@ -110,11 +110,17 @@ for forbidden in (
 assert continuity['producer'] == 'GoreeCloud Care'
 assert continuity['dimension'] == 'restore_capability'
 assert continuity['state'] in {'attention', 'ready'}
-assert continuity['stage'] in {
+allowed_stages = {
     'target-acceptance-required',
     'target-accepted-governance-pending',
     'everkeep-promoted',
 }
+if continuity['stage'] not in allowed_stages:
+    raise SystemExit(
+        'installed continuity evidence failed its trust boundary: '
+        f"state={continuity.get('state')} stage={continuity.get('stage')} "
+        f"provenance_state={continuity.get('provenance_state')}"
+    )
 if continuity['state'] == 'ready':
     assert continuity['stage'] == 'everkeep-promoted'
     assert continuity['freshness'] == 'exact-build-bound'
