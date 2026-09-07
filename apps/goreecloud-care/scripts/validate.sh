@@ -55,11 +55,11 @@ assert everkeep_acceptance['acceptance']['exact_revision_acceptance_required'] i
 print('Platform integration contract validation: passed')
 PY
 # Exact Development version alignment.
-grep -F '__version__ = "0.1.0-dev21"' goreecloud_care/__init__.py >/dev/null
-grep -F 'version = "0.1.0.dev21"' pyproject.toml >/dev/null
-grep -F 'VERSION="0.1.0~dev21"' scripts/build-deb.sh >/dev/null
-grep -F '<release version="0.1.0-dev21"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
-grep -F 'version: 0.1.0-dev21' goreecloud.platform.yaml >/dev/null
+grep -F '__version__ = "0.1.0-dev22"' goreecloud_care/__init__.py >/dev/null
+grep -F 'version = "0.1.0.dev22"' pyproject.toml >/dev/null
+grep -F 'VERSION="0.1.0~dev22"' scripts/build-deb.sh >/dev/null
+grep -F '<release version="0.1.0-dev22"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
+grep -F 'version: 0.1.0-dev22' goreecloud.platform.yaml >/dev/null
 # Installed Python entrypoints must remain isolated from source/CWD/user path shadowing.
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care "$@"' packaging/goreecloud-care >/dev/null
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"' packaging/goreecloud-care-helper >/dev/null
@@ -113,6 +113,10 @@ grep -F 'button.resonant-action' goreecloud_care/glaze_v13.py >/dev/null
 grep -F '.content-plane' goreecloud_care/glaze_v13.py >/dev/null
 grep -F '.maintenance-collection' goreecloud_care/glaze_v13.py >/dev/null
 grep -F '.findings-plane' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'window.care-shell.care-dark headerbar button' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'window.care-shell.care-deep-dark headerbar button' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'background: #34383f;' goreecloud_care/glaze_v13.py >/dev/null
+grep -F 'background: #272a2f;' goreecloud_care/glaze_v13.py >/dev/null
 grep -F 'reduced-transparency' goreecloud_care/glaze_v13.py >/dev/null
 grep -F 'reduced-motion' goreecloud_care/glaze_v13.py >/dev/null
 grep -F 'show-borders' goreecloud_care/glaze_v13.py >/dev/null
