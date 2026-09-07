@@ -55,11 +55,11 @@ assert everkeep_acceptance['acceptance']['exact_revision_acceptance_required'] i
 print('Platform integration contract validation: passed')
 PY
 # Exact Development version alignment.
-grep -F '__version__ = "0.1.0-dev20"' goreecloud_care/__init__.py >/dev/null
-grep -F 'version = "0.1.0.dev20"' pyproject.toml >/dev/null
-grep -F 'VERSION="0.1.0~dev20"' scripts/build-deb.sh >/dev/null
-grep -F '<release version="0.1.0-dev20"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
-grep -F 'version: 0.1.0-dev20' goreecloud.platform.yaml >/dev/null
+grep -F '__version__ = "0.1.0-dev21"' goreecloud_care/__init__.py >/dev/null
+grep -F 'version = "0.1.0.dev21"' pyproject.toml >/dev/null
+grep -F 'VERSION="0.1.0~dev21"' scripts/build-deb.sh >/dev/null
+grep -F '<release version="0.1.0-dev21"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
+grep -F 'version: 0.1.0-dev21' goreecloud.platform.yaml >/dev/null
 # Installed Python entrypoints must remain isolated from source/CWD/user path shadowing.
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care "$@"' packaging/goreecloud-care >/dev/null
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"' packaging/goreecloud-care-helper >/dev/null
@@ -76,6 +76,7 @@ grep -F 'def _apply_layout(' goreecloud_care/app.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/app.py >/dev/null
 grep -F 'layout_environment(' goreecloud_care/app.py >/dev/null
 grep -F 'effective_layout_width(width)' goreecloud_care/app.py >/dev/null
+grep -F 'self.header.set_title("Care" if compact else "GoreeCloud Care")' goreecloud_care/app.py >/dev/null
 grep -F 'self.header.set_subtitle(None if compact else self.header_subtitle)' goreecloud_care/app.py >/dev/null
 grep -F 'COMPACT_WIDTH = 820' goreecloud_care/ui_contract.py >/dev/null
 grep -F 'GDK_DPI_SCALE' goreecloud_care/ui_contract.py >/dev/null
