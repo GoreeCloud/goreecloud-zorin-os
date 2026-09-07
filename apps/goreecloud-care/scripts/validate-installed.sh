@@ -26,6 +26,7 @@ CONTINUITY_JSON=$continuity_json \
 python3 - <<'PY'
 import json
 import os
+from datetime import datetime, timezone
 
 report = json.loads(os.environ['REPORT_JSON'])
 health = json.loads(os.environ['HEALTH_JSON'])
@@ -53,11 +54,45 @@ assert privacy['acceptance']['runtime_acceptance_required'] is True
 assert privacy['acceptance']['production_approved'] is False
 assert privacy['state'] == 'development'
 
-assert security['scope']['id'] == 'goreecloud-care'
+# Installed Wardveil-compatible status must be explicit, scoped, current and
+# fail-closed without ever turning Care-owned boundary evidence into a broad
+# "Protected by Wardveil" claim.
+assert security['contract_version'] == '0.1.0'
+assert security['scope'] == {
+    'kind': 'application',
+    'id': 'goreecloud-care',
+    'display_name': 'GoreeCloud Care',
+}
+assert security['authority']['system'] == 'GoreeCloud Care'
+assert security['authority']['control'] == 'local-maintenance-privilege-boundary'
+assert security['authority']['authoritative'] is True
 assert security['claim']['protected_by_wardveil'] is False
+assert security['source_state'] in {'passing', 'non-passing'}
 assert security['state'] in {'protected', 'attention'}
 if security['state'] != 'protected':
     raise SystemExit('installed privileged-boundary security evidence is non-passing')
+assert security['source_state'] == 'passing'
+assert security['evidence']['status'] == 'current'
+assert security['evidence']['reference'] == 'local-cli://goreecloud-care/security-status'
+assert security['evidence']['summary']
+observed = datetime.fromisoformat(security['evidence']['observed_at'].replace('Z', '+00:00'))
+valid_until = datetime.fromisoformat(security['evidence']['valid_until'].replace('Z', '+00:00'))
+assert observed.tzinfo is not None
+assert valid_until.tzinfo is not None
+assert valid_until > observed
+assert (valid_until - observed).total_seconds() == 15 * 60
+assert valid_until > datetime.now(timezone.utc)
+assert security['privacy']['details_withheld'] is True
+assert security['privacy']['redactions']
+
+# Shared Wardveil evidence must not leak reusable secrets, user identity,
+# arbitrary home paths or raw privileged output.
+security_text = json.dumps(security, sort_keys=True).lower()
+for forbidden in (
+    'password', 'authentication token', 'private key', 'recovery code',
+    'raw privileged command output:', '/home/', 'username', 'user_email',
+):
+    assert forbidden not in security_text, forbidden
 
 assert continuity['producer'] == 'GoreeCloud Care'
 assert continuity['dimension'] == 'restore_capability'
@@ -123,5 +158,6 @@ test ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ || {
 
 printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe acceptance probe: passed"
 printf '%s\n' "Installed application/helper launchers are isolated from working-directory Python shadowing."
+printf '%s\n' "Installed Wardveil-compatible privilege-boundary evidence is passing, current, minimized, scoped, and does not claim Wardveil protection."
 printf '%s\n' "Canonical Care icon derivative is installed and referenced by the desktop entry."
 printf '%s\n' "Continuity remains attention until governed Everkeep readiness is explicitly promoted from accepted restore evidence."
