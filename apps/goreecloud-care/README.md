@@ -102,16 +102,24 @@ A safe preparation harness now consolidates exact-source provenance, local valid
 sh ./scripts/prepare-representative-acceptance.sh
 ```
 
-Run it from a clean tracked working tree. The harness refuses to turn a dirty tracked tree into exact-source evidence, does not invoke Care cleanup, PolicyKit, `pkexec`, `sudo`, `apt`, or network operations, and does not mark manual items passed. Its default output is `dist/representative-acceptance/`, including `SOURCE_REVISION`, `package.sha256`, validation/build logs, `MANUAL-CHECKLIST.txt`, and `MANUAL-COMMANDS.txt`.
+Run it from a clean tracked working tree. The harness refuses to turn a dirty tracked tree into exact-source evidence, does not invoke Care cleanup, PolicyKit, `pkexec`, `sudo`, `apt`, or network operations, and does not mark manual items passed. It selects the exact expected `0.1.0~dev18` package path rather than guessing from older `.deb` files that may already exist in `dist/`. Its default output is `dist/representative-acceptance/`, including `SOURCE_REVISION`, `package.sha256`, validation/build logs, `MANUAL-CHECKLIST.txt`, and `MANUAL-COMMANDS.txt`.
 
 ## Package lifecycle acceptance
 
-The representative target can exercise the recovery gate as the normal desktop user; the script requests administrator authentication only for package operations:
+A local-only helper can build the accepted dev17 rollback package directly from immutable source revision `0fda6f90a545eaf3d1bed525aae98c6529ebbf7b` without installing/removing packages or accessing the network:
+
+```sh
+sh ./scripts/build-dev17-rollback-package.sh
+```
+
+By default it writes the verified `0.1.0~dev17` package, checksum, and source-revision record under `dist/rollback/`. If that historical revision is not present in the local clone, the helper fails closed and asks for the branch history to be fetched rather than silently substituting another package.
+
+The representative target can then exercise the recovery gate as the normal desktop user; the lifecycle script requests administrator authentication only for package operations:
 
 ```sh
 sh ./scripts/validate-package-lifecycle.sh \
   ./dist/goreecloud-care_0.1.0~dev18_all.deb \
-  /path/to/retained/previous-development-package.deb
+  ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 ```
 
 The script refuses full root execution, verifies that the rollback package actually sorts older than the dev18 candidate, and validates candidate install, removal, reinstall, explicit downgrade, candidate restoration, and final installed state without invoking Care cleanup actions. Everkeep continuity remains non-ready until this exact-candidate lifecycle evidence is actually accepted on the supported target.
