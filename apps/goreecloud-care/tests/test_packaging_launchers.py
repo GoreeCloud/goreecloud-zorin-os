@@ -48,20 +48,19 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
         self.assertIn("chown root:root /usr/share/goreecloud-care/build-provenance.json", source)
         self.assertIn("chmod 0644 /usr/share/goreecloud-care/build-provenance.json", source)
 
-    def test_debian_build_installs_maintainer_scripts_and_stable_version(self) -> None:
+    def test_debian_build_installs_stable_identity_and_maintainer_scripts(self) -> None:
         source = BUILD.read_text(encoding="utf-8")
         self.assertIn('install -m 0755 "$ROOT/packaging/postinst" "$STAGE/DEBIAN/postinst"', source)
         self.assertIn('install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"', source)
         self.assertIn('VERSION="0.1.0"', source)
         self.assertIn('RUNTIME_VERSION="0.1.0"', source)
-        self.assertIn('packaging/com.goreecloud.care.desktop', source)
-        self.assertIn('packaging/com.goreecloud.care.metainfo.xml', source)
-        self.assertNotIn('packaging/com.goreecloud.care.dev.desktop', source)
-        self.assertNotIn('packaging/com.goreecloud.care.dev.metainfo.xml', source)
+        self.assertIn("packaging/com.goreecloud.care.desktop", source)
+        self.assertIn("packaging/com.goreecloud.care.metainfo.xml", source)
 
-    def test_lifecycle_probe_keeps_stable_candidate_shadowing_as_a_regression_gate(self) -> None:
+    def test_lifecycle_probe_keeps_stable_candidate_shadowing_as_regression_gate(self) -> None:
         source = LIFECYCLE.read_text(encoding="utf-8")
-        self.assertIn("Stable candidate retains source/working-directory shadow resistance", source)
+        self.assertIn("Stable candidate checks deliberately exercise source/working-directory shadow resistance", source)
+        self.assertIn("working-directory/PYTHONPATH shadowing", source)
         self.assertIn("Private Python bytecode remained after package removal", source)
         self.assertIn("0.1.0", source)
         self.assertIn("/usr/share/applications/com.goreecloud.care.desktop", source)

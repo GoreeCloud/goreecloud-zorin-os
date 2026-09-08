@@ -4,8 +4,8 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 OUT=${1:-"$ROOT/dist/representative-runtime"}
-EXPECTED_RUNTIME_VERSION="0.1.0-dev22"
-EXPECTED_PACKAGE_VERSION="0.1.0~dev22"
+EXPECTED_RUNTIME_VERSION="0.1.0"
+EXPECTED_PACKAGE_VERSION="0.1.0"
 CANDIDATE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 ROLLBACK_DIR="$ROOT/dist/rollback"
 ROLLBACK="$ROLLBACK_DIR/goreecloud-care_0.1.0~dev17_all.deb"
@@ -54,8 +54,12 @@ RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __v
   exit 2
 }
 
-grep -F 'lifecycle: release-candidate' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Representative RC acceptance requires lifecycle: release-candidate in goreecloud.platform.yaml." >&2
+grep -F 'lifecycle: stable' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
+  echo "Representative Stable qualification requires lifecycle: stable in goreecloud.platform.yaml." >&2
+  exit 2
+}
+grep -F 'status: nonconformant' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
+  echo "Representative Stable qualification must remain nonconformant until separate governed promotion." >&2
   exit 2
 }
 
@@ -71,7 +75,7 @@ rm -f \
   "$OUT/continuity-installed.json" \
   "$OUT/SOURCE_REVISION"
 
-printf '%s\n' "GoreeCloud Care exact Release Candidate representative-target acceptance"
+printf '%s\n' "GoreeCloud Care exact Stable qualification representative-target acceptance"
 printf '%s\n' "Target:          ${PRETTY_NAME}"
 printf '%s\n' "Source branch:   $SOURCE_BRANCH"
 printf '%s\n' "Source revision: $SOURCE_REVISION"
@@ -79,6 +83,7 @@ printf '%s\n' "Source tree:     $SOURCE_TREE"
 printf '%s\n' "Runtime:         $RUNTIME_VERSION"
 printf '%s\n' "This runner performs package install/remove/reinstall/downgrade/restore through the existing lifecycle probe."
 printf '%s\n' "It never invokes a Care cleanup action and never writes or promotes an Everkeep governance record."
+printf '%s\n' "Stable promotion is not authorized by this runner."
 
 (
   cd "$ROOT"
@@ -161,7 +166,8 @@ cat > "$OUT/SOURCE_REVISION" <<EOF
 source_revision=$SOURCE_REVISION
 source_tree=$SOURCE_TREE
 source_branch=$SOURCE_BRANCH
-lifecycle=release-candidate
+lifecycle=stable
+stable_promotion_authorized=false
 runtime_version=$EXPECTED_RUNTIME_VERSION
 package_version=$EXPECTED_PACKAGE_VERSION
 package_sha256=$PACKAGE_SHA256
@@ -232,7 +238,7 @@ payload = {
         "freshness_rule": (
             "This Care-produced representative-target record applies only to the exact source revision, "
             "Care source tree, package version, package SHA-256, and representative target named here. "
-            "It is target evidence only and cannot grant Everkeep integration or readiness."
+            "It is target evidence only and cannot grant Everkeep integration, Everkeep readiness, or Stable promotion."
         ),
     },
 }
@@ -248,8 +254,7 @@ sudo install -o root -g root -m 0644 "$OUT/representative-target.json" "$REPRESE
 
 # Prove that the Care-produced record cannot self-promote when Everkeep evidence
 # is absent, regardless of any already-existing governed Everkeep state on this
-# machine. This uses the same source implementation and the protected installed
-# provenance/representative record.
+# machine.
 PYTHONPATH="$ROOT" python3 - "$OUT/continuity-without-governance.json" <<'PY'
 import json
 import sys
@@ -266,10 +271,11 @@ PY
 
 goreecloud-care --continuity-status-json > "$OUT/continuity-installed.json"
 
-printf '%s\n' "Representative Release Candidate target acceptance: passed"
+printf '%s\n' "Representative Stable qualification target acceptance: passed"
 printf '%s\n' "Local tests: $LOCAL_TESTS"
 printf '%s\n' "Candidate SHA-256: $PACKAGE_SHA256"
 printf '%s\n' "Care-owned target handoff: $OUT/representative-target.json"
 printf '%s\n' "Protected local target handoff: $REPRESENTATIVE_RECORD"
 printf '%s\n' "Everkeep promotion: not performed by this runner"
-printf '%s\n' "The exact source remains Release Candidate / nonconformant until separate platform governance, human-only review where applicable, immutable release evidence, and Stable production gates are satisfied."
+printf '%s\n' "Stable promotion authorized: false"
+printf '%s\n' "The exact source carries Stable identity but remains nonconformant until separate platform governance, exact-source Glaze acceptance/bridge, immutable release evidence, and explicit governed production promotion are satisfied."

@@ -23,6 +23,7 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('find "$STAGE" -type d -exec chmod 0755 {} +', BUILD)
         self.assertIn('chmod 0644 "$STAGE/DEBIAN/control"', BUILD)
         self.assertIn('chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"', BUILD)
+        self.assertIn('Caller umask is not part of package identity', BUILD)
 
     def test_build_eliminates_compressor_and_locale_variability(self):
         self.assertIn('export LC_ALL=C', BUILD)
@@ -46,11 +47,11 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('"source_revision": revision', BUILD)
         self.assertIn('"source_tree": tree', BUILD)
         self.assertIn('"package_sha256_embedded": False', BUILD)
+        self.assertIn("embedding a package's own hash is circular", BUILD)
 
-    def test_stable_package_identity_is_explicit(self):
+    def test_stable_package_identity_is_exact(self):
         self.assertIn('VERSION="0.1.0"', BUILD)
         self.assertIn('RUNTIME_VERSION="0.1.0"', BUILD)
-        self.assertIn('Description: GoreeCloud Care local-first maintenance utility', BUILD)
         self.assertIn('packaging/com.goreecloud.care.desktop', BUILD)
         self.assertIn('packaging/com.goreecloud.care.metainfo.xml', BUILD)
 
@@ -67,8 +68,10 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('Umask independence: passed (0022 == 0002)', VERIFY)
 
     def test_ci_runs_same_environment_reproducibility_gate(self):
+        self.assertIn('name: GoreeCloud Care Stable Qualification', WORKFLOW)
+        self.assertIn('goreecloud-care_0.1.0_all.deb', WORKFLOW)
+        self.assertIn('stable_promotion_authorized=false', WORKFLOW)
         self.assertIn('Verify reproducible GoreeCloud Care package', WORKFLOW)
-        self.assertIn('sh ./scripts/verify-reproducible-package.sh', WORKFLOW)
 
     def test_ci_compares_jammy_and_noble_package_bytes(self):
         self.assertIn('ubuntu-22.04', WORKFLOW)

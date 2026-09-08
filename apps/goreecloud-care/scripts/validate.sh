@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 
 for p in [
     Path('packaging/com.goreecloud.care.policy'),
-    Path('packaging/com.goreecloud.care.dev.metainfo.xml'),
+    Path('packaging/com.goreecloud.care.metainfo.xml'),
 ]:
     ET.parse(p)
 print('XML validation: passed')
@@ -63,12 +63,14 @@ assert set(continuity_schema['properties']['state']['enum']) == {'attention', 'r
 assert 'everkeep-promoted' in continuity_schema['properties']['stage']['enum']
 print('Platform integration contract validation: passed')
 PY
-# Exact Development version alignment.
-grep -F '__version__ = "0.1.0-dev22"' goreecloud_care/__init__.py >/dev/null
-grep -F 'version = "0.1.0.dev22"' pyproject.toml >/dev/null
-grep -F 'VERSION="0.1.0~dev22"' scripts/build-deb.sh >/dev/null
-grep -F '<release version="0.1.0-dev22"' packaging/com.goreecloud.care.dev.metainfo.xml >/dev/null
-grep -F 'version: 0.1.0-dev22' goreecloud.platform.yaml >/dev/null
+# Exact Stable qualification version alignment.
+grep -F '__version__ = "0.1.0"' goreecloud_care/__init__.py >/dev/null
+grep -F 'version = "0.1.0"' pyproject.toml >/dev/null
+grep -F 'VERSION="0.1.0"' scripts/build-deb.sh >/dev/null
+grep -F 'RUNTIME_VERSION="0.1.0"' scripts/build-deb.sh >/dev/null
+grep -F '<release version="0.1.0"' packaging/com.goreecloud.care.metainfo.xml >/dev/null
+grep -F 'version: 0.1.0' goreecloud.platform.yaml >/dev/null
+grep -F 'lifecycle: stable' goreecloud.platform.yaml >/dev/null
 # Installed Python entrypoints must remain isolated from source/CWD/user path shadowing.
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care "$@"' packaging/goreecloud-care >/dev/null
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"' packaging/goreecloud-care-helper >/dev/null
@@ -79,7 +81,7 @@ grep -F 'install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"' script
 # Security/source invariants for the privileged boundary.
 grep -F '["/usr/bin/apt-get", "clean"]' goreecloud_care/helper.py >/dev/null
 ! grep -R --line-number -E 'shell[[:space:]]*=[[:space:]]*True|os\.system\(' goreecloud_care packaging scripts
-# Adaptive/accessibility invariants for current Development.
+# Adaptive/accessibility invariants retained from the accepted RC.
 grep -F 'self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)' goreecloud_care/app.py >/dev/null
 grep -F 'def _apply_layout(' goreecloud_care/app.py >/dev/null
 grep -F 'compact = is_compact_width(width)' goreecloud_care/app.py >/dev/null
@@ -107,7 +109,7 @@ grep -F 'GLAZE_UI_LABEL = "GLAZE UI V1.2"' goreecloud_care/glaze_v12.py >/dev/nu
 grep -F 'version: "1.2.0"' goreecloud.platform.yaml >/dev/null
 grep -F 'glaze_ui_required: "1.2.0"' goreecloud.platform.yaml >/dev/null
 grep -F 'glaze-ui==1.2.0' goreecloud.platform.yaml >/dev/null
-# Latest Proposed GLAZE UI V1.3 Adaptive Resonance Development mapping.
+# Latest Proposed GLAZE UI V1.3 Adaptive Resonance preview mapping remains non-authoritative.
 grep -F 'GLAZE_UI_LABEL = "GLAZE UI V1.3 — Adaptive Resonance"' goreecloud_care/glaze_v13.py >/dev/null
 grep -F 'GLAZE_UI_TARGET_VERSION = "1.3.0-candidate"' goreecloud_care/glaze_v13.py >/dev/null
 grep -F 'GLAZE_UI_LIFECYCLE = "proposed"' goreecloud_care/glaze_v13.py >/dev/null
@@ -183,7 +185,7 @@ grep -F "<span weight='bold'>Review storage safely</span>" goreecloud_care/insig
 grep -F 'Refreshing read-only insights…' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.findings_plane.get_style_context().add_class("findings-plane")' goreecloud_care/insights_window.py >/dev/null
 grep -F 'self.refresh.get_style_context().add_class("command-capsule")' goreecloud_care/insights_window.py >/dev/null
-grep -F 'Maintenance Insights (Read-only)' packaging/com.goreecloud.care.dev.desktop >/dev/null
+grep -F 'Maintenance Insights (Read-only)' packaging/com.goreecloud.care.desktop >/dev/null
 ! grep -R --line-number -E '\.unlink\(|shutil\.rmtree|os\.remove|subprocess|pkexec' goreecloud_care/insights.py goreecloud_care/insights_window.py
 # Post-action completion must survive the automatic values refresh.
 grep -F 'def _refresh_after_action(' goreecloud_care/app.py >/dev/null
@@ -191,7 +193,7 @@ grep -F 'def _refresh_after_action_done(' goreecloud_care/app.py >/dev/null
 grep -F 'self._show_notice(completion_title, outcome.message, Gtk.MessageType.INFO)' goreecloud_care/app.py >/dev/null
 grep -F 'self._refresh_after_action(outcome.message, "success", completion_title)' goreecloud_care/app.py >/dev/null
 # Mandatory GoreeCloud component documentation and integration records.
-for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json contracts/everkeep.acceptance.json contracts/continuity.status.schema.json scripts/validate-installed.sh scripts/validate-package-lifecycle.sh scripts/run-representative-acceptance.sh packaging/postinst packaging/postrm; do
+for f in README.md SPECIFICATIONS.md FEATURES.md BENEFITS.md CAPABILITIES.md COMPETITIVE-OBJECTIVES.md BRANDING.md USER-MANUAL.md LICENSE CHANGELOG.md API.md WARDVEIL-INTEGRATION.md GLAZE-UI-CONFORMANCE.md RELEASE-ACCEPTANCE.md goreecloud.platform.yaml contracts/privacy-shield.application.json contracts/privacy-shield.adapter.json contracts/everkeep.adoption.json contracts/everkeep.acceptance.json contracts/continuity.status.schema.json scripts/validate-installed.sh scripts/validate-package-lifecycle.sh scripts/run-representative-acceptance.sh packaging/postinst packaging/postrm packaging/com.goreecloud.care.desktop packaging/com.goreecloud.care.metainfo.xml; do
   test -s "$f"
 done
 echo 'Local source validation: passed'

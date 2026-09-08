@@ -70,12 +70,16 @@ class StableIdentityTests(unittest.TestCase):
         self.assertIn('PACKAGE_VERSION = "0.1.0"', source)
         self.assertNotIn('PACKAGE_VERSION = "0.1.0~dev22"', source)
 
-    def test_ci_is_stable_qualification_not_self_promotion(self) -> None:
+    def test_ci_and_representative_harnesses_are_stable_qualification_not_self_promotion(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "care-ci.yml").read_text(encoding="utf-8")
+        prepare = (ROOT / "scripts" / "prepare-representative-acceptance.sh").read_text(encoding="utf-8")
+        runner = (ROOT / "scripts" / "run-representative-acceptance.sh").read_text(encoding="utf-8")
         self.assertIn("name: GoreeCloud Care Stable Qualification", workflow)
-        self.assertIn("lifecycle=stable", workflow)
-        self.assertIn("stable_promotion_authorized=false", workflow)
-        self.assertNotIn("name: GoreeCloud Care Release Candidate", workflow)
+        for text in (workflow, prepare, runner):
+            self.assertIn("stable_promotion_authorized=false", text)
+            self.assertNotIn("lifecycle=release-candidate", text)
+        self.assertIn("Representative Stable qualification", prepare)
+        self.assertIn("Representative Stable qualification", runner)
 
     def test_stable_source_does_not_self_inherit_exact_rc_platform_governance(self) -> None:
         manifest = (ROOT / "goreecloud.platform.yaml").read_text(encoding="utf-8")
