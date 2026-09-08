@@ -142,6 +142,7 @@ class InsightsWindow(Gtk.ApplicationWindow):
         findings_title.get_style_context().add_class("section-title")
         findings_box.pack_start(findings_title, False, False, 0)
 
+        # Findings keep their own scroll position and guaranteed visible viewport.
         self.results_scroll = Gtk.ScrolledWindow()
         self.results_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         self.results_scroll.set_hexpand(True)
@@ -150,6 +151,8 @@ class InsightsWindow(Gtk.ApplicationWindow):
         findings_box.pack_start(self.results_scroll, True, True, 0)
         self.root.pack_start(self.findings_plane, True, True, 0)
 
+        # Preserve dev17's accepted copy integrity: selectable Pango text uses
+        # WORD_CHAR fallback with synthetic hyphen insertion disabled.
         self.results = Gtk.Label(xalign=0, yalign=0)
         self.results.set_selectable(True)
         self.results.set_line_wrap(True)
