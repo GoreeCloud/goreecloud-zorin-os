@@ -3,8 +3,8 @@ set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
-VERSION="0.1.0~dev22"
-RUNTIME_VERSION="0.1.0-dev22"
+VERSION="0.1.0"
+RUNTIME_VERSION="0.1.0"
 ARCH="all"
 PKG="goreecloud-care"
 OUT=${1:-"$ROOT/dist"}
@@ -39,17 +39,15 @@ require_tracked() {
 }
 
 # Every working-tree file that can enter the package must itself be tracked.
-# This specifically prevents an untracked *.py dropped into goreecloud_care/
-# from being globbed into a package whose provenance names only committed source.
 for packaged_source in \
   "$ROOT/packaging/postinst" \
   "$ROOT/packaging/postrm" \
   "$ROOT/packaging/goreecloud-care" \
   "$ROOT/packaging/goreecloud-care-helper" \
   "$ROOT/goreecloud_care/"*.py \
-  "$ROOT/packaging/com.goreecloud.care.dev.desktop" \
+  "$ROOT/packaging/com.goreecloud.care.desktop" \
   "$ROOT/packaging/icons/com.goreecloud.care.svg" \
-  "$ROOT/packaging/com.goreecloud.care.dev.metainfo.xml" \
+  "$ROOT/packaging/com.goreecloud.care.metainfo.xml" \
   "$ROOT/packaging/com.goreecloud.care.policy" \
   "$ROOT/LICENSE" \
   "$ROOT/API.md" \
@@ -68,9 +66,6 @@ printf '%s\n' "$SOURCE_TREE" | grep -Eq '^[0-9a-f]{40}$' || {
   exit 2
 }
 
-# Debian package output must be reproducible for an exact source revision. Use an
-# explicit SOURCE_DATE_EPOCH when supplied; otherwise bind the package timestamp
-# to the exact repository HEAD being built.
 if [ -z "${SOURCE_DATE_EPOCH:-}" ]; then
   SOURCE_DATE_EPOCH=$(git -C "$REPO_ROOT" show -s --format=%ct HEAD)
 fi
@@ -81,10 +76,6 @@ case "$SOURCE_DATE_EPOCH" in
     ;;
 esac
 export SOURCE_DATE_EPOCH
-
-# Keep locale/timezone behavior deterministic and avoid compressor-version drift
-# across the supported Zorin/Ubuntu build boundary. The package is small, so
-# deterministic portability is more important than archive compression here.
 export LC_ALL=C
 export TZ=UTC
 
@@ -110,7 +101,7 @@ Architecture: $ARCH
 Maintainer: GoreeCloud <support@goreecloud.com>
 Depends: python3, python3-gi, gir1.2-gtk-3.0, gir1.2-atk-1.0, policykit-1
 Homepage: https://goreecloud.com/
-Description: GoreeCloud Care Release Candidate maintenance utility
+Description: GoreeCloud Care local-first maintenance utility
  Local-first GTK maintenance utility for Zorin OS and compatible Linux systems.
 CONTROL
 chmod 0644 "$STAGE/DEBIAN/control"
@@ -119,9 +110,9 @@ install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"
 install -m 0755 "$ROOT/packaging/goreecloud-care" "$STAGE/usr/bin/goreecloud-care"
 install -m 0755 "$ROOT/packaging/goreecloud-care-helper" "$STAGE/usr/lib/goreecloud-care/goreecloud-care-helper"
 install -m 0644 "$ROOT/goreecloud_care/"*.py "$STAGE/usr/lib/goreecloud-care/goreecloud_care/"
-install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.desktop" "$STAGE/usr/share/applications/com.goreecloud.care.desktop"
+install -m 0644 "$ROOT/packaging/com.goreecloud.care.desktop" "$STAGE/usr/share/applications/com.goreecloud.care.desktop"
 install -m 0644 "$ROOT/packaging/icons/com.goreecloud.care.svg" "$STAGE/usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg"
-install -m 0644 "$ROOT/packaging/com.goreecloud.care.dev.metainfo.xml" "$STAGE/usr/share/metainfo/com.goreecloud.care.metainfo.xml"
+install -m 0644 "$ROOT/packaging/com.goreecloud.care.metainfo.xml" "$STAGE/usr/share/metainfo/com.goreecloud.care.metainfo.xml"
 install -m 0644 "$ROOT/packaging/com.goreecloud.care.policy" "$STAGE/usr/share/polkit-1/actions/"
 install -m 0644 "$ROOT/LICENSE" "$STAGE/usr/share/doc/goreecloud-care/copyright"
 install -m 0644 "$ROOT/API.md" "$STAGE/usr/share/doc/goreecloud-care/API.md"
@@ -133,10 +124,6 @@ chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"
 mkdir -p "$STAGE/usr/lib/python3/dist-packages"
 install -m 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth" "$STAGE/usr/lib/python3/dist-packages/goreecloud_care.pth"
 
-# Package-owned build provenance lets installed Care bind later target/runtime
-# acceptance to the exact Git source without relying on the invoking directory,
-# user-writable state, or a retained .deb archive. The package SHA-256 remains an
-# external acceptance property because embedding a package's own hash is circular.
 python3 - "$STAGE/usr/share/goreecloud-care/build-provenance.json" \
   "$SOURCE_REVISION" "$SOURCE_TREE" "$RUNTIME_VERSION" "$VERSION" "$SOURCE_DATE_EPOCH" <<'PY'
 import json
@@ -159,14 +146,7 @@ Path(out).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encod
 PY
 chmod 0644 "$STAGE/usr/share/goreecloud-care/build-provenance.json"
 
-# Caller umask is not part of package identity or the installed trust boundary.
-# mkdir and generated files otherwise inherit it, which can change package bytes
-# and can make the provenance parent directory group-writable on a developer host.
 find "$STAGE" -type d -exec chmod 0755 {} +
-
-# Normalize every staged filesystem timestamp before dpkg-deb sees it. Explicit
-# format 2.0 plus -Znone removes xz/zstd/gzip implementation differences from
-# the byte-for-byte package identity.
 find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +
 
 dpkg-deb --root-owner-group --deb-format=2.0 -Znone --build "$STAGE" "$OUT/${PKG}_${VERSION}_${ARCH}.deb" >/dev/null
