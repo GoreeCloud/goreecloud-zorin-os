@@ -11,7 +11,7 @@ from typing import Any
 from . import __version__
 
 API_VERSION = "1"
-PACKAGE_VERSION = "0.1.0~dev22"
+PACKAGE_VERSION = "0.1.0"
 BUILD_PROVENANCE_PATH = Path("/usr/share/goreecloud-care/build-provenance.json")
 REPRESENTATIVE_ACCEPTANCE_PATH = Path(
     "/var/lib/goreecloud-care/acceptance/representative-target.json"
@@ -344,10 +344,6 @@ def evaluate_continuity_evidence(
         )
     )
 
-    # The package SHA-256 cannot be embedded inside the package whose hash it
-    # would describe. Bind that external identity by requiring the governed
-    # Everkeep record to agree exactly with the package SHA captured by the
-    # representative-device acceptance handoff for the same source build.
     package_identity_matches = (
         representative_matches
         and everkeep_matches
