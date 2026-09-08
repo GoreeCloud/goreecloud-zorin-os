@@ -66,6 +66,9 @@ printf '%s\n' "$SOURCE_TREE" | grep -Eq '^[0-9a-f]{40}$' || {
   exit 2
 }
 
+# Debian package output must be reproducible for an exact source revision. Use an
+# explicit SOURCE_DATE_EPOCH when supplied; otherwise bind the package timestamp
+# to the exact repository HEAD being built.
 if [ -z "${SOURCE_DATE_EPOCH:-}" ]; then
   SOURCE_DATE_EPOCH=$(git -C "$REPO_ROOT" show -s --format=%ct HEAD)
 fi
@@ -76,6 +79,10 @@ case "$SOURCE_DATE_EPOCH" in
     ;;
 esac
 export SOURCE_DATE_EPOCH
+
+# Keep locale/timezone behavior deterministic and avoid compressor-version drift
+# across the supported Zorin/Ubuntu build boundary. The package is small, so
+# deterministic portability is more important than archive compression here.
 export LC_ALL=C
 export TZ=UTC
 
@@ -124,6 +131,10 @@ chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"
 mkdir -p "$STAGE/usr/lib/python3/dist-packages"
 install -m 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth" "$STAGE/usr/lib/python3/dist-packages/goreecloud_care.pth"
 
+# Package-owned build provenance lets installed Care bind later target/runtime
+# acceptance to the exact Git source without relying on the invoking directory,
+# user-writable state, or a retained .deb archive. The package SHA-256 remains an
+# external acceptance property because embedding a package's own hash is circular.
 python3 - "$STAGE/usr/share/goreecloud-care/build-provenance.json" \
   "$SOURCE_REVISION" "$SOURCE_TREE" "$RUNTIME_VERSION" "$VERSION" "$SOURCE_DATE_EPOCH" <<'PY'
 import json
@@ -146,7 +157,14 @@ Path(out).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encod
 PY
 chmod 0644 "$STAGE/usr/share/goreecloud-care/build-provenance.json"
 
+# Caller umask is not part of package identity or the installed trust boundary.
+# mkdir and generated files otherwise inherit it, which can change package bytes
+# and can make the provenance parent directory group-writable on a developer host.
 find "$STAGE" -type d -exec chmod 0755 {} +
+
+# Normalize every staged filesystem timestamp before dpkg-deb sees it. Explicit
+# format 2.0 plus -Znone removes xz/zstd/gzip implementation differences from
+# the byte-for-byte package identity.
 find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +
 
 dpkg-deb --root-owner-group --deb-format=2.0 -Znone --build "$STAGE" "$OUT/${PKG}_${VERSION}_${ARCH}.deb" >/dev/null

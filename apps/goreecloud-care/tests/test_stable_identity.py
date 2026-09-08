@@ -8,16 +8,16 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = ROOT.parents[1]
 
 
-class StableIdentityTests(unittest.TestCase):
-    def test_platform_manifest_declares_stable_identity_without_conformance_shortcut(self) -> None:
+class StableArtifactIdentityTests(unittest.TestCase):
+    def test_platform_manifest_keeps_governed_rc_lifecycle_for_0_1_0_artifact(self) -> None:
         manifest = (ROOT / "goreecloud.platform.yaml").read_text(encoding="utf-8")
-        self.assertIn("lifecycle: stable", manifest)
+        self.assertIn("lifecycle: release-candidate", manifest)
         self.assertIn("version: 0.1.0", manifest)
         self.assertIn("status: nonconformant", manifest)
-        self.assertNotIn("lifecycle: release-candidate", manifest)
+        self.assertNotIn("lifecycle: stable", manifest)
         self.assertNotIn("version: 0.1.0-dev22", manifest)
 
-    def test_runtime_and_python_metadata_are_stable(self) -> None:
+    def test_runtime_and_python_metadata_are_final_0_1_0_artifact_identity(self) -> None:
         init_source = (ROOT / "goreecloud_care" / "__init__.py").read_text(encoding="utf-8")
         pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
         self.assertIn('__version__ = "0.1.0"', init_source)
@@ -39,7 +39,7 @@ class StableIdentityTests(unittest.TestCase):
         self.assertIn('self.header_subtitle = "Read-only local review"', source)
         self.assertNotIn('Release Candidate •', source)
 
-    def test_desktop_and_appstream_sources_are_canonical_stable(self) -> None:
+    def test_desktop_and_appstream_sources_are_canonical_0_1_0(self) -> None:
         desktop_path = ROOT / "packaging" / "com.goreecloud.care.desktop"
         metainfo_path = ROOT / "packaging" / "com.goreecloud.care.metainfo.xml"
         self.assertTrue(desktop_path.is_file())
@@ -55,7 +55,7 @@ class StableIdentityTests(unittest.TestCase):
         self.assertIn("<name>GoreeCloud Care</name>", metainfo)
         self.assertIn('<release version="0.1.0" date="2026-09-07" type="stable"/>', metainfo)
 
-    def test_package_build_uses_stable_identity(self) -> None:
+    def test_package_build_uses_final_artifact_identity(self) -> None:
         build = (ROOT / "scripts" / "build-deb.sh").read_text(encoding="utf-8")
         self.assertIn('VERSION="0.1.0"', build)
         self.assertIn('RUNTIME_VERSION="0.1.0"', build)
@@ -65,28 +65,29 @@ class StableIdentityTests(unittest.TestCase):
         self.assertNotIn("packaging/com.goreecloud.care.dev.desktop", build)
         self.assertNotIn("packaging/com.goreecloud.care.dev.metainfo.xml", build)
 
-    def test_platform_status_package_identity_matches_stable(self) -> None:
+    def test_platform_status_package_identity_matches_artifact(self) -> None:
         source = (ROOT / "goreecloud_care" / "platform_status.py").read_text(encoding="utf-8")
         self.assertIn('PACKAGE_VERSION = "0.1.0"', source)
         self.assertNotIn('PACKAGE_VERSION = "0.1.0~dev22"', source)
 
-    def test_ci_and_representative_harnesses_are_stable_qualification_not_self_promotion(self) -> None:
+    def test_ci_and_representative_harnesses_are_artifact_qualification_not_promotion(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "care-ci.yml").read_text(encoding="utf-8")
         prepare = (ROOT / "scripts" / "prepare-representative-acceptance.sh").read_text(encoding="utf-8")
         runner = (ROOT / "scripts" / "run-representative-acceptance.sh").read_text(encoding="utf-8")
-        self.assertIn("name: GoreeCloud Care Stable Qualification", workflow)
+        self.assertIn("name: GoreeCloud Care 0.1.0 Stable Artifact Qualification", workflow)
         for text in (workflow, prepare, runner):
+            self.assertIn("lifecycle=release-candidate", text)
+            self.assertIn("artifact_version=0.1.0", text)
             self.assertIn("stable_promotion_authorized=false", text)
-            self.assertNotIn("lifecycle=release-candidate", text)
-        self.assertIn("Representative Stable qualification", prepare)
-        self.assertIn("Representative Stable qualification", runner)
+            self.assertNotIn("lifecycle=stable", text)
 
-    def test_stable_source_does_not_self_inherit_exact_rc_platform_governance(self) -> None:
+    def test_artifact_source_does_not_self_inherit_exact_rc_platform_governance(self) -> None:
         manifest = (ROOT / "goreecloud.platform.yaml").read_text(encoding="utf-8")
         self.assertIn("status: nonconformant", manifest)
-        self.assertIn("Stable identity requires exact-source", manifest)
+        self.assertIn("0.1.0 golden artifact candidate requires exact-source", manifest)
         self.assertIn("productionEligible=false", manifest)
         self.assertIn("protected_by_wardveil=false", manifest)
+        self.assertIn("Stable promotion must be an explicit governance action", manifest)
 
 
 if __name__ == "__main__":

@@ -49,7 +49,7 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('"package_sha256_embedded": False', BUILD)
         self.assertIn("embedding a package's own hash is circular", BUILD)
 
-    def test_stable_package_identity_is_exact(self):
+    def test_artifact_package_identity_is_exact(self):
         self.assertIn('VERSION="0.1.0"', BUILD)
         self.assertIn('RUNTIME_VERSION="0.1.0"', BUILD)
         self.assertIn('packaging/com.goreecloud.care.desktop', BUILD)
@@ -68,8 +68,10 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('Umask independence: passed (0022 == 0002)', VERIFY)
 
     def test_ci_runs_same_environment_reproducibility_gate(self):
-        self.assertIn('name: GoreeCloud Care Stable Qualification', WORKFLOW)
+        self.assertIn('name: GoreeCloud Care 0.1.0 Stable Artifact Qualification', WORKFLOW)
         self.assertIn('goreecloud-care_0.1.0_all.deb', WORKFLOW)
+        self.assertIn('lifecycle=release-candidate', WORKFLOW)
+        self.assertIn('artifact_version=0.1.0', WORKFLOW)
         self.assertIn('stable_promotion_authorized=false', WORKFLOW)
         self.assertIn('Verify reproducible GoreeCloud Care package', WORKFLOW)
 

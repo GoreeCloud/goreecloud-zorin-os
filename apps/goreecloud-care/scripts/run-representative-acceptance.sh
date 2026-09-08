@@ -54,12 +54,12 @@ RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __v
   exit 2
 }
 
-grep -F 'lifecycle: stable' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Representative Stable qualification requires lifecycle: stable in goreecloud.platform.yaml." >&2
+grep -F 'lifecycle: release-candidate' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
+  echo "Representative 0.1.0 artifact acceptance requires lifecycle: release-candidate in goreecloud.platform.yaml." >&2
   exit 2
 }
 grep -F 'status: nonconformant' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Representative Stable qualification must remain nonconformant until separate governed promotion." >&2
+  echo "Representative 0.1.0 artifact acceptance must remain nonconformant until separate governed Stable promotion." >&2
   exit 2
 }
 
@@ -75,12 +75,13 @@ rm -f \
   "$OUT/continuity-installed.json" \
   "$OUT/SOURCE_REVISION"
 
-printf '%s\n' "GoreeCloud Care exact Stable qualification representative-target acceptance"
+printf '%s\n' "GoreeCloud Care exact 0.1.0 golden artifact representative-target acceptance"
 printf '%s\n' "Target:          ${PRETTY_NAME}"
 printf '%s\n' "Source branch:   $SOURCE_BRANCH"
 printf '%s\n' "Source revision: $SOURCE_REVISION"
 printf '%s\n' "Source tree:     $SOURCE_TREE"
 printf '%s\n' "Runtime:         $RUNTIME_VERSION"
+printf '%s\n' "Governed lifecycle: Release Candidate"
 printf '%s\n' "This runner performs package install/remove/reinstall/downgrade/restore through the existing lifecycle probe."
 printf '%s\n' "It never invokes a Care cleanup action and never writes or promotes an Everkeep governance record."
 printf '%s\n' "Stable promotion is not authorized by this runner."
@@ -166,7 +167,8 @@ cat > "$OUT/SOURCE_REVISION" <<EOF
 source_revision=$SOURCE_REVISION
 source_tree=$SOURCE_TREE
 source_branch=$SOURCE_BRANCH
-lifecycle=stable
+lifecycle=release-candidate
+artifact_version=0.1.0
 stable_promotion_authorized=false
 runtime_version=$EXPECTED_RUNTIME_VERSION
 package_version=$EXPECTED_PACKAGE_VERSION
@@ -245,16 +247,10 @@ payload = {
 Path(output).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 PY
 
-# Install only the Care-owned representative-target handoff as protected local
-# evidence. This is not the Everkeep governance record and both promotion flags
-# remain false by construction.
 sudo install -d -o root -g root -m 0755 /var/lib/goreecloud-care
 sudo install -d -o root -g root -m 0755 /var/lib/goreecloud-care/acceptance
 sudo install -o root -g root -m 0644 "$OUT/representative-target.json" "$REPRESENTATIVE_RECORD"
 
-# Prove that the Care-produced record cannot self-promote when Everkeep evidence
-# is absent, regardless of any already-existing governed Everkeep state on this
-# machine.
 PYTHONPATH="$ROOT" python3 - "$OUT/continuity-without-governance.json" <<'PY'
 import json
 import sys
@@ -271,11 +267,11 @@ PY
 
 goreecloud-care --continuity-status-json > "$OUT/continuity-installed.json"
 
-printf '%s\n' "Representative Stable qualification target acceptance: passed"
+printf '%s\n' "Representative 0.1.0 golden artifact target acceptance: passed"
 printf '%s\n' "Local tests: $LOCAL_TESTS"
 printf '%s\n' "Candidate SHA-256: $PACKAGE_SHA256"
 printf '%s\n' "Care-owned target handoff: $OUT/representative-target.json"
 printf '%s\n' "Protected local target handoff: $REPRESENTATIVE_RECORD"
 printf '%s\n' "Everkeep promotion: not performed by this runner"
 printf '%s\n' "Stable promotion authorized: false"
-printf '%s\n' "The exact source carries Stable identity but remains nonconformant until separate platform governance, exact-source Glaze acceptance/bridge, immutable release evidence, and explicit governed production promotion are satisfied."
+printf '%s\n' "The exact 0.1.0 golden artifact remains Release Candidate / nonconformant until separate platform governance, exact-source Glaze acceptance/bridge, immutable release evidence, and explicit governed Stable promotion are satisfied."

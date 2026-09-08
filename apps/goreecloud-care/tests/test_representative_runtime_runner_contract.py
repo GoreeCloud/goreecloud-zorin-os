@@ -22,13 +22,13 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
         self.assertIn("Zorin OS 17.3", self.source)
         self.assertIn("PRETTY_NAME", self.source)
 
-    def test_runner_requires_clean_exact_stable_source_and_tree(self) -> None:
+    def test_runner_requires_clean_exact_golden_candidate_source_and_tree(self) -> None:
         self.assertIn('status --porcelain --untracked-files=no -- apps/goreecloud-care .github/workflows/care-ci.yml', self.source)
         self.assertIn('SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)', self.source)
         self.assertIn('SOURCE_TREE=$(git -C "$REPO_ROOT" rev-parse HEAD:apps/goreecloud-care)', self.source)
         self.assertIn('EXPECTED_RUNTIME_VERSION="0.1.0"', self.source)
         self.assertIn('EXPECTED_PACKAGE_VERSION="0.1.0"', self.source)
-        self.assertIn("Representative Stable qualification requires lifecycle: stable", self.source)
+        self.assertIn("requires lifecycle: release-candidate", self.source)
         self.assertIn("status: nonconformant", self.source)
 
     def test_runner_executes_all_automatable_exact_candidate_gates(self) -> None:
@@ -61,6 +61,8 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
             '"everkeep_ready_promoted": False',
         ):
             self.assertIn(required, self.source)
+        self.assertIn("lifecycle=release-candidate", self.source)
+        self.assertIn("artifact_version=0.1.0", self.source)
         self.assertIn("stable_promotion_authorized=false", self.source)
 
     def test_runner_installs_only_care_owned_root_protected_target_record(self) -> None:
@@ -78,11 +80,10 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
         self.assertIn('assert payload["stage"] == "target-accepted-governance-pending"', self.source)
         self.assertIn("Everkeep promotion: not performed by this runner", self.source)
 
-    def test_runner_reports_stable_qualification_without_promotion_claim(self) -> None:
-        self.assertIn("Representative Stable qualification target acceptance: passed", self.source)
+    def test_runner_reports_golden_artifact_acceptance_without_stable_claim(self) -> None:
+        self.assertIn("Representative 0.1.0 golden artifact target acceptance: passed", self.source)
         self.assertIn("Stable promotion authorized: false", self.source)
-        self.assertIn("carries Stable identity but remains nonconformant", self.source)
-        self.assertNotIn("remains Release Candidate", self.source)
+        self.assertIn("remains Release Candidate / nonconformant", self.source)
         self.assertNotIn("Stable / conformant", self.source)
 
     def test_runner_never_invokes_care_cleanup_actions(self) -> None:

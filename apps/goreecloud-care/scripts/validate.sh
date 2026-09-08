@@ -63,14 +63,14 @@ assert set(continuity_schema['properties']['state']['enum']) == {'attention', 'r
 assert 'everkeep-promoted' in continuity_schema['properties']['stage']['enum']
 print('Platform integration contract validation: passed')
 PY
-# Exact Stable qualification version alignment.
+# Exact 0.1.0 golden artifact identity with governed Release Candidate lifecycle.
 grep -F '__version__ = "0.1.0"' goreecloud_care/__init__.py >/dev/null
 grep -F 'version = "0.1.0"' pyproject.toml >/dev/null
 grep -F 'VERSION="0.1.0"' scripts/build-deb.sh >/dev/null
 grep -F 'RUNTIME_VERSION="0.1.0"' scripts/build-deb.sh >/dev/null
 grep -F '<release version="0.1.0"' packaging/com.goreecloud.care.metainfo.xml >/dev/null
 grep -F 'version: 0.1.0' goreecloud.platform.yaml >/dev/null
-grep -F 'lifecycle: stable' goreecloud.platform.yaml >/dev/null
+grep -F 'lifecycle: release-candidate' goreecloud.platform.yaml >/dev/null
 # Installed Python entrypoints must remain isolated from source/CWD/user path shadowing.
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care "$@"' packaging/goreecloud-care >/dev/null
 grep -F 'exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"' packaging/goreecloud-care-helper >/dev/null

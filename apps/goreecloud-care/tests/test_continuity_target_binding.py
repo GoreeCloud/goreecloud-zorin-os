@@ -30,8 +30,8 @@ class ContinuityTargetBindingTests(unittest.TestCase):
             "producer": "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care",
             "source_revision": REVISION,
             "source_tree": TREE,
-            "runtime_version": "0.1.0-dev22",
-            "package_version": "0.1.0~dev22",
+            "runtime_version": "0.1.0",
+            "package_version": "0.1.0",
             "source_date_epoch": 1_788_800_000,
             "package_sha256_embedded": False,
         }
@@ -44,8 +44,8 @@ class ContinuityTargetBindingTests(unittest.TestCase):
             "candidate": {
                 "source_revision": REVISION,
                 "source_tree": TREE,
-                "runtime_version": "0.1.0-dev22",
-                "package_version": "0.1.0~dev22",
+                "runtime_version": "0.1.0",
+                "package_version": "0.1.0",
                 "package_sha256": PACKAGE_SHA,
             },
             "target": {
@@ -55,7 +55,7 @@ class ContinuityTargetBindingTests(unittest.TestCase):
             },
             "dimensions": ["restore_capability", "provenance"],
             "evidence": {
-                "local_tests": 128,
+                "local_tests": 143,
                 "source_validation": "passed",
                 "package_lifecycle": "passed",
                 "references": ["fixture"],
@@ -65,7 +65,7 @@ class ContinuityTargetBindingTests(unittest.TestCase):
                 "exact_revision_accepted": True,
                 "everkeep_integration_promoted": promoted,
                 "everkeep_ready_promoted": promoted,
-                "freshness_rule": "Exact candidate and representative target only.",
+                "freshness_rule": "Exact 0.1.0 candidate and representative target only.",
             },
         }
 

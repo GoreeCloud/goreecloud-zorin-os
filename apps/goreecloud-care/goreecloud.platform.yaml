@@ -6,9 +6,10 @@ component:
   product_name: GoreeCloud Care
   repository: GoreeCloud/goreecloud-zorin-os
 
-# Stable product identity is established in source here, but conformance remains
-# fail-closed until this exact source/tree/package completes Stable qualification.
-lifecycle: stable
+# The final 0.1.0 artifact bits are under qualification, but the governed
+# lifecycle remains Release Candidate until every applicable platform-system
+# result is resolved and explicit Stable promotion is recorded.
+lifecycle: release-candidate
 version: 0.1.0
 
 supported_platforms:
@@ -55,7 +56,7 @@ platform_systems:
       - goreecloud_care/platform_status.py
       - tests/test_platform_status.py
       - https://github.com/GoreeCloud/goreecloud-privacy-shield/commit/d2ee2c626beb2ebc2d951d01db877fc8f46d3791
-    notes: The frozen exact RC 334b53102c5fe0bd5d348397ba8b13cc5608ada2 received Care-adapter production approval from Privacy Shield at d2ee2c626beb2ebc2d951d01db877fc8f46d3791. Stable identity requires exact-source refresh or an explicit authority-approved bridge because source/tree/package identity changes to 0.1.0. The local source remains fail-closed and does not self-promote production_approved.
+    notes: The frozen exact RC 334b53102c5fe0bd5d348397ba8b13cc5608ada2 received Care-adapter production approval from Privacy Shield at d2ee2c626beb2ebc2d951d01db877fc8f46d3791. The 0.1.0 artifact candidate requires exact-source refresh or an explicit authority-approved bridge because source/tree/package identity changes. The local source remains fail-closed and does not self-promote production_approved.
 
   wardveil_security:
     result: applicable-blocked
@@ -73,7 +74,7 @@ platform_systems:
       - tests/test_privilege.py
       - tests/test_packaging_launchers.py
       - https://github.com/GoreeCloud/goreecloud-wardveil-security/commit/e16fc489dbf98849601a198358863dffe7df81d4
-    notes: The frozen exact RC has governed Wardveil adoption/runtime acceptance for the local-maintenance-privilege-boundary at e16fc489dbf98849601a198358863dffe7df81d4. Stable identity requires exact-source refresh or an explicit authority-approved bridge. Care continues to emit protected_by_wardveil=false and grants no cross-service execution authority until the new exact Stable identity is governed.
+    notes: The frozen exact RC has governed Wardveil adoption/runtime acceptance for the local-maintenance-privilege-boundary at e16fc489dbf98849601a198358863dffe7df81d4. The 0.1.0 artifact candidate requires exact-source refresh or an explicit authority-approved bridge. Care continues to emit protected_by_wardveil=false and grants no cross-service execution authority until governed adoption applies to the exact artifact candidate.
 
   everkeep:
     result: applicable-blocked
@@ -90,7 +91,7 @@ platform_systems:
       - scripts/validate-package-lifecycle.sh
       - scripts/run-representative-acceptance.sh
       - https://github.com/GoreeCloud/goreecloud-everkeep/commit/d6192dc2a38d5749df561f0638860c974faae8ff
-    notes: The frozen exact RC is ready / everkeep-promoted under exact Everkeep authority d6192dc2a38d5749df561f0638860c974faae8ff. Stable identity requires a new exact representative target handoff and exact-source/tree/package Everkeep governance or an explicit authority-approved bridge. The Stable source cannot inherit the RC record silently.
+    notes: The frozen exact RC is ready / everkeep-promoted under exact Everkeep authority d6192dc2a38d5749df561f0638860c974faae8ff. The 0.1.0 artifact candidate requires a new exact representative target handoff and exact-source/tree/package Everkeep governance or an explicit authority-approved bridge. The candidate cannot inherit the RC record silently.
 
   glaze_ui:
     result: applicable-blocked
@@ -111,7 +112,7 @@ platform_systems:
       - tests/test_insights_window_contract.py
       - tests/runtime_ui_acceptance.py
       - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/a4fe4cf1b0d75cb82dbea6fdc3db363be317394e
-    notes: GLAZE UI V1.2 / 1.2.0 remains the required Stable compatibility baseline. Frozen RC source 334b53102c5fe0bd5d348397ba8b13cc5608ada2 is accepted-v1 in the authoritative Glaze registry at a4fe4cf1b0d75cb82dbea6fdc3db363be317394e after all seven required human/native dimensions passed. Stable identity requires exact-source registry refresh or an explicit authority-approved bridge. productionEligible=false remains authoritative until then. V1.3 Adaptive Resonance remains Proposed and consumer-ineligible.
+    notes: GLAZE UI V1.2 / 1.2.0 remains the required Stable compatibility baseline. Frozen RC source 334b53102c5fe0bd5d348397ba8b13cc5608ada2 is accepted-v1 in the authoritative Glaze registry at a4fe4cf1b0d75cb82dbea6fdc3db363be317394e after all seven required human/native dimensions passed. The 0.1.0 artifact candidate requires exact-source registry refresh or an explicit authority-approved bridge. productionEligible=false remains authoritative until then. V1.3 Adaptive Resonance remains Proposed and consumer-ineligible.
 
   mesh:
     result: not-applicable-justified
@@ -146,7 +147,7 @@ continuity:
   restore:
     required: true
     requirements:
-      - Validate install, removal/reinstall, downgrade, rollback, and post-rollback launch/report behavior on the representative target for the exact Stable identity.
+      - Validate install, removal/reinstall, downgrade, rollback, and post-rollback launch/report behavior on the representative target for the exact 0.1.0 artifact candidate.
       - Preserve explicit warning and irreversibility boundaries for permanent Trash deletion, which is maintenance behavior rather than application-data recovery.
   export:
     required: false
@@ -196,14 +197,14 @@ evidence:
       revision: 334b53102c5fe0bd5d348397ba8b13cc5608ada2
       result: passed
       observed_at: "2026-09-07T20:27:15Z"
-      notes: Frozen RC passed 144-test exact-head qualification, deterministic/cross-environment package identity, full representative Zorin OS 17.3 lifecycle acceptance, Privacy Shield production approval, Everkeep readiness, scoped Wardveil adoption/runtime acceptance, and final Glaze V1.2 accepted-v1 human/native acceptance. This evidence is predecessor evidence for the Stable transition and remains exact-RC scoped.
+      notes: Frozen RC passed 144-test exact-head qualification, deterministic/cross-environment package identity, full representative Zorin OS 17.3 lifecycle acceptance, Privacy Shield production approval, Everkeep readiness, scoped Wardveil adoption/runtime acceptance, and final Glaze V1.2 accepted-v1 human/native acceptance. This evidence remains exact-RC scoped and is predecessor evidence only.
     - id: care-stable-predecessor-glaze-human-native
       category: glaze-ui
       path: https://github.com/GoreeCloud/goreecloud-glaze-ui/pull/169
       revision: 334b53102c5fe0bd5d348397ba8b13cc5608ada2
       result: passed
       observed_at: "2026-09-07T20:33:00-05:00"
-      notes: Authorized representative reviewer reported PASS for all seven required final Orca, compositor/window-control, Dark/Deep Dark, canonical-icon, and task-UX dimensions for the frozen exact RC. The Stable source must be bridged or refreshed explicitly; the result is not silently transferred.
+      notes: Authorized representative reviewer reported PASS for all seven required final Orca, compositor/window-control, Dark/Deep Dark, canonical-icon, and task-UX dimensions for the frozen exact RC. The 0.1.0 artifact candidate must be bridged or refreshed explicitly; the result is not silently transferred.
   release: []
 
 conformance:
@@ -211,10 +212,10 @@ conformance:
   validated_at: null
   evidence: []
   blockers:
-    - Stable identity requires exact-source CI package/checksum/reproducibility evidence for this new source/tree/package identity.
-    - Stable identity requires exact-source representative Zorin OS 17.3 package lifecycle and installed-provenance evidence for this new package.
-    - Privacy Shield exact-RC approval must be refreshed or explicitly bridged to the exact Stable identity before final promotion.
-    - Wardveil exact-RC adoption/runtime acceptance must be refreshed or explicitly bridged to the exact Stable identity; protected_by_wardveil=false remains the local source claim.
-    - Everkeep exact-RC readiness must be refreshed or explicitly bridged to the exact Stable source/tree/package and representative target before ready / everkeep-promoted can be accepted for 0.1.0.
-    - GLAZE UI V1.2 exact-RC accepted-v1 must be refreshed or explicitly bridged to the exact Stable source; productionEligible=false remains authoritative until then.
-    - Stable product promotion is not authorized merely by lifecycle/version labels; an exact qualified source/package plus all applicable governed authorities is required.
+    - The 0.1.0 golden artifact candidate requires exact-source CI package/checksum/reproducibility evidence for this new source/tree/package identity.
+    - The 0.1.0 golden artifact candidate requires exact-source representative Zorin OS 17.3 package lifecycle and installed-provenance evidence for this new package.
+    - Privacy Shield exact-RC approval must be refreshed or explicitly bridged to the exact 0.1.0 artifact candidate before final promotion.
+    - Wardveil exact-RC adoption/runtime acceptance must be refreshed or explicitly bridged to the exact 0.1.0 artifact candidate; protected_by_wardveil=false remains the local source claim.
+    - Everkeep exact-RC readiness must be refreshed or explicitly bridged to the exact 0.1.0 source/tree/package and representative target before ready / everkeep-promoted can be accepted.
+    - GLAZE UI V1.2 exact-RC accepted-v1 must be refreshed or explicitly bridged to the exact 0.1.0 artifact candidate; productionEligible=false remains authoritative until then.
+    - Governed lifecycle remains Release Candidate until every applicable blocker is resolved; Stable promotion must be an explicit governance action over the accepted golden artifact rather than inferred from the 0.1.0 version string.

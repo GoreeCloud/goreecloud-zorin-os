@@ -26,20 +26,18 @@ SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)
 SOURCE_BRANCH=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || printf '%s' detached)
 RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __version__; print(__version__)')
 [ "$RUNTIME_VERSION" = "$EXPECTED_RUNTIME_VERSION" ] || {
-  echo "Representative Stable qualification harness expects runtime $EXPECTED_RUNTIME_VERSION; got $RUNTIME_VERSION" >&2
+  echo "Representative 0.1.0 artifact qualification harness expects runtime $EXPECTED_RUNTIME_VERSION; got $RUNTIME_VERSION" >&2
   exit 2
 }
-grep -F 'lifecycle: stable' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Representative Stable qualification preparation requires lifecycle: stable." >&2
+grep -F 'lifecycle: release-candidate' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
+  echo "Representative 0.1.0 artifact preparation requires lifecycle: release-candidate." >&2
   exit 2
 }
 grep -F 'status: nonconformant' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Stable qualification must remain fail-closed until governed promotion; expected conformance status: nonconformant." >&2
+  echo "0.1.0 artifact qualification must remain fail-closed until governed Stable promotion." >&2
   exit 2
 }
 
-# Probe an installed runtime from an empty neutral directory so the source checkout
-# cannot make a different installed package look like the exact Stable candidate.
 INSTALLED_PROBE_DIR=$(mktemp -d)
 cleanup() {
   rm -rf "$INSTALLED_PROBE_DIR"
@@ -48,7 +46,7 @@ trap cleanup EXIT INT TERM
 
 mkdir -p "$OUT"
 
-printf '%s\n' "Preparing read-only/non-destructive Stable qualification representative acceptance evidence."
+printf '%s\n' "Preparing read-only/non-destructive 0.1.0 golden artifact representative acceptance evidence."
 printf '%s\n' "Source revision: $SOURCE_REVISION"
 printf '%s\n' "Source branch:   $SOURCE_BRANCH"
 printf '%s\n' "Runtime version: $RUNTIME_VERSION"
@@ -74,7 +72,7 @@ PACKAGE=$EXPECTED_PACKAGE
 }
 PACKAGE_VERSION=$(dpkg-deb -f "$PACKAGE" Version)
 [ "$PACKAGE_VERSION" = "$EXPECTED_PACKAGE_VERSION" ] || {
-  echo "Representative Stable qualification harness expects package $EXPECTED_PACKAGE_VERSION; got $PACKAGE_VERSION" >&2
+  echo "Representative 0.1.0 artifact harness expects package $EXPECTED_PACKAGE_VERSION; got $PACKAGE_VERSION" >&2
   exit 2
 }
 sha256sum "$PACKAGE" > "$OUT/package.sha256"
@@ -83,7 +81,8 @@ PACKAGE_SHA256=$(awk '{print $1}' "$OUT/package.sha256")
 cat > "$OUT/SOURCE_REVISION" <<EOF
 source_revision=$SOURCE_REVISION
 source_branch=$SOURCE_BRANCH
-lifecycle=stable
+lifecycle=release-candidate
+artifact_version=0.1.0
 stable_promotion_authorized=false
 runtime_version=$RUNTIME_VERSION
 package_version=$PACKAGE_VERSION
@@ -118,25 +117,25 @@ if command -v goreecloud-care >/dev/null 2>&1; then
       printf 'api_version=not-probed-runtime-mismatch\n'
     } > "$OUT/installed-version.txt"
     printf '%s\n' \
-      "Installed Care runtime differs from the exact Stable source candidate; Stable-only status snapshots were skipped." \
+      "Installed Care runtime differs from the exact 0.1.0 artifact candidate; candidate-only status snapshots were skipped." \
       > "$OUT/installed-status-snapshots-skipped.txt"
   fi
 else
   printf '%s\n' "GoreeCloud Care is not currently installed; installed read-only status snapshots were skipped." > "$OUT/installed-version.txt"
-  printf '%s\n' "No installed Care executable was found; Stable-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
+  printf '%s\n' "No installed Care executable was found; candidate-only status snapshots were skipped." > "$OUT/installed-status-snapshots-skipped.txt"
 fi
 
 cat > "$OUT/MANUAL-CHECKLIST.txt" <<'EOF'
-GoreeCloud Care Stable qualification — representative-device checklist
+GoreeCloud Care 0.1.0 golden artifact — representative-device checklist
 =====================================================================
 
 Record PASS or FAIL plus notes for every exercised item. A blank item is NOT accepted evidence.
 Do not use unrelated personal files for destructive-flow testing; use disposable fixtures/test data.
 This checklist does not authorize Stable promotion by itself.
 
-Lifecycle note: this source carries the 0.1.0 Stable identity while conformance remains fail-closed/nonconformant until exact-source package, physical-target, platform-system, Glaze, and governance evidence are complete. GLAZE UI V1.2 / 1.2.0 remains the Stable compatibility baseline; V1.3 Adaptive Resonance remains Proposed / consumer-ineligible.
+Lifecycle note: the artifact version is 0.1.0, but the governed source lifecycle remains Release Candidate / nonconformant until exact-source package, physical-target, platform-system, Glaze, and governance evidence are complete. GLAZE UI V1.2 / 1.2.0 remains the Stable compatibility baseline; V1.3 Adaptive Resonance remains Proposed / consumer-ineligible.
 
-A. Stable identity delta
+A. 0.1.0 identity delta
 [ ] PASS [ ] FAIL  Main window title is GoreeCloud Care without Development/Release Candidate branding.
 [ ] PASS [ ] FAIL  Main header subtitle reads Local maintenance • Adaptive Resonance preview and does not imply V1.3 conformance.
 [ ] PASS [ ] FAIL  Maintenance Insights subtitle reads Read-only local review.
@@ -160,15 +159,14 @@ Previous package:
 Lifecycle log/evidence:
 
 D. Platform-system acceptance
-[ ] PASS [ ] FAIL  Privacy Shield exact-Stable runtime/application review complete; production approval is governed externally.
-[ ] PASS [ ] FAIL  Wardveil exact-Stable scoped adoption/runtime review complete; no broad protection claim is inferred.
-[ ] PASS [ ] FAIL  Everkeep exact-Stable continuity evidence is complete and package provenance matches.
-[ ] PASS [ ] FAIL  Glaze V1.2 exact-Stable consumer acceptance/bridge is governed; V1.3 remains Proposed / consumer-ineligible.
+[ ] PASS [ ] FAIL  Privacy Shield exact-0.1.0 runtime/application review complete; production approval is governed externally.
+[ ] PASS [ ] FAIL  Wardveil exact-0.1.0 scoped adoption/runtime review complete; no broad protection claim is inferred.
+[ ] PASS [ ] FAIL  Everkeep exact-0.1.0 continuity evidence is complete and package provenance matches.
+[ ] PASS [ ] FAIL  Glaze V1.2 exact-0.1.0 consumer acceptance/bridge is governed; V1.3 remains Proposed / consumer-ineligible.
 Notes:
 EOF
 
 cat > "$OUT/MANUAL-COMMANDS.txt" <<'EOF'
-# Run one mode at a time from the representative desktop session.
 goreecloud-care
 GDK_DPI_SCALE=2 goreecloud-care --insights-ui
 GTK_THEME=HighContrast goreecloud-care
@@ -196,7 +194,7 @@ sh ./scripts/build-dev17-rollback-package.sh
 sh ./scripts/validate-package-lifecycle.sh ./dist/goreecloud-care_0.1.0_all.deb ./dist/rollback/goreecloud-care_0.1.0~dev17_all.deb
 EOF
 
-printf '%s\n' "Stable qualification representative acceptance preparation: passed"
+printf '%s\n' "0.1.0 golden artifact representative acceptance preparation: passed"
 printf '%s\n' "Package: $PACKAGE_VERSION"
 printf '%s\n' "SHA-256: $PACKAGE_SHA256"
 printf '%s\n' "Manual checklist: $OUT/MANUAL-CHECKLIST.txt"

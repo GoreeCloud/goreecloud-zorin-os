@@ -20,10 +20,12 @@ class BrandingContractTests(unittest.TestCase):
         self.assertIn(CANONICAL_INITIAL_GIT_BLOB, branding)
 
     def test_desktop_and_appstream_use_care_identity(self) -> None:
-        desktop = (ROOT / "packaging" / "com.goreecloud.care.dev.desktop").read_text(encoding="utf-8")
-        metainfo = (ROOT / "packaging" / "com.goreecloud.care.dev.metainfo.xml").read_text(encoding="utf-8")
+        desktop = (ROOT / "packaging" / "com.goreecloud.care.desktop").read_text(encoding="utf-8")
+        metainfo = (ROOT / "packaging" / "com.goreecloud.care.metainfo.xml").read_text(encoding="utf-8")
         self.assertIn("Icon=com.goreecloud.care", desktop)
+        self.assertIn("Name=GoreeCloud Care", desktop)
         self.assertIn('<icon type="stock">com.goreecloud.care</icon>', metainfo)
+        self.assertIn("<name>GoreeCloud Care</name>", metainfo)
 
     def test_debian_package_installs_icon_to_freedesktop_location(self) -> None:
         build = (ROOT / "scripts" / "build-deb.sh").read_text(encoding="utf-8")

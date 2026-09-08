@@ -178,8 +178,8 @@ class PlatformStatusTests(unittest.TestCase):
             "producer": "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care",
             "source_revision": SOURCE_REVISION,
             "source_tree": SOURCE_TREE,
-            "runtime_version": "0.1.0-dev22",
-            "package_version": "0.1.0~dev22",
+            "runtime_version": "0.1.0",
+            "package_version": "0.1.0",
             "source_date_epoch": 1_788_800_000,
             "package_sha256_embedded": False,
         }
@@ -198,8 +198,8 @@ class PlatformStatusTests(unittest.TestCase):
             "candidate": {
                 "source_revision": source_revision,
                 "source_tree": SOURCE_TREE,
-                "runtime_version": "0.1.0-dev22",
-                "package_version": "0.1.0~dev22",
+                "runtime_version": "0.1.0",
+                "package_version": "0.1.0",
                 "package_sha256": package_sha256,
             },
             "target": {
@@ -214,7 +214,7 @@ class PlatformStatusTests(unittest.TestCase):
                 "provenance",
             ],
             "evidence": {
-                "local_tests": 110,
+                "local_tests": 143,
                 "source_validation": "passed",
                 "package_lifecycle": "passed",
                 "references": ["representative acceptance fixture"],
@@ -224,7 +224,7 @@ class PlatformStatusTests(unittest.TestCase):
                 "exact_revision_accepted": True,
                 "everkeep_integration_promoted": promoted,
                 "everkeep_ready_promoted": promoted,
-                "freshness_rule": "Exact source, source tree, package version, package SHA-256, and target only.",
+                "freshness_rule": "Exact 0.1.0 source, source tree, package version, package SHA-256, and target only.",
             },
         }
 
