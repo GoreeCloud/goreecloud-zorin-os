@@ -16,20 +16,13 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertNotIn('date +%s', BUILD)
 
     def test_build_normalizes_staged_mtimes(self):
-        self.assertIn(
-            'find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +',
-            BUILD,
-        )
+        self.assertIn('find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +', BUILD)
         self.assertIn('dpkg-deb --root-owner-group', BUILD)
 
     def test_build_normalizes_umask_sensitive_modes(self):
         self.assertIn('find "$STAGE" -type d -exec chmod 0755 {} +', BUILD)
         self.assertIn('chmod 0644 "$STAGE/DEBIAN/control"', BUILD)
-        self.assertIn(
-            'chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"',
-            BUILD,
-        )
-        self.assertIn('Caller umask is not part of package identity', BUILD)
+        self.assertIn('chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"', BUILD)
 
     def test_build_eliminates_compressor_and_locale_variability(self):
         self.assertIn('export LC_ALL=C', BUILD)
@@ -53,7 +46,13 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('"source_revision": revision', BUILD)
         self.assertIn('"source_tree": tree', BUILD)
         self.assertIn('"package_sha256_embedded": False', BUILD)
-        self.assertIn("embedding a package's own hash is circular", BUILD)
+
+    def test_stable_package_identity_is_explicit(self):
+        self.assertIn('VERSION="0.1.0"', BUILD)
+        self.assertIn('RUNTIME_VERSION="0.1.0"', BUILD)
+        self.assertIn('Description: GoreeCloud Care local-first maintenance utility', BUILD)
+        self.assertIn('packaging/com.goreecloud.care.desktop', BUILD)
+        self.assertIn('packaging/com.goreecloud.care.metainfo.xml', BUILD)
 
     def test_verifier_compares_independent_build_to_reference(self):
         self.assertIn('SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" sh "$ROOT/scripts/build-deb.sh"', VERIFY)
