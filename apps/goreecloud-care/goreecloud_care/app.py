@@ -41,10 +41,10 @@ STATUS_TITLES = {
 
 
 class CareWindow(Gtk.ApplicationWindow):
-    """Content-first GoreeCloud Care Release Candidate surface."""
+    """Content-first GoreeCloud Care maintenance surface."""
 
     def __init__(self, app: Gtk.Application) -> None:
-        super().__init__(application=app, title="GoreeCloud Care — Release Candidate")
+        super().__init__(application=app, title="GoreeCloud Care")
         self.set_default_size(1060, 720)
         self.set_size_request(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         self.set_border_width(0)
@@ -56,7 +56,7 @@ class CareWindow(Gtk.ApplicationWindow):
 
         # Chrome Plane: identity plus one transient scan command. The command is
         # the deliberate capsule; ordinary controls use the standard shape role.
-        self.header_subtitle = "Release Candidate • Adaptive Resonance preview"
+        self.header_subtitle = "Local maintenance • Adaptive Resonance preview"
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
         self.header.props.title = "GoreeCloud Care"
@@ -377,186 +377,152 @@ class CareWindow(Gtk.ApplicationWindow):
         button.connect("clicked", handler)
         row.pack_start(button, False, False, 0)
         parent.pack_start(row, False, False, 0)
-
         self.rows[key] = (None, amount)
-        self.category_layouts[key] = (top, amount)
         return button
 
     def _on_size_allocate(self, _widget, allocation) -> None:
         self._apply_layout(allocation.width)
 
     def _apply_layout(self, width: int) -> None:
+        effective_width = effective_layout_width(width)
         compact = is_compact_width(width)
-        environment = layout_environment(
-            int(effective_layout_width(width)), compact=compact
-        )
+        environment = layout_environment(width)
         if environment == self._layout_environment:
             return
         self._layout_environment = environment
 
-        self.root.set_border_width(COMPACT_BORDER if compact else REGULAR_BORDER)
-        self.root.set_spacing(12 if compact else 16)
-        # Keep the compact HeaderBar identity intentionally short so Scan and
-        # native window controls cannot force an ellipsized product title.
+        if environment == "expanded":
+            self.workspace.set_orientation(Gtk.Orientation.HORIZONTAL)
+            self.workspace.set_spacing(18)
+            self.primary_column.set_size_request(max(500, int(effective_width * 0.57)), -1)
+            self.secondary_column.set_size_request(max(350, int(effective_width * 0.34)), -1)
+        else:
+            self.workspace.set_orientation(Gtk.Orientation.VERTICAL)
+            self.workspace.set_spacing(COMPACT_BORDER if compact else 14)
+            self.primary_column.set_size_request(-1, -1)
+            self.secondary_column.set_size_request(-1, -1)
+
         self.header.set_title("Care" if compact else "GoreeCloud Care")
         self.header.set_subtitle(None if compact else self.header_subtitle)
-        self.workspace.set_orientation(
-            Gtk.Orientation.HORIZONTAL
-            if environment == "expanded"
-            else Gtk.Orientation.VERTICAL
-        )
-        self.primary_controls.set_orientation(
-            Gtk.Orientation.VERTICAL if compact else Gtk.Orientation.HORIZONTAL
-        )
-        for button in self.action_buttons:
-            button.set_hexpand(compact)
-            button.set_halign(Gtk.Align.FILL if compact else Gtk.Align.START)
-        for outer, amount in self.category_layouts.values():
-            outer.set_orientation(
-                Gtk.Orientation.VERTICAL if compact else Gtk.Orientation.HORIZONTAL
-            )
+        self.root.set_border_width(COMPACT_BORDER if compact else REGULAR_BORDER)
+        self.root.set_spacing(COMPACT_BORDER if compact else 16)
+
+        for row, amount in self.category_layouts.values():
+            row.set_orientation(Gtk.Orientation.VERTICAL if compact else Gtk.Orientation.HORIZONTAL)
+            row.set_spacing(5 if compact else 12)
             amount.set_xalign(0 if compact else 1)
-            amount.set_halign(Gtk.Align.START if compact else Gtk.Align.END)
+        self.system_label.set_line_wrap(True)
 
-    def refresh_system_status(self) -> None:
-        mem = read_memory_stats()
-        disk = read_disk_stats()
-        self.system_label.set_text(
-            f"Disk {human_bytes(disk.free)} free of {human_bytes(disk.total)}  •  "
-            f"Memory {human_bytes(mem.available)} available of {human_bytes(mem.total)}  •  "
-            f"File cache about {human_bytes(mem.cached)}"
-        )
+    def _set_actions_sensitive(self, sensitive: bool) -> None:
+        for button in self.action_buttons:
+            button.set_sensitive(sensitive)
+        self.scan_btn.set_sensitive(sensitive)
 
-    def set_status(self, text: str, state: str = "info", title: str | None = None) -> None:
-        if state not in STATUS_ICONS:
+    def set_status(self, message: str, state: str = "info", title: str | None = None) -> None:
+        if state not in STATUS_STYLES:
             state = "info"
-        resolved_title = title or STATUS_TITLES[state]
         context = self.status_frame.get_style_context()
-        for class_name in STATUS_STYLES:
-            context.remove_class(class_name)
+        for style in STATUS_STYLES:
+            context.remove_class(style)
         context.add_class(f"status-{state}")
         self.status_icon.set_from_icon_name(STATUS_ICONS[state], Gtk.IconSize.BUTTON)
+        resolved_title = title or STATUS_TITLES[state]
         self.status_title.set_text(resolved_title)
-        self.status.set_text(text)
-        self.status_accessible.set_name(f"{resolved_title}. {text}")
-        try:
-            self.status_accessible.emit("visible-data-changed")
-        except (TypeError, RuntimeError):
-            pass
+        self.status.set_text(message)
+        accessible_value = f"{resolved_title}. {message}".strip()
+        self.status_accessible.set_name(accessible_value)
+        self.status_accessible.notify("accessible-name")
+        self.status_accessible.emit("visible-data-changed")
 
-    def run_thread(self, fn, done) -> None:
-        def worker() -> None:
-            try:
-                value = fn()
-                GLib.idle_add(done, value, None)
-            except Exception as exc:  # UI boundary: surface failure, do not claim success.
-                GLib.idle_add(done, None, exc)
-        threading.Thread(target=worker, daemon=True).start()
-
-    def _apply_scans(self, scans) -> int:
-        self.scans = scans
-        total = 0
-        for key, scan in scans.items():
-            total += scan.bytes
-            amount_text = f"{human_bytes(scan.bytes)} • {scan.count} items"
-            self.rows[key][1].set_text(amount_text)
-            self.rows[key][1].get_accessible().set_name(
-                f"{scan.label}: {human_bytes(scan.bytes)}, {scan.count} items"
-            )
-        self.refresh_system_status()
-        return total
+    def refresh_system_status(self) -> None:
+        disk = read_disk_stats()
+        mem = read_memory_stats()
+        self.system_label.set_text(
+            f"Disk free: {human_bytes(disk.free)} of {human_bytes(disk.total)} • "
+            f"Memory available: {human_bytes(mem.available)} • File cache: {human_bytes(mem.cache)}"
+        )
 
     def on_scan(self, _button) -> None:
-        self.set_status("Scanning without deleting files…", "info", "Scanning")
+        self.set_status("Scanning local maintenance categories…", "info", "Scanning")
+        self._set_actions_sensitive(False)
         self.run_thread(self.engine.scan_all, self._scan_done)
 
     def _scan_done(self, scans, error) -> bool:
+        self._set_actions_sensitive(True)
         if error:
             self.set_status(f"Scan failed: {error}", "error", "Scan failed")
             return False
-        total = self._apply_scans(scans)
+        self.scans = scans
+        for key, (_selector, amount) in self.rows.items():
+            scan = scans.get(key)
+            amount.set_text(human_bytes(scan.bytes) if scan else "Unavailable")
+            if scan:
+                amount.get_accessible().set_name(f"{scan.label}: {human_bytes(scan.bytes)}")
+        total = sum(s.bytes for s in scans.values())
         self.set_status(
-            f"Up to {human_bytes(total)} is visible across all maintenance categories.",
-            "info",
+            f"Scan complete. About {human_bytes(total)} is currently reclaimable across reviewed categories.",
+            "success",
             "Scan complete",
         )
         return False
 
-    def _refresh_after_action(self, text: str, state: str, title: str) -> None:
-        """Refresh category/system values without overwriting the action result."""
-        self.run_thread(
-            self.engine.scan_all,
-            lambda scans, error: self._refresh_after_action_done(scans, error, text, state, title),
-        )
+    def run_thread(self, action, callback) -> None:
+        def worker():
+            result = None
+            error = None
+            try:
+                result = action()
+            except Exception as exc:  # defensive boundary around filesystem/system access
+                error = exc
+            GLib.idle_add(callback, result, error)
 
-    def _refresh_after_action_done(self, scans, error, text: str, state: str, title: str) -> bool:
-        if error:
-            self.refresh_system_status()
-            self.set_status(
-                f"{text} Follow-up scan failed: {error}",
-                "attention",
-                f"{title}; refresh incomplete",
-            )
-            return False
-        self._apply_scans(scans)
-        self.set_status(text, state, title)
-        return False
+        threading.Thread(target=worker, daemon=True).start()
 
     def _confirm(
         self,
-        primary: str,
-        secondary: str,
+        title: str,
+        body: str,
+        *,
         destructive: bool = False,
         cancel_status: str | None = None,
     ) -> bool:
         dialog = Gtk.MessageDialog(
             transient_for=self,
             modal=True,
+            destroy_with_parent=True,
             message_type=Gtk.MessageType.WARNING if destructive else Gtk.MessageType.QUESTION,
-            buttons=Gtk.ButtonsType.CANCEL,
-            text=primary,
+            buttons=Gtk.ButtonsType.NONE,
+            text=title,
         )
-        dialog.format_secondary_text(secondary)
-        label = "Delete permanently" if destructive else "Continue"
-        response_id = Gtk.ResponseType.ACCEPT
-        dialog.add_button(label, response_id)
-        dialog.set_default_response(Gtk.ResponseType.CANCEL)
-        cancel = dialog.get_widget_for_response(Gtk.ResponseType.CANCEL)
-        if cancel is not None:
-            cancel.grab_focus()
+        dialog.format_secondary_text(body)
+        dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
+        dialog.add_button("Continue", Gtk.ResponseType.OK)
+        if destructive:
+            dialog.get_widget_for_response(Gtk.ResponseType.OK).get_style_context().add_class("destructive-action")
         response = dialog.run()
         dialog.destroy()
-        accepted = response == response_id
-        if not accepted and cancel_status:
-            self.set_status(cancel_status, "attention", "Action cancelled")
-        return accepted
+        if response != Gtk.ResponseType.OK:
+            if cancel_status:
+                self.set_status(cancel_status, "attention", "Cancelled")
+            return False
+        return True
 
-    def _show_notice(self, primary: str, secondary: str, message_type=Gtk.MessageType.INFO) -> None:
-        dialog = Gtk.MessageDialog(
-            transient_for=self,
-            modal=True,
-            message_type=message_type,
-            buttons=Gtk.ButtonsType.CLOSE,
-            text=primary,
-        )
-        dialog.format_secondary_text(secondary)
-        dialog.run()
-        dialog.destroy()
+    def _refresh_after_action(self, message: str, state: str, title: str) -> None:
+        self.scans = self.engine.scan_all()
+        for key, (_selector, amount) in self.rows.items():
+            scan = self.scans.get(key)
+            amount.set_text(human_bytes(scan.bytes) if scan else "Unavailable")
+            if scan:
+                amount.get_accessible().set_name(f"{scan.label}: {human_bytes(scan.bytes)}")
+        self.refresh_system_status()
+        self.set_status(message, state, title)
 
     def on_clean_selected(self, _button) -> None:
-        selected: list[str] = []
-        for key in ("cache", "thumbnails", "temp"):
-            selector = self.rows[key][0]
-            if selector is not None and selector.get_active():
-                selected.append(key)
+        selected = [key for key, (selector, _amount) in self.rows.items() if selector and selector.get_active()]
         if not selected:
-            self.set_status(
-                "Select at least one cache or temporary-file category.",
-                "attention",
-                "Selection needed",
-            )
+            self.set_status("Nothing is selected. Choose at least one routine category first.", "attention", "No selection")
             return
-        if any(key not in self.scans for key in selected):
+        if not self.scans:
             self.set_status("Scan first so cleanup has a current preview.", "attention", "Scan required")
             return
         total = sum(self.scans[key].bytes for key in selected)
