@@ -21,19 +21,13 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
 
     def test_application_launcher_uses_isolated_no_bytecode_python(self) -> None:
         source = APP.read_text(encoding="utf-8")
-        self.assertIn(
-            'exec /usr/bin/python3 -I -B -m goreecloud_care "$@"',
-            source,
-        )
+        self.assertIn('exec /usr/bin/python3 -I -B -m goreecloud_care "$@"', source)
         self.assertIn("working directory", source)
         self.assertNotIn("PYTHONPATH=", source)
 
     def test_privileged_helper_launcher_uses_same_isolation_boundary(self) -> None:
         source = HELPER.read_text(encoding="utf-8")
-        self.assertIn(
-            'exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"',
-            source,
-        )
+        self.assertIn('exec /usr/bin/python3 -I -B -m goreecloud_care.helper "$@"', source)
         self.assertIn("user-controlled working directory", source)
         self.assertIn("PolicyKit", source)
         self.assertNotIn("PYTHONPATH=", source)
@@ -41,10 +35,7 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
     def test_package_maintainer_scripts_stay_on_fixed_package_paths(self) -> None:
         for path in (POSTINST, POSTRM):
             source = path.read_text(encoding="utf-8")
-            self.assertIn(
-                "/usr/lib/goreecloud-care/goreecloud_care/__pycache__",
-                source,
-            )
+            self.assertIn("/usr/lib/goreecloud-care/goreecloud_care/__pycache__", source)
             self.assertNotIn("$HOME", source)
             self.assertNotIn("/home/", source)
             self.assertNotIn("find ", source)
@@ -54,33 +45,27 @@ class PackagingLauncherIsolationTests(unittest.TestCase):
         self.assertIn("/usr/share/goreecloud-care/build-provenance.json", source)
         self.assertIn("chown root:root /usr/share/goreecloud-care", source)
         self.assertIn("chmod 0755 /usr/share/goreecloud-care", source)
-        self.assertIn(
-            "chown root:root /usr/share/goreecloud-care/build-provenance.json",
-            source,
-        )
-        self.assertIn(
-            "chmod 0644 /usr/share/goreecloud-care/build-provenance.json",
-            source,
-        )
+        self.assertIn("chown root:root /usr/share/goreecloud-care/build-provenance.json", source)
+        self.assertIn("chmod 0644 /usr/share/goreecloud-care/build-provenance.json", source)
 
-    def test_debian_build_installs_bytecode_cleanup_maintainer_scripts(self) -> None:
+    def test_debian_build_installs_maintainer_scripts_and_stable_version(self) -> None:
         source = BUILD.read_text(encoding="utf-8")
-        self.assertIn(
-            'install -m 0755 "$ROOT/packaging/postinst" "$STAGE/DEBIAN/postinst"',
-            source,
-        )
-        self.assertIn(
-            'install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"',
-            source,
-        )
-        self.assertIn('VERSION="0.1.0~dev22"', source)
+        self.assertIn('install -m 0755 "$ROOT/packaging/postinst" "$STAGE/DEBIAN/postinst"', source)
+        self.assertIn('install -m 0755 "$ROOT/packaging/postrm" "$STAGE/DEBIAN/postrm"', source)
+        self.assertIn('VERSION="0.1.0"', source)
+        self.assertIn('RUNTIME_VERSION="0.1.0"', source)
+        self.assertIn('packaging/com.goreecloud.care.desktop', source)
+        self.assertIn('packaging/com.goreecloud.care.metainfo.xml', source)
+        self.assertNotIn('packaging/com.goreecloud.care.dev.desktop', source)
+        self.assertNotIn('packaging/com.goreecloud.care.dev.metainfo.xml', source)
 
-    def test_lifecycle_probe_keeps_candidate_shadowing_as_a_regression_gate(self) -> None:
+    def test_lifecycle_probe_keeps_stable_candidate_shadowing_as_a_regression_gate(self) -> None:
         source = LIFECYCLE.read_text(encoding="utf-8")
-        self.assertIn("Dev22 candidate checks deliberately exercise source/working-directory shadow resistance", source)
-        self.assertIn("working-directory/PYTHONPATH shadowing", source)
+        self.assertIn("Stable candidate retains source/working-directory shadow resistance", source)
         self.assertIn("Private Python bytecode remained after package removal", source)
-        self.assertIn("0.1.0~dev22", source)
+        self.assertIn("0.1.0", source)
+        self.assertIn("/usr/share/applications/com.goreecloud.care.desktop", source)
+        self.assertIn("/usr/share/metainfo/com.goreecloud.care.metainfo.xml", source)
 
     def test_historical_rollback_is_checked_from_a_clean_neutral_directory(self) -> None:
         source = LIFECYCLE.read_text(encoding="utf-8")
