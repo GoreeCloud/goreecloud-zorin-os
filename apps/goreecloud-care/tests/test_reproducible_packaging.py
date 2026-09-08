@@ -54,6 +54,8 @@ class ReproduciblePackagingContractTests(unittest.TestCase):
         self.assertIn('RUNTIME_VERSION="0.1.0"', BUILD)
         self.assertIn('packaging/com.goreecloud.care.desktop', BUILD)
         self.assertIn('packaging/com.goreecloud.care.metainfo.xml', BUILD)
+        self.assertIn('PACKAGE_NAME="goreecloud-care_0.1.0_all.deb"', VERIFY)
+        self.assertNotIn('goreecloud-care_0.1.0~dev22_all.deb', VERIFY)
 
     def test_verifier_compares_independent_build_to_reference(self):
         self.assertIn('SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" sh "$ROOT/scripts/build-deb.sh"', VERIFY)
