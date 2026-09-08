@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
-EXPECTED_PACKAGE_VERSION=${1:-0.1.0~dev22}
-EXPECTED_RUNTIME_VERSION=${2:-0.1.0-dev22}
+EXPECTED_PACKAGE_VERSION=${1:-0.1.0}
+EXPECTED_RUNTIME_VERSION=${2:-0.1.0}
 
 for command_name in goreecloud-care dpkg-query mktemp mkdir rm python3; do
   command -v "$command_name" >/dev/null
@@ -47,12 +47,15 @@ assert report['privacy']['contains_raw_scan_errors'] is False
 assert report['privacy']['network_used'] is False
 
 assert health['product'] == 'GoreeCloud Care'
+assert health['version'] == os.environ['EXPECTED_RUNTIME_VERSION']
 assert health['state'] == 'ready'
 assert health['local_only'] is True
 assert health['network_used'] is False
 assert health['telemetry_used'] is False
 assert health['privileged_action_performed'] is False
 
+# Care's local privacy endpoint remains fail-closed until exact Stable-adapter
+# governance is supplied; the source does not self-promote external approval.
 assert privacy['producer']['adapter_id'] == 'goreecloud-care'
 assert privacy['privacy']['raw_private_activity_included'] is False
 assert privacy['privacy']['contains_credentials'] is False
@@ -118,8 +121,7 @@ allowed_stages = {
 if continuity['stage'] not in allowed_stages:
     raise SystemExit(
         'installed continuity evidence failed its trust boundary: '
-        f"state={continuity.get('state')} stage={continuity.get('stage')} "
-        f"provenance_state={continuity.get('provenance_state')}"
+        f"state={continuity.get('state')} stage={continuity.get('stage')}"
     )
 if continuity['state'] == 'ready':
     assert continuity['stage'] == 'everkeep-promoted'
@@ -138,7 +140,11 @@ test -f /usr/share/metainfo/com.goreecloud.care.metainfo.xml
 test -f /usr/share/doc/goreecloud-care/API.md
 test -f /usr/share/doc/goreecloud-care/WARDVEIL-INTEGRATION.md
 grep -F 'Icon=com.goreecloud.care' /usr/share/applications/com.goreecloud.care.desktop >/dev/null
-grep -F 'Name=GoreeCloud Care (Release Candidate)' /usr/share/applications/com.goreecloud.care.desktop >/dev/null
+grep -F 'Name=GoreeCloud Care' /usr/share/applications/com.goreecloud.care.desktop >/dev/null
+! grep -F 'Release Candidate' /usr/share/applications/com.goreecloud.care.desktop >/dev/null
+
+grep -F '<name>GoreeCloud Care</name>' /usr/share/metainfo/com.goreecloud.care.metainfo.xml >/dev/null
+grep -F '<release version="0.1.0"' /usr/share/metainfo/com.goreecloud.care.metainfo.xml >/dev/null
 
 SHADOW_ROOT=$(mktemp -d)
 cleanup() {
@@ -184,9 +190,9 @@ test ! -e /usr/lib/goreecloud-care/goreecloud_care/__pycache__ || {
   exit 1
 }
 
-printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe acceptance probe: passed"
+printf '%s\n' "Installed GoreeCloud Care $EXPECTED_PACKAGE_VERSION safe qualification probe: passed"
 printf '%s\n' "Installed application/helper launchers are isolated from working-directory Python shadowing."
 printf '%s\n' "Installed package-owned exact-source provenance is present and structurally valid."
-printf '%s\n' "Installed Wardveil-compatible privilege-boundary evidence is passing, current, minimized, scoped, and does not claim Wardveil protection."
-printf '%s\n' "Canonical Care Release Candidate desktop/AppStream identity and icon derivative are installed."
-printf '%s\n' "Continuity is evidence-derived and cannot become ready without exact governed Everkeep promotion."
+printf '%s\n' "Installed Wardveil-compatible privilege-boundary evidence is passing, current, minimized, scoped, and does not self-claim Wardveil governance."
+printf '%s\n' "Canonical GoreeCloud Care desktop/AppStream identity and icon derivative are installed."
+printf '%s\n' "Continuity remains evidence-derived and cannot become ready without exact governed Everkeep promotion."
