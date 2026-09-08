@@ -6,8 +6,10 @@ component:
   product_name: GoreeCloud Care
   repository: GoreeCloud/goreecloud-zorin-os
 
-lifecycle: release-candidate
-version: 0.1.0-dev22
+# Stable product identity is established in source here, but conformance remains
+# fail-closed until this exact source/tree/package completes Stable qualification.
+lifecycle: stable
+version: 0.1.0
 
 supported_platforms:
   - linux
@@ -40,7 +42,8 @@ platform_systems:
       - API.md
       - CAPABILITIES.md
       - goreecloud_care/platform_status.py
-    notes: The intended first Stable scope is a local single-user desktop maintenance application and does not require central administration, remote management, or Manager authority to perform its normal functions. The Release Candidate exposes a minimized read-only local API for future Manager consumption without making Manager a release dependency. Re-evaluate applicability if Care gains remote or delegated administration.
+    notes: The intended first Stable scope remains a local single-user desktop maintenance application and does not require central administration, remote management, or Manager authority. Re-evaluate if Care gains remote or delegated administration.
+
   privacy_shield:
     result: applicable-blocked
     version: null
@@ -51,11 +54,9 @@ platform_systems:
       - contracts/privacy-shield.adapter.json
       - goreecloud_care/platform_status.py
       - tests/test_platform_status.py
-      - tests/test_reporting.py
-      - tests/test_insights.py
-      - https://github.com/GoreeCloud/goreecloud-privacy-shield/pull/76
-      - https://github.com/GoreeCloud/goreecloud-privacy-shield/commit/84cc60dbb90b81f693defc25df4235d4b34d32b7
-    notes: The immediately preceding exact Development candidate 4f7aecd6fa5a6fdd6efb496e606c29457c18fefb received passed Privacy Shield runtime acceptance for Care's bounded telemetry-minimization, data-minimization, and privacy-status capabilities through PR 76, while production_approved remained false. That acceptance is revision/package scoped and does not transfer to this Release Candidate source. Exact Release Candidate runtime/application acceptance must be refreshed after its deterministic package identity and representative target evidence exist. Production approval remains a separate governed Stable/production gate.
+      - https://github.com/GoreeCloud/goreecloud-privacy-shield/commit/d2ee2c626beb2ebc2d951d01db877fc8f46d3791
+    notes: The frozen exact RC 334b53102c5fe0bd5d348397ba8b13cc5608ada2 received Care-adapter production approval from Privacy Shield at d2ee2c626beb2ebc2d951d01db877fc8f46d3791. Stable identity requires exact-source refresh or an explicit authority-approved bridge because source/tree/package identity changes to 0.1.0. The local source remains fail-closed and does not self-promote production_approved.
+
   wardveil_security:
     result: applicable-blocked
     version: null
@@ -71,9 +72,9 @@ platform_systems:
       - tests/test_helper.py
       - tests/test_privilege.py
       - tests/test_packaging_launchers.py
-      - https://github.com/GoreeCloud/goreecloud-wardveil-security/pull/138
-      - https://github.com/GoreeCloud/goreecloud-wardveil-security/commit/52ee2544021c9491152cc31f123a6214d7d21209
-    notes: The immediately preceding exact Development candidate 4f7aecd6fa5a6fdd6efb496e606c29457c18fefb has accepted Zorin installed-boundary target evidence in Wardveil. The current Care source still keeps protected_by_wardveil=false and grants no cross-service execution or broad protection authority. Wardveil acceptance is exact-candidate scoped, so the Release Candidate requires a fresh exact source/tree/package/target record plus immutable RC regression evidence and governed adoption/promotion before any Protected by Wardveil claim is allowed.
+      - https://github.com/GoreeCloud/goreecloud-wardveil-security/commit/e16fc489dbf98849601a198358863dffe7df81d4
+    notes: The frozen exact RC has governed Wardveil adoption/runtime acceptance for the local-maintenance-privilege-boundary at e16fc489dbf98849601a198358863dffe7df81d4. Stable identity requires exact-source refresh or an explicit authority-approved bridge. Care continues to emit protected_by_wardveil=false and grants no cross-service execution authority until the new exact Stable identity is governed.
+
   everkeep:
     result: applicable-blocked
     version: null
@@ -88,9 +89,9 @@ platform_systems:
       - scripts/validate-installed.sh
       - scripts/validate-package-lifecycle.sh
       - scripts/run-representative-acceptance.sh
-      - https://github.com/GoreeCloud/goreecloud-everkeep/pull/54
-      - https://github.com/GoreeCloud/goreecloud-everkeep/commit/7262766e465d15227dfc663cc142b984d845d983
-    notes: The immediately preceding exact Development candidate 4f7aecd6fa5a6fdd6efb496e606c29457c18fefb completed deterministic package lifecycle acceptance, received exact Everkeep integration/readiness promotion through PR 54, and was locally verified ready / everkeep-promoted on the representative Zorin laptop with trusted root-owned governance evidence. Because the governance chain is exact-source/tree/package bound, that readiness does not transfer to this Release Candidate source. Fresh representative package identity and target evidence must be accepted by Everkeep before the Release Candidate can report ready / everkeep-promoted.
+      - https://github.com/GoreeCloud/goreecloud-everkeep/commit/d6192dc2a38d5749df561f0638860c974faae8ff
+    notes: The frozen exact RC is ready / everkeep-promoted under exact Everkeep authority d6192dc2a38d5749df561f0638860c974faae8ff. Stable identity requires a new exact representative target handoff and exact-source/tree/package Everkeep governance or an explicit authority-approved bridge. The Stable source cannot inherit the RC record silently.
+
   glaze_ui:
     result: applicable-blocked
     version: "1.2.0"
@@ -109,12 +110,9 @@ platform_systems:
       - tests/test_accessibility_identity.py
       - tests/test_insights_window_contract.py
       - tests/runtime_ui_acceptance.py
-      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34157086443
-      - https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34157086919
-      - https://github.com/GoreeCloud/goreecloud-branding-assets/blob/main/products/care/app-icon.svg
-      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/f88aa45b4d012dcfcd04a938cb71e96f9bb107d6
-      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/dc5ee04b09bd7d2c06d6ac1456618cbd4b1f4b80
-    notes: GLAZE UI V1.2 / 1.2.0 remains the required Stable compatibility baseline. V1.3 Adaptive Resonance remains Proposed with no active Candidate and no upstream consumer eligibility. Care retains the bounded V1.2 compatibility implementation plus V1.3 preview styling and extensive automated/representative Development evidence, but the authoritative Glaze consumer registry still records Care as adoption-required with null target/revision/evidence and productionEligible=false. Product-specific accepted-v1/production acceptance must not be inferred from source compatibility or prior screenshots. Human-only visual/usability/manual accessibility review may remain explicitly pending at Release Candidate under the lifecycle standard; every applicable Stable Glaze acceptance requirement remains mandatory.
+      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/a4fe4cf1b0d75cb82dbea6fdc3db363be317394e
+    notes: GLAZE UI V1.2 / 1.2.0 remains the required Stable compatibility baseline. Frozen RC source 334b53102c5fe0bd5d348397ba8b13cc5608ada2 is accepted-v1 in the authoritative Glaze registry at a4fe4cf1b0d75cb82dbea6fdc3db363be317394e after all seven required human/native dimensions passed. Stable identity requires exact-source registry refresh or an explicit authority-approved bridge. productionEligible=false remains authoritative until then. V1.3 Adaptive Resonance remains Proposed and consumer-ineligible.
+
   mesh:
     result: not-applicable-justified
     version: null
@@ -122,18 +120,19 @@ platform_systems:
       - API.md
       - CAPABILITIES.md
       - goreecloud_care/platform_status.py
-    notes: The intended first Stable scope performs local single-user maintenance without cross-application coordination, service discovery, Mesh event transport, or Mesh policy authority. The local API can support a future Mesh adapter without making Mesh a release dependency. Re-evaluate applicability when cross-application coordination or evidence transport becomes part of released scope.
+    notes: The intended first Stable scope performs local single-user maintenance without cross-application coordination, service discovery, Mesh event transport, or Mesh policy authority. Re-evaluate when cross-application coordination becomes released scope.
     capabilities: []
     dependencies: []
     published_events: []
     consumed_events: []
+
   identity:
     result: not-applicable-justified
     version: null
     evidence:
       - SPECIFICATIONS.md
       - API.md
-    notes: The intended first Stable local single-user scope has no GoreeCloud account, remote management, multi-user behavior, or delegated administration. Re-evaluate Identity applicability before any such capability is introduced.
+    notes: The intended first Stable local single-user scope has no GoreeCloud account, remote management, multi-user behavior, or delegated administration. Re-evaluate before any such capability is introduced.
 
 health:
   health_endpoint: local-cli://goreecloud-care/health
@@ -143,11 +142,11 @@ continuity:
   backup:
     required: false
     requirements:
-      - Care currently persists no substantial durable user application data requiring an application-owned backup workflow.
+      - Care persists no substantial durable user application data requiring an application-owned backup workflow.
   restore:
     required: true
     requirements:
-      - Validate install, removal/reinstall, downgrade, rollback, and post-rollback launch/report behavior on the representative target for the exact Release Candidate.
+      - Validate install, removal/reinstall, downgrade, rollback, and post-rollback launch/report behavior on the representative target for the exact Stable identity.
       - Preserve explicit warning and irreversibility boundaries for permanent Trash deletion, which is maintenance behavior rather than application-data recovery.
   export:
     required: false
@@ -191,118 +190,20 @@ compatibility:
 
 evidence:
   acceptance_tests:
-    - id: care-dev8-large-text-compact-target
-      category: accessibility
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5552837967
-      revision: 45b5f11a49f363ebcaf753c892245a31109bc9bb
-      result: passed
-      observed_at: "2026-09-05T16:19:00Z"
-      notes: Representative Zorin OS laptop accepted the combined GDK_DPI_SCALE=2 large-text and compact/minimum-width adaptive-layout slice; broader accessibility acceptance remains separate.
-    - id: care-dev10-highcontrast-keyboard-target
-      category: accessibility
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5555569354
-      revision: 3524a4a82da87ea51dcde08992a402190b54c130
-      result: passed
-      observed_at: "2026-09-05T23:38:00Z"
-      notes: Representative-device dev10 accepted HighContrast palette authority, visible focus, constrained-width rendering, and the requested complete forward/reverse keyboard traversal for the core Care window.
-    - id: care-dev12-atspi-application-identity-static-semantics-target
-      category: accessibility
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
-      result: passed
-      observed_at: "2026-09-06T14:14:00Z"
-      notes: Representative-device AT-SPI inspection exposed GoreeCloud Care as the application root and verified expected static status-bar, selector/action roles, names/descriptions, checked state, and focused state for the accepted static semantic slice.
-    - id: care-dev12-atspi-dynamic-listener-target
-      category: accessibility
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 09c3a6bcbec094dd3cb0c828de88d084fcbd5a22
-      result: blocked
-      observed_at: "2026-09-06T14:40:00Z"
-      notes: Dynamic status event/Orca quality remained open at this historical checkpoint; later exact dev22 automated AT-SPI event acceptance superseded the event-delivery uncertainty but not final spoken-announcement quality.
-    - id: care-dev13-read-only-report-target
-      category: supported-platform
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 48049b6f634a05300e01bb0e85d718284b79d7ee
-      result: passed
-      observed_at: "2026-09-06T15:15:49Z"
-      notes: Representative laptop passed 38 tests plus XML/source validation, installed 0.1.0~dev13, and successfully produced both path-redacted human and JSON read-only reports.
-    - id: care-dev16-large-text-insights-visual-target
-      category: accessibility
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5560656873
-      revision: 02b7df9eb7543e7147dd7e81212d465daa15086e
-      result: passed
-      observed_at: "2026-09-06T16:42:00Z"
-      notes: Representative GDK_DPI_SCALE=2 screenshots verified a fully readable compact Insights title, visible Refresh focus, and true-bottom findings reachability. Continuous resize remained unreported and synthetic hyphenation was subsequently remediated by dev17.
-    - id: care-dev17-insights-rendering-install-target
-      category: accessibility
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5561183405
-      revision: 0fda6f90a545eaf3d1bed525aae98c6529ebbf7b
-      result: passed
-      observed_at: "2026-09-06T18:15:00Z"
-      notes: Representative laptop passed 50 tests plus XML/source validation, built and installed 0.1.0~dev17, removed the prior synthetic mid-word hyphenation, retained compact/wide readability and visible Refresh focus, and reached the true findings bottom.
-    - id: care-dev18-v12-repository-validation
-      category: glaze-ui
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34071691286
-      revision: ba646235dd12df251a02d728b096d8398a515ab7
-      result: passed
-      observed_at: "2026-09-07T01:02:36Z"
-      notes: Exact source revision passed repository/headless V1.2 compatibility validation; representative-device acceptance remained separate.
-    - id: care-glaze-v12-consumer-registration
-      category: glaze-ui
-      path: https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/f88aa45b4d012dcfcd04a938cb71e96f9bb107d6
-      revision: ba646235dd12df251a02d728b096d8398a515ab7
-      result: passed
-      observed_at: "2026-09-07T01:23:00Z"
-      notes: Upstream registration mechanics are complete and Care is adoption-required; targetVersion, referenceRevision, and evidence remain null and productionEligible remains false.
-    - id: care-dev18-package-lifecycle-target
-      category: rollback
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5564137242
-      revision: 7393ee330f8f2344303be44e26fe7ebca8dcf126
-      result: blocked
-      observed_at: "2026-09-07T02:24:00Z"
-      notes: Historical dev18 lifecycle stopped after exposing ambient Python launcher resolution and private bytecode residue; dev19 remediated the boundary.
-    - id: care-dev20-package-lifecycle-target
-      category: rollback
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 9da1107527bb4d7627e4940bd5b1b752cf318e83
-      result: passed
-      observed_at: "2026-09-07T03:20:00Z"
-      notes: Representative dev20 package lifecycle accepted candidate install/upgrade, complete removal, fresh reinstall, dev17 downgrade, dev20 restoration, final installed-state verification, application/helper working-directory isolation, and private-bytecode cleanup.
-    - id: care-dev20-adaptive-interaction-target
-      category: accessibility
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 9da1107527bb4d7627e4940bd5b1b752cf318e83
-      result: passed
-      observed_at: "2026-09-07T03:54:00Z"
-      notes: Representative user accepted continuous enlarged-text drag responsiveness and complete forward/reverse keyboard traversal with no selectable-findings focus trap.
-    - id: care-dev21-headerbar-identity-target
-      category: glaze-ui
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2#issuecomment-5565377067
-      revision: 2836a700935a019f21a4e19612a2609c21fd874c
-      result: passed
-      observed_at: "2026-09-07T05:05:00Z"
-      notes: Exact installed dev21 package/runtime attribution plus compact and widened GDK_DPI_SCALE=2 screenshots verified fully readable Care in compact mode and restored GoreeCloud Care plus Development subtitle outside compact mode.
-    - id: care-dev21-dark-headerbar-contrast-target
-      category: glaze-ui
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/2
-      revision: 2836a700935a019f21a4e19612a2609c21fd874c
-      result: blocked
-      observed_at: "2026-09-07T05:29:00Z"
-      notes: Historical dev21 Dark/Deep Dark command-chrome contrast failure; dev22 remediated the defect.
-    - id: care-dev22-exact-current-automated-validation
-      category: supported-platform
-      path: https://github.com/GoreeCloud/goreecloud-zorin-os/actions/runs/34157086443
-      revision: 4f7aecd6fa5a6fdd6efb496e606c29457c18fefb
-      result: passed
-      observed_at: "2026-09-07T20:00:00Z"
-      notes: Exact Development source passed 134 tests, current automated runtime/task-flow/live-AT-SPI/appearance/clarity/reduced-motion gates, deterministic cross-umask and cross-environment package identity, and installed lifecycle prequalification. Package SHA-256 was 2e5b92350bb397194ce6472c3d8b54a2d30e37dbd6d79c3ed470d14c61334ac4.
-    - id: care-dev22-exact-current-representative-target
-      category: rollback
-      path: https://github.com/GoreeCloud/goreecloud-everkeep/pull/54#issuecomment-5575356223
-      revision: 4f7aecd6fa5a6fdd6efb496e606c29457c18fefb
+    - id: care-stable-predecessor-rc-qualification
+      category: release
+      path: https://github.com/GoreeCloud/goreecloud-zorin-os/pull/9
+      revision: 334b53102c5fe0bd5d348397ba8b13cc5608ada2
       result: passed
       observed_at: "2026-09-07T20:27:15Z"
-      notes: Representative Zorin OS 17.3 passed exact package install/remove/reinstall/dev17-downgrade/dev22-restore/final-state acceptance and then locally verified the exact Everkeep governance record as ready / everkeep-promoted with no limitations. This evidence is historical for the predecessor Development source and does not transfer to the Release Candidate revision.
+      notes: Frozen RC passed 144-test exact-head qualification, deterministic/cross-environment package identity, full representative Zorin OS 17.3 lifecycle acceptance, Privacy Shield production approval, Everkeep readiness, scoped Wardveil adoption/runtime acceptance, and final Glaze V1.2 accepted-v1 human/native acceptance. This evidence is predecessor evidence for the Stable transition and remains exact-RC scoped.
+    - id: care-stable-predecessor-glaze-human-native
+      category: glaze-ui
+      path: https://github.com/GoreeCloud/goreecloud-glaze-ui/pull/169
+      revision: 334b53102c5fe0bd5d348397ba8b13cc5608ada2
+      result: passed
+      observed_at: "2026-09-07T20:33:00-05:00"
+      notes: Authorized representative reviewer reported PASS for all seven required final Orca, compositor/window-control, Dark/Deep Dark, canonical-icon, and task-UX dimensions for the frozen exact RC. The Stable source must be bridged or refreshed explicitly; the result is not silently transferred.
   release: []
 
 conformance:
@@ -310,10 +211,10 @@ conformance:
   validated_at: null
   evidence: []
   blockers:
-    - Exact Release Candidate CI package/checksum/reproducibility and representative Zorin OS 17.3 package lifecycle/installed-boundary evidence must be produced for this source revision before governed RC promotion is complete.
-    - Privacy Shield predecessor runtime acceptance does not transfer to the Release Candidate; exact RC runtime acceptance must be refreshed and production_approved remains false for Stable/production.
-    - Wardveil predecessor target evidence does not transfer to the Release Candidate; immutable RC regression evidence and governed Wardveil adoption/promotion remain required, and no Protected by Wardveil claim is authorized.
-    - Everkeep predecessor readiness does not transfer to the Release Candidate; fresh exact RC target-runtime governance and local ready / everkeep-promoted verification remain required.
-    - GLAZE UI V1.2 remains the official Stable compatibility baseline and product accepted-v1/production acceptance is incomplete; V1.3 Adaptive Resonance remains Proposed and consumer-ineligible.
-    - Human-only final Orca spoken-announcement quality, compositor/native-window-control/icon optical review, applicable PolicyKit-agent UX, and remaining visual/usability/manual accessibility review remain explicit and unpassed; lifecycle v0.4 permits these to remain pending at RC but Stable still requires every applicable gate.
-    - Release Candidate release evidence is intentionally absent until exact-head CI, deterministic package identity, representative target acceptance, and the applicable non-human governance sequence complete.
+    - Stable identity requires exact-source CI package/checksum/reproducibility evidence for this new source/tree/package identity.
+    - Stable identity requires exact-source representative Zorin OS 17.3 package lifecycle and installed-provenance evidence for this new package.
+    - Privacy Shield exact-RC approval must be refreshed or explicitly bridged to the exact Stable identity before final promotion.
+    - Wardveil exact-RC adoption/runtime acceptance must be refreshed or explicitly bridged to the exact Stable identity; protected_by_wardveil=false remains the local source claim.
+    - Everkeep exact-RC readiness must be refreshed or explicitly bridged to the exact Stable source/tree/package and representative target before ready / everkeep-promoted can be accepted for 0.1.0.
+    - GLAZE UI V1.2 exact-RC accepted-v1 must be refreshed or explicitly bridged to the exact Stable source; productionEligible=false remains authoritative until then.
+    - Stable product promotion is not authorized merely by lifecycle/version labels; an exact qualified source/package plus all applicable governed authorities is required.
