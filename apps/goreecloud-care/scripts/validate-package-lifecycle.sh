@@ -8,11 +8,11 @@ usage() {
 
 [ "$#" -eq 2 ] || usage
 [ "$(id -u)" -ne 0 ] || {
-  echo "Run this acceptance probe as the representative desktop user, not as root. The script requests sudo only for apt package operations." >&2
+  echo "Run this qualification probe as the representative desktop user, not as root. The script requests sudo only for apt package operations." >&2
   exit 2
 }
 
-for command_name in sudo apt dpkg dpkg-deb dpkg-query python3 grep sed mktemp rm; do
+for command_name in sudo apt dpkg dpkg-deb dpkg-query grep sed mktemp rm; do
   command -v "$command_name" >/dev/null || {
     echo "Required command not found: $command_name" >&2
     exit 2
@@ -43,33 +43,27 @@ candidate_runtime=$(printf '%s' "$candidate_version" | sed 's/~/-/')
 previous_runtime=$(printf '%s' "$previous_version" | sed 's/~/-/')
 
 case "$candidate_version" in
-  0.1.0~dev22) ;;
-  *) echo "This Development lifecycle probe expects candidate 0.1.0~dev22; got $candidate_version" >&2; exit 2 ;;
+  0.1.0) ;;
+  *) echo "This Stable qualification probe expects candidate 0.1.0; got $candidate_version" >&2; exit 2 ;;
 esac
 
-# The accepted historical dev17 package predates dev19's isolated launcher.
-# Validate that historical rollback from a clean neutral directory, while the
-# dev22 candidate retains the dev19+ source/working-directory isolation gate.
 PREVIOUS_PROBE_DIR=$(mktemp -d)
 cleanup() {
   rm -rf "$PREVIOUS_PROBE_DIR"
 }
 trap cleanup EXIT INT TERM
 
-printf '%s\n' "Package lifecycle acceptance will temporarily remove and downgrade GoreeCloud Care."
-printf '%s\n' "Candidate: $candidate_version"
-printf '%s\n' "Previous:  $previous_version"
+printf '%s\n' "Package lifecycle qualification will temporarily remove and downgrade GoreeCloud Care."
+printf '%s\n' "Stable candidate: $candidate_version"
+printf '%s\n' "Rollback package: $previous_version"
 printf '%s\n' "Representative user: $(id -un) (uid $(id -u))"
-printf '%s\n' "Dev22 candidate checks deliberately exercise source/working-directory shadow resistance inherited from dev19 hardening."
+printf '%s\n' "The Stable candidate retains source/working-directory shadow resistance inherited from dev19 hardening."
 printf '%s\n' "The immutable historical rollback package is validated from a clean neutral directory because dev17 predates that isolation contract."
 printf '%s\n' "No Care-owned user data is expected to be removed; this script does not invoke Care cleanup actions."
 printf '%s\n' "Administrator authentication may be requested by apt."
 
 install_package() {
   package_path=$1
-  # Exact-candidate acceptance is package-byte scoped. --reinstall prevents
-  # APT from treating a different local build with the same Debian version as
-  # already satisfied and leaving older dev22 bytes/provenance installed.
   sudo apt install -y --reinstall --allow-downgrades "$package_path"
 }
 
@@ -86,16 +80,15 @@ assert_version_from() {
   [ "$actual_runtime" = "$expected_runtime" ] || {
     echo "Installed runtime mismatch: package=$expected_package expected_runtime=$expected_runtime actual_runtime=$actual_runtime" >&2
     echo "Runtime probe directory: $runtime_dir" >&2
-    echo "For dev22 this may indicate working-directory/PYTHONPATH shadowing or stale installed bytecode." >&2
     exit 1
   }
 }
 
-printf '%s\n' "[1/6] Install/upgrade candidate"
+printf '%s\n' "[1/6] Install/upgrade Stable candidate"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
-printf '%s\n' "[2/6] Remove candidate"
+printf '%s\n' "[2/6] Remove Stable candidate"
 sudo apt remove -y goreecloud-care
 if dpkg-query -W -f='${Status}' goreecloud-care 2>/dev/null | grep -qx 'install ok installed'; then
   echo "Package still installed after removal" >&2
@@ -108,9 +101,9 @@ for path in \
   /usr/lib/goreecloud-care \
   /usr/lib/python3/dist-packages/goreecloud_care.pth \
   /usr/share/polkit-1/actions/com.goreecloud.care.policy \
-  /usr/share/applications/com.goreecloud.care.dev.desktop \
+  /usr/share/applications/com.goreecloud.care.desktop \
   /usr/share/icons/hicolor/scalable/apps/com.goreecloud.care.svg \
-  /usr/share/metainfo/com.goreecloud.care.dev.metainfo.xml \
+  /usr/share/metainfo/com.goreecloud.care.metainfo.xml \
   /usr/share/goreecloud-care/build-provenance.json \
   /usr/share/goreecloud-care; do
   [ ! -e "$path" ] || { echo "Package-owned path remained after removal: $path" >&2; exit 1; }
@@ -120,20 +113,20 @@ done
   exit 1
 }
 
-printf '%s\n' "[3/6] Reinstall candidate as a fresh package state"
+printf '%s\n' "[3/6] Reinstall Stable candidate as a fresh package state"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
-printf '%s\n' "[4/6] Downgrade to previous Development package"
+printf '%s\n' "[4/6] Downgrade to immutable accepted Development rollback package"
 install_package "$PREVIOUS"
 assert_version_from "$previous_version" "$previous_runtime" "$PREVIOUS_PROBE_DIR"
 (cd "$PREVIOUS_PROBE_DIR" && goreecloud-care --report-json >/dev/null)
 
-printf '%s\n' "[5/6] Restore candidate after downgrade"
+printf '%s\n' "[5/6] Restore Stable candidate after downgrade"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
-printf '%s\n' "[6/6] Final package state"
+printf '%s\n' "[6/6] Final Stable-candidate package state"
 assert_version_from "$candidate_version" "$candidate_runtime" "$ROOT"
-printf '%s\n' "Representative package install/remove/reinstall/downgrade/rollback acceptance: passed"
-printf '%s\n' "The candidate is installed at the end of the probe; no Care cleanup action was invoked."
+printf '%s\n' "Representative Stable package install/remove/reinstall/downgrade/rollback qualification: passed"
+printf '%s\n' "The Stable candidate is installed at the end of the probe; no Care cleanup action was invoked."
