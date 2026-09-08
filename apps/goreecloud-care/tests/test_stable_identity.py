@@ -80,8 +80,6 @@ class StableArtifactIdentityTests(unittest.TestCase):
         for text in (workflow, prepare, runner):
             self.assertIn("artifact_version=0.1.0", text)
             self.assertIn("stable_promotion_authorized=false", text)
-        # These harnesses describe the qualification state of the immutable release artifact.
-        # Stable lifecycle is granted later by the governance manifest, not by rewriting history.
         self.assertIn("lifecycle=release-candidate", prepare)
         self.assertIn("lifecycle=release-candidate", runner)
 
@@ -100,10 +98,9 @@ class StableArtifactIdentityTests(unittest.TestCase):
         platform_status = (ROOT / "goreecloud_care" / "platform_status.py").read_text(encoding="utf-8")
         self.assertIn('"protected_by_wardveil": False', platform_status)
         self.assertIn('production_approved: bool = False', platform_status)
-        # External authorities in the manifest own the final production/adoption decisions.
         manifest = (ROOT / "goreecloud.platform.yaml").read_text(encoding="utf-8")
         self.assertIn("Wardveil accepts exact 0.1.0 runtime adoption", manifest)
-        self.assertIn("Privacy Shield accepts the exact 0.1.0 release source/tree/package", manifest)
+        self.assertIn("Privacy Shield accepts exact 0.1.0 release source/tree/package", manifest)
 
 
 if __name__ == "__main__":
