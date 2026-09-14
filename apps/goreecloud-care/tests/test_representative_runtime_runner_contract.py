@@ -67,10 +67,14 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
             '"stable_promotion_authorized": False',
         ):
             self.assertIn(required, self.source)
-        self.assertIn("6731098b28dd0393faa878c70d989a221d714a20", self.source)
+        self.assertIn('GLAZE_TARGET="2.2.0"', self.source)
+        self.assertIn('GLAZE_RELEASE_TAG="v2.2.0"', self.source)
+        self.assertIn('GLAZE_SOURCE_REVISION="6731098b28dd0393faa878c70d989a221d714a20"', self.source)
         self.assertIn("lifecycle=development", self.source)
         self.assertIn("package_version=$EXPECTED_PACKAGE_VERSION", self.source)
-        self.assertIn("glaze_ui_target=2.2.0", self.source)
+        self.assertIn("glaze_ui_target=$GLAZE_TARGET", self.source)
+        self.assertIn("glaze_ui_release_tag=$GLAZE_RELEASE_TAG", self.source)
+        self.assertIn("glaze_ui_source_revision=$GLAZE_SOURCE_REVISION", self.source)
         self.assertIn("stable_promotion_authorized=false", self.source)
 
     def test_runner_installs_only_care_owned_root_protected_target_record(self) -> None:
