@@ -21,8 +21,8 @@ NOW = datetime(2026, 9, 6, 18, 30, tzinfo=timezone.utc)
 SOURCE_REVISION = "a" * 40
 SOURCE_TREE = "b" * 40
 PACKAGE_SHA256 = "c" * 64
-RUNTIME_VERSION = "0.2.0-dev1"
-PACKAGE_VERSION = "0.2.0~dev1"
+RUNTIME_VERSION = "0.2.0-dev2"
+PACKAGE_VERSION = "0.2.0~dev2"
 
 
 class PlatformStatusTests(unittest.TestCase):
@@ -227,7 +227,7 @@ class PlatformStatusTests(unittest.TestCase):
                 "exact_revision_accepted": True,
                 "everkeep_integration_promoted": promoted,
                 "everkeep_ready_promoted": promoted,
-                "freshness_rule": "Exact 0.2.0-dev1 source, source tree, package version, package SHA-256, and target only.",
+                "freshness_rule": "Exact 0.2.0-dev2 source, source tree, package version, package SHA-256, and target only.",
             },
         }
 
