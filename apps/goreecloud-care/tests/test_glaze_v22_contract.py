@@ -69,14 +69,16 @@ class GlazeV22ContractTests(unittest.TestCase):
         self.assertIn("effects-reduced", source)
         self.assertIn("is_high_contrast_theme", global_source)
 
-    def test_v22_resolves_safety_state_before_window_binding(self) -> None:
+    def test_v22_resolves_safety_state_before_race_free_window_binding(self) -> None:
         global_source = _source("glaze_v22_global.py")
         self.assertIn("def _runtime_css(", global_source)
         self.assertIn('data = data.replace(b"window.glaze-v22", b"window")', global_source)
         self.assertIn("self.provider.load_from_data(runtime_css)", global_source)
+        self.assertIn("GLib.idle_add(self._attach_application)", global_source)
+        self.assertNotIn("GLib.timeout_add(100, self._attach_application)", global_source)
         self.assertLess(
             global_source.index("self.sync()"),
-            global_source.index("GLib.timeout_add(100, self._attach_application)"),
+            global_source.index("GLib.idle_add(self._attach_application)"),
         )
 
     def test_v22_is_the_active_native_provider(self) -> None:
