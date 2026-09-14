@@ -100,9 +100,9 @@ class EverkeepContractTests(unittest.TestCase):
 
     def test_package_lifecycle_probe_reinstalls_exact_candidate_bytes(self) -> None:
         source = (ROOT / "scripts" / "validate-package-lifecycle.sh").read_text(encoding="utf-8")
-        self.assertIn('candidate_version" = "0.2.0~dev1"', source)
+        self.assertIn('candidate_version" = "0.2.0~dev2"', source)
         self.assertIn("--reinstall --allow-downgrades", source)
-        self.assertIn("Reinstall 0.2.0~dev1 candidate as a fresh package state", source)
+        self.assertIn("Reinstall 0.2.0~dev2 candidate as a fresh package state", source)
         self.assertNotIn('sudo apt install -y --allow-downgrades "$package_path"', source)
 
     def test_package_lifecycle_probe_requires_true_stable_rollback_package(self) -> None:
