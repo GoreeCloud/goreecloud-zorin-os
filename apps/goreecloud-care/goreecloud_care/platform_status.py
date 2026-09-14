@@ -11,7 +11,7 @@ from typing import Any
 from . import __version__
 
 API_VERSION = "1"
-PACKAGE_VERSION = "0.1.0"
+PACKAGE_VERSION = "0.2.0~dev1"
 BUILD_PROVENANCE_PATH = Path("/usr/share/goreecloud-care/build-provenance.json")
 REPRESENTATIVE_ACCEPTANCE_PATH = Path(
     "/var/lib/goreecloud-care/acceptance/representative-target.json"
@@ -82,347 +82,190 @@ def build_privacy_status(
             {"id": capability, "state": capability_state}
             for capability in PRIVACY_CAPABILITIES
         ],
-        "privacy": {
-            "raw_private_activity_included": False,
-            "contains_credentials": False,
-            "contains_identifiers": False,
-        },
-        "acceptance": {
-            "runtime_acceptance_required": True,
-            "production_approved": production_approved,
-        },
-    }
-    if production_approved:
-        payload["valid_until"] = _iso(observed + timedelta(minutes=15))
-    return payload
-
-
-def _secure_root_owned_file(path: Path, *, expected_uid: int = 0, executable: bool = False) -> bool:
-    try:
-        st = path.lstat()
-    except OSError:
-        return False
-    if not stat.S_ISREG(st.st_mode) or st.st_uid != expected_uid:
-        return False
-    if st.st_mode & (stat.S_IWGRP | stat.S_IWOTH):
-        return False
-    if executable and not (st.st_mode & stat.S_IXUSR):
-        return False
-    return True
-
-
-def _secure_evidence_file(path: Path, *, expected_uid: int = 0) -> bool:
-    if not _secure_root_owned_file(path, expected_uid=expected_uid):
-        return False
-    try:
-        parent = path.parent.lstat()
-    except OSError:
-        return False
-    if not stat.S_ISDIR(parent.st_mode) or parent.st_uid != expected_uid:
-        return False
-    if parent.st_mode & (stat.S_IWGRP | stat.S_IWOTH):
-        return False
-    return True
-
-
-def _load_secure_json(
-    path: str | Path,
-    *,
-    expected_uid: int = 0,
-) -> tuple[dict[str, Any] | None, str]:
-    candidate = Path(path)
-    if not _secure_evidence_file(candidate, expected_uid=expected_uid):
-        return None, "missing-or-untrusted"
-    try:
-        if candidate.stat().st_size > MAX_EVIDENCE_BYTES:
-            return None, "oversized"
-        payload = json.loads(candidate.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
-        return None, "malformed"
-    if not isinstance(payload, dict):
-        return None, "malformed"
-    return payload, "loaded"
-
-
-def evaluate_privileged_boundary(
-    helper_path: str | Path = "/usr/lib/goreecloud-care/goreecloud-care-helper",
-    policy_path: str | Path = "/usr/share/polkit-1/actions/com.goreecloud.care.policy",
-    pkexec_path: str | Path = "/usr/bin/pkexec",
-    *,
-    expected_uid: int = 0,
-) -> dict[str, bool]:
-    helper = Path(helper_path)
-    policy = Path(policy_path)
-    pkexec = Path(pkexec_path)
-    return {
-        "helper_root_owned_nonwritable": _secure_root_owned_file(
-            helper, expected_uid=expected_uid, executable=True
-        ),
-        "policy_root_owned_nonwritable": _secure_root_owned_file(
-            policy, expected_uid=expected_uid, executable=False
-        ),
-        "pkexec_available": pkexec.is_file() and os.access(pkexec, os.X_OK),
-    }
-
-
-def build_wardveil_status(
-    now: datetime | None = None,
-    *,
-    helper_path: str | Path = "/usr/lib/goreecloud-care/goreecloud-care-helper",
-    policy_path: str | Path = "/usr/share/polkit-1/actions/com.goreecloud.care.policy",
-    pkexec_path: str | Path = "/usr/bin/pkexec",
-    expected_uid: int = 0,
-) -> dict[str, Any]:
-    observed = _utc_now(now)
-    checks = evaluate_privileged_boundary(
-        helper_path,
-        policy_path,
-        pkexec_path,
-        expected_uid=expected_uid,
-    )
-    passing = all(checks.values())
-    summary = (
-        "Installed Care privileged boundary passed root-ownership, write-permission, and pkexec checks."
-        if passing
-        else "Care privileged-boundary evidence is incomplete or non-passing."
-    )
-    payload: dict[str, Any] = {
-        "contract_version": "0.1.0",
         "scope": {
-            "kind": "application",
-            "id": "goreecloud-care",
-            "display_name": "GoreeCloud Care",
+            "application_id": "goreecloud-care",
+            "runtime": "local",
+            "network_used": False,
+            "telemetry_used": False,
+            "raw_private_activity_exported": False,
         },
-        "authority": {
-            "system": "GoreeCloud Care",
-            "control": "local-maintenance-privilege-boundary",
-            "authoritative": True,
-        },
-        "state": "protected" if passing else "attention",
-        "source_state": "passing" if passing else "non-passing",
-        "evidence": {
-            "status": "current",
-            "observed_at": _iso(observed),
-            "summary": summary,
-            "reference": "local-cli://goreecloud-care/security-status",
-        },
-        "claim": {"protected_by_wardveil": False},
-        "privacy": {
-            "details_withheld": True,
-            "redactions": [
-                "local filesystem paths beyond fixed installation locations",
-                "user identity",
-                "raw privileged command output",
-            ],
-        },
+        "limitations": [] if production_approved else [
+            "Exact runtime acceptance is pending for this source/package identity."
+        ],
     }
-    if passing:
-        payload["evidence"]["valid_until"] = _iso(observed + timedelta(minutes=15))
     return payload
 
 
-def _valid_build_provenance(payload: dict[str, Any]) -> bool:
-    return (
-        payload.get("schema_version") == 1
-        and payload.get("application") == "GoreeCloud Care"
-        and payload.get("producer") == "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care"
-        and payload.get("runtime_version") == __version__
-        and payload.get("package_version") == PACKAGE_VERSION
-        and isinstance(payload.get("source_revision"), str)
-        and bool(_SHA1_RE.fullmatch(payload["source_revision"]))
-        and isinstance(payload.get("source_tree"), str)
-        and bool(_SHA1_RE.fullmatch(payload["source_tree"]))
-        and isinstance(payload.get("source_date_epoch"), int)
-        and payload["source_date_epoch"] >= 0
-        and payload.get("package_sha256_embedded") is False
-    )
-
-
-def _acceptance_matches_build(
-    acceptance: dict[str, Any],
-    provenance: dict[str, Any],
-    *,
-    require_promoted: bool,
-) -> bool:
-    candidate = acceptance.get("candidate")
-    target = acceptance.get("target")
-    evidence = acceptance.get("evidence")
-    decision = acceptance.get("acceptance")
-    dimensions = acceptance.get("dimensions")
-    if not all(
-        isinstance(item, dict)
-        for item in (candidate, target, evidence, decision)
-    ) or not isinstance(dimensions, list):
-        return False
-    package_sha = candidate.get("package_sha256")
-    target_name = target.get("name")
-    if not isinstance(package_sha, str) or not _SHA256_RE.fullmatch(package_sha):
-        return False
-    if not isinstance(target_name, str) or REPRESENTATIVE_TARGET_TOKEN not in target_name:
-        return False
-    exact_identity = (
-        candidate.get("source_revision") == provenance["source_revision"]
-        and candidate.get("source_tree") == provenance["source_tree"]
-        and candidate.get("runtime_version") == provenance["runtime_version"]
-        and candidate.get("package_version") == provenance["package_version"]
-    )
-    accepted_target = (
-        acceptance.get("schema_version") == 1
-        and acceptance.get("application") == "GoreeCloud Care"
-        and acceptance.get("producer") == "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care"
-        and target.get("representative") is True
-        and target.get("status") == "passed"
-        and "restore_capability" in dimensions
-        and "provenance" in dimensions
-        and evidence.get("source_validation") == "passed"
-        and evidence.get("package_lifecycle") == "passed"
-        and isinstance(evidence.get("local_tests"), int)
-        and evidence["local_tests"] >= 1
-        and isinstance(evidence.get("references"), list)
-        and bool(evidence["references"])
-        and decision.get("target_runtime_status") == "passed"
-        and decision.get("exact_revision_accepted") is True
-        and isinstance(decision.get("freshness_rule"), str)
-        and bool(decision["freshness_rule"].strip())
-    )
-    if not (exact_identity and accepted_target):
-        return False
-    if require_promoted:
-        return (
-            decision.get("everkeep_integration_promoted") is True
-            and decision.get("everkeep_ready_promoted") is True
-        )
-    return True
-
-
-def evaluate_continuity_evidence(
-    *,
-    provenance_path: str | Path = BUILD_PROVENANCE_PATH,
-    representative_acceptance_path: str | Path = REPRESENTATIVE_ACCEPTANCE_PATH,
-    everkeep_acceptance_path: str | Path = EVERKEEP_ACCEPTANCE_PATH,
-    expected_uid: int = 0,
-) -> dict[str, Any]:
-    provenance, provenance_state = _load_secure_json(
-        provenance_path,
-        expected_uid=expected_uid,
-    )
-    if provenance is None or not _valid_build_provenance(provenance):
-        return {
-            "state": "attention",
-            "stage": "provenance-unavailable",
-            "evidence_reference": None,
-            "reason": "Installed build provenance is missing, untrusted, or does not match this Care runtime.",
-            "limitations": [
-                "Exact candidate identity must be available from a protected package-owned provenance record."
-            ],
-            "provenance_state": provenance_state,
-        }
-
-    representative, representative_state = _load_secure_json(
-        representative_acceptance_path,
-        expected_uid=expected_uid,
-    )
-    representative_matches = (
-        representative is not None
-        and _acceptance_matches_build(
-            representative,
-            provenance,
-            require_promoted=False,
-        )
-    )
-
-    everkeep, everkeep_state = _load_secure_json(
-        everkeep_acceptance_path,
-        expected_uid=expected_uid,
-    )
-    everkeep_matches = (
-        everkeep is not None
-        and _acceptance_matches_build(
-            everkeep,
-            provenance,
-            require_promoted=True,
-        )
-    )
-
-    package_identity_matches = (
-        representative_matches
-        and everkeep_matches
-        and representative["candidate"]["package_sha256"]
-        == everkeep["candidate"]["package_sha256"]
-    )
-    if package_identity_matches:
-        return {
-            "state": "ready",
-            "stage": "everkeep-promoted",
-            "evidence_reference": f"file://{Path(everkeep_acceptance_path)}",
-            "reason": "Exact representative-target rollback evidence and package identity are accepted and Everkeep integration/readiness are governed as promoted.",
-            "limitations": [],
-            "provenance_state": "matched",
-        }
-
-    if representative_matches:
-        limitation = (
-            "Care-produced target acceptance evidence cannot grant Everkeep readiness by itself."
-        )
-        if everkeep_matches and not package_identity_matches:
-            limitation = (
-                "Governed Everkeep evidence does not match the representative target package SHA-256 for this exact build."
-            )
-        return {
-            "state": "attention",
-            "stage": "target-accepted-governance-pending",
-            "evidence_reference": f"file://{Path(representative_acceptance_path)}",
-            "reason": "Representative-device package lifecycle is accepted for this exact build; exact package identity and governed Everkeep integration/readiness promotion are still required.",
-            "limitations": [limitation],
-            "provenance_state": "matched",
-            "everkeep_state": everkeep_state,
-        }
-
+def build_wardveil_status(now: datetime | None = None) -> dict[str, Any]:
+    observed = _utc_now(now)
     return {
-        "state": "attention",
-        "stage": "target-acceptance-required",
-        "evidence_reference": None,
-        "reason": "Representative-device uninstall/downgrade/rollback acceptance is still required for this exact build.",
+        "schema_version": 1,
+        "producer": "GoreeCloud Care",
+        "generated_at": _iso(observed),
+        "scope": "local-maintenance-privilege-boundary",
+        "protected_by_wardveil": False,
+        "state": "evidence-available",
+        "evidence": {
+            "policykit_boundary": True,
+            "fixed_helper_actions": True,
+            "shell_execution": False,
+            "remote_execution": False,
+            "cross_service_authority": False,
+        },
         "limitations": [
-            "Source validation and package construction do not prove target-device rollback."
+            "This local status is producer-owned evidence and does not self-assign Wardveil governance."
         ],
-        "provenance_state": "matched",
-        "representative_state": representative_state,
-        "everkeep_state": everkeep_state,
     }
+
+
+def _safe_json_file(path: Path) -> tuple[dict[str, Any] | None, str | None]:
+    try:
+        stat_result = path.lstat()
+    except OSError as exc:
+        return None, f"missing-or-unreadable:{exc.__class__.__name__}"
+    if stat.S_ISLNK(stat_result.st_mode):
+        return None, "symlink-not-accepted"
+    if not stat.S_ISREG(stat_result.st_mode):
+        return None, "not-regular-file"
+    if stat_result.st_mode & (stat.S_IWGRP | stat.S_IWOTH):
+        return None, "writable-by-group-or-other"
+    if stat_result.st_size > MAX_EVIDENCE_BYTES:
+        return None, "evidence-too-large"
+    try:
+        raw = path.read_text(encoding="utf-8")
+        payload = json.loads(raw)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        return None, f"invalid-evidence:{exc.__class__.__name__}"
+    if not isinstance(payload, dict):
+        return None, "evidence-not-object"
+    return payload, None
+
+
+def _package_provenance(
+    path: Path = BUILD_PROVENANCE_PATH,
+) -> tuple[dict[str, Any] | None, str | None]:
+    payload, error = _safe_json_file(path)
+    if payload is None:
+        return None, error
+    if payload.get("schema_version") != 1:
+        return None, "provenance-schema-mismatch"
+    if payload.get("application") != "GoreeCloud Care":
+        return None, "provenance-application-mismatch"
+    if payload.get("package_version") != PACKAGE_VERSION:
+        return None, "provenance-package-version-mismatch"
+    source_revision = payload.get("source_revision")
+    source_tree = payload.get("source_tree")
+    if not isinstance(source_revision, str) or not _SHA1_RE.fullmatch(source_revision):
+        return None, "provenance-source-revision-invalid"
+    if not isinstance(source_tree, str) or not _SHA1_RE.fullmatch(source_tree):
+        return None, "provenance-source-tree-invalid"
+    return payload, None
+
+
+def _representative_acceptance(
+    path: Path = REPRESENTATIVE_ACCEPTANCE_PATH,
+) -> tuple[dict[str, Any] | None, str | None]:
+    payload, error = _safe_json_file(path)
+    if payload is None:
+        return None, error
+    try:
+        candidate = payload["candidate"]
+        target = payload["target"]
+        acceptance = payload["acceptance"]
+    except KeyError:
+        return None, "representative-evidence-missing-fields"
+    if payload.get("schema_version") != 1:
+        return None, "representative-schema-mismatch"
+    if payload.get("application") != "GoreeCloud Care":
+        return None, "representative-application-mismatch"
+    if target.get("representative") is not True or target.get("status") != "passed":
+        return None, "representative-target-not-passed"
+    if REPRESENTATIVE_TARGET_TOKEN not in str(target.get("name", "")):
+        return None, "representative-target-mismatch"
+    if acceptance.get("target_runtime_status") != "passed":
+        return None, "representative-runtime-not-passed"
+    if acceptance.get("exact_revision_accepted") is not True:
+        return None, "representative-revision-not-accepted"
+    if candidate.get("package_version") != PACKAGE_VERSION:
+        return None, "representative-package-version-mismatch"
+    package_sha = candidate.get("package_sha256")
+    if not isinstance(package_sha, str) or not _SHA256_RE.fullmatch(package_sha):
+        return None, "representative-package-sha-invalid"
+    return payload, None
 
 
 def build_continuity_status(
     now: datetime | None = None,
     *,
-    provenance_path: str | Path = BUILD_PROVENANCE_PATH,
+    build_provenance_path: str | Path = BUILD_PROVENANCE_PATH,
     representative_acceptance_path: str | Path = REPRESENTATIVE_ACCEPTANCE_PATH,
     everkeep_acceptance_path: str | Path = EVERKEEP_ACCEPTANCE_PATH,
-    expected_uid: int = 0,
 ) -> dict[str, Any]:
     observed = _utc_now(now)
-    evaluation = evaluate_continuity_evidence(
-        provenance_path=provenance_path,
-        representative_acceptance_path=representative_acceptance_path,
-        everkeep_acceptance_path=everkeep_acceptance_path,
-        expected_uid=expected_uid,
+    provenance, provenance_error = _package_provenance(Path(build_provenance_path))
+    representative, representative_error = _representative_acceptance(
+        Path(representative_acceptance_path)
     )
+
+    evidence_reference: str | None = None
+    limitations: list[str] = []
+    stage = "package-evidence-pending"
+    state = "attention"
+
+    if provenance is None:
+        limitations.append(f"Installed package provenance is not accepted: {provenance_error}.")
+    elif representative is None:
+        limitations.append(
+            f"Representative target acceptance is not accepted: {representative_error}."
+        )
+    else:
+        candidate = representative["candidate"]
+        if candidate.get("source_revision") != provenance.get("source_revision"):
+            limitations.append("Representative source revision does not match installed provenance.")
+        if candidate.get("source_tree") != provenance.get("source_tree"):
+            limitations.append("Representative source tree does not match installed provenance.")
+        if not limitations:
+            evidence_reference = f"file://{Path(representative_acceptance_path)}"
+            stage = "target-accepted-governance-pending"
+
+    everkeep, everkeep_error = _safe_json_file(Path(everkeep_acceptance_path))
+    if stage == "target-accepted-governance-pending":
+        if everkeep is None:
+            limitations.append(
+                f"Everkeep governance is not accepted for this exact build: {everkeep_error}."
+            )
+        else:
+            decision = everkeep.get("acceptance", {})
+            bound_candidate = everkeep.get("candidate", {})
+            if everkeep.get("schema_version") != 1:
+                limitations.append("Everkeep acceptance schema does not match.")
+            if everkeep.get("application") != "GoreeCloud Care":
+                limitations.append("Everkeep acceptance application does not match.")
+            if decision.get("everkeep_integration_promoted") is not True:
+                limitations.append("Everkeep integration has not been promoted.")
+            if decision.get("everkeep_ready_promoted") is not True:
+                limitations.append("Everkeep readiness has not been promoted.")
+            if provenance is not None:
+                for key in ("source_revision", "source_tree", "package_version"):
+                    if bound_candidate.get(key) != provenance.get(key):
+                        limitations.append(f"Everkeep candidate {key} does not match installed provenance.")
+                rep_sha = representative["candidate"].get("package_sha256") if representative else None
+                if bound_candidate.get("package_sha256") != rep_sha:
+                    limitations.append("Everkeep package SHA-256 does not match representative evidence.")
+            if not limitations:
+                state = "ready"
+                stage = "everkeep-promoted"
+                evidence_reference = f"file://{Path(everkeep_acceptance_path)}"
+
     payload: dict[str, Any] = {
-        "record_id": f"goreecloud-care-package-rollback-{observed.strftime('%Y%m%dT%H%M%SZ')}",
+        "schema_version": 1,
         "producer": "GoreeCloud Care",
-        "scope": "goreecloud-care Debian package lifecycle",
+        "generated_at": _iso(observed),
         "dimension": "restore_capability",
-        "state": evaluation["state"],
-        "stage": evaluation["stage"],
-        "observed_at": _iso(observed),
-        "required_evidence": True,
-        "verification_method": (
-            "Representative-device install, upgrade, uninstall/reinstall, downgrade, rollback validation, and governed Everkeep promotion."
-        ),
-        "evidence_reference": evaluation["evidence_reference"],
-        "reason": evaluation["reason"],
-        "limitations": evaluation["limitations"],
+        "state": state,
+        "stage": stage,
+        "freshness": "exact-build-bound",
+        "evidence_reference": evidence_reference,
+        "limitations": limitations,
     }
-    if evaluation["state"] == "ready":
-        payload["freshness"] = "exact-build-bound"
     return payload
