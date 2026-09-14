@@ -13,7 +13,7 @@ from .glaze_v14 import (
     appearance_from_theme,
     clarity_profile,
     expression_profile,
-    form_factor_environment,
+    native_form_factor_for_window_width,
     reduced_motion_requested,
     reduced_transparency_requested,
     show_borders_requested,
@@ -109,7 +109,7 @@ class GlobalGlazeV14Controller:
         resolved_width = width
         if resolved_width is None:
             resolved_width, _ = window.get_size()
-        state = form_factor_environment(max(0, int(resolved_width)))
+        state = native_form_factor_for_window_width(int(resolved_width))
         context.add_class(f"form-factor-{state}")
 
     def _sync_window(self, window: Gtk.Window) -> None:
