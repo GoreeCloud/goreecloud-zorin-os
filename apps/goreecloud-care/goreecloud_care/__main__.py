@@ -16,15 +16,15 @@ GLib.set_application_name("GoreeCloud Care")
 
 
 def _install_native_ui_contract() -> None:
-    """Install shared focus and Glaze UI V1.4 adoption providers for GTK modes."""
+    """Install shared focus and current Glaze UI 2.2 adoption providers."""
     from .focus_resilience import install_focus_resilience_provider
-    from .glaze_v14_global import install_glaze_v14_global_style
+    from .glaze_v22_global import install_glaze_v22_global_style
 
     # The focus-only fallback remains one priority below ordinary application
-    # styling. The V1.4 process-level provider removes itself when HighContrast
+    # styling. The 2.2 process-level provider removes itself when HighContrast
     # is effective, preserving system palette authority and fail-closed access.
     install_focus_resilience_provider()
-    install_glaze_v14_global_style()
+    install_glaze_v22_global_style()
 
 
 def _run() -> int:
