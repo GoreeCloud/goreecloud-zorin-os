@@ -1,4 +1,4 @@
-schema_version: "0.2"
+schema_version: "0.3"
 
 component:
   type: application
@@ -91,7 +91,7 @@ platform_systems:
       - tests/test_accessibility_identity.py
       - tests/runtime_ui_acceptance.py
       - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/01c86323f8b747373d308026adc8b0881855cdc5
-    notes: GoreeCloud Care 0.2.0-dev1 intentionally targets Glaze UI V1.4 / 1.4.0. The design-system release and automated implementation evidence do not independently grant downstream Care conformance; exact representative rendered/native and consumer acceptance remain required.
+    notes: GoreeCloud Care 0.2.0-dev1 intentionally targets Glaze UI V1.4 / 1.4.0. Platform Contract 0.3 permits a Development component to declare that forward target without treating it as Stable acceptance. The design-system release and automated implementation evidence do not independently grant downstream Care conformance; exact representative rendered/native and consumer acceptance remain required.
   mesh:
     result: not-applicable-justified
     version: null
@@ -106,6 +106,11 @@ platform_systems:
     version: null
     evidence: [SPECIFICATIONS.md, API.md]
     notes: Current Care has no GoreeCloud account, remote management, multi-user behavior, or delegated administration.
+  sync:
+    result: not-applicable-justified
+    version: null
+    evidence: [SPECIFICATIONS.md, API.md, PRIVACY.md]
+    notes: Current Care owns no cross-device synchronized dataset or remote state. Maintenance scans, reports, and status are local-first and device-scoped.
 
 health:
   health_endpoint: local-cli://goreecloud-care/health
@@ -151,9 +156,9 @@ external_dependencies:
     version_constraint: null
 
 compatibility:
-  platform_contract: "0.2"
+  platform_contract: "0.3"
   glaze_ui_required: "1.4.0"
-  requires: [goreecloud-platform-contract==0.2, glaze-ui==1.4.0]
+  requires: [goreecloud-platform-contract==0.3, glaze-ui==1.4.0]
   provides:
     - goreecloud-care-local-maintenance
     - goreecloud-care-read-only-maintenance-report
@@ -248,8 +253,8 @@ conformance:
   status: nonconformant
   validated_at: null
   evidence:
-    - GLAZE-UI-CONFORMANCE.md
-    - GLAZE-UI-V1.4-MIGRATION.md
+    - apps/goreecloud-care/GLAZE-UI-CONFORMANCE.md
+    - apps/goreecloud-care/GLAZE-UI-V1.4-MIGRATION.md
     - apps/goreecloud-care/goreecloud_care/glaze_v14.py
     - apps/goreecloud-care/goreecloud_care/glaze_v14_global.py
   blockers:
