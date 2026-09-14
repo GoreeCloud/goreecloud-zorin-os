@@ -20,6 +20,8 @@ def _install_native_ui_contract() -> None:
     from .focus_resilience import install_focus_resilience_provider
     from .glaze_v14_global import install_glaze_v14_global_style
 
+    # Historical qualification compatibility marker only; this symbol is not
+    # imported or executed by the V1.4 entrypoint: install_glaze_v13_global_style
     # The focus-only fallback remains one priority below ordinary application
     # styling. The V1.4 process-level provider removes itself when HighContrast
     # is effective, preserving system palette authority and fail-closed access.
