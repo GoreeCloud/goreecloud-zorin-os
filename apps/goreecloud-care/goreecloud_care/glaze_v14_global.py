@@ -40,6 +40,40 @@ _STATE_CLASSES = (
 ) + FORM_FACTOR_CLASSES[1:]
 
 
+def _runtime_css(
+    appearance: str,
+    *,
+    expression: str,
+    clarity: str,
+    reduced_transparency: bool,
+    reduced_motion: bool,
+    show_borders: bool,
+) -> bytes:
+    """Resolve safety-critical V1.4 state before any window binding occurs.
+
+    Care installs its process provider before Gtk.Application creates the first
+    window. Appearance, clarity and accessibility state therefore cannot depend
+    on the asynchronous window-added/size-allocate lifecycle. Form-factor
+    selectors intentionally remain class-bound because they require a realized
+    window allocation.
+    """
+    data = CSS.replace(b"window.care-shell", b"window")
+    data = data.replace(b"window.glaze-v14", b"window")
+    if appearance == "dark":
+        data = data.replace(b"window.care-dark", b"window")
+    elif appearance == "deep-dark":
+        data = data.replace(b"window.care-deep-dark", b"window")
+    data = data.replace(f"window.expression-{expression}".encode(), b"window")
+    data = data.replace(f"window.clarity-{clarity}".encode(), b"window")
+    if reduced_transparency:
+        data = data.replace(b"window.reduced-transparency", b"window")
+    if reduced_motion:
+        data = data.replace(b"window.reduced-motion", b"window")
+    if show_borders:
+        data = data.replace(b"window.show-borders", b"window")
+    return data
+
+
 class GlobalGlazeV14Controller:
     """Synchronize V1.4 appearance and native form-factor state process-wide."""
 
@@ -47,7 +81,6 @@ class GlobalGlazeV14Controller:
         self.settings = Gtk.Settings.get_default()
         self.screen = Gdk.Screen.get_default()
         self.provider = Gtk.CssProvider()
-        self.provider.load_from_data(CSS)
         self.provider_attached = False
         self._bound_windows: set[int] = set()
         self._application_handler_id: int | None = None
@@ -59,11 +92,11 @@ class GlobalGlazeV14Controller:
             except TypeError:
                 pass
 
-        # Installation happens before Care constructs Gtk.Application. Retry at
-        # a bounded cadence until the application exists, then use window-added
-        # instead of polling for the lifetime of the process.
-        GLib.timeout_add(100, self._attach_application)
+        # Install resolved process state immediately. Application/window binding
+        # may happen afterward because only V1.4 form-factor geometry depends on
+        # a concrete window allocation.
         self.sync()
+        GLib.timeout_add(100, self._attach_application)
 
     def _attach_application(self) -> bool:
         app = Gtk.Application.get_default()
@@ -155,11 +188,28 @@ class GlobalGlazeV14Controller:
             if self.provider_attached:
                 Gtk.StyleContext.remove_provider_for_screen(self.screen, self.provider)
                 self.provider_attached = False
-        elif not self.provider_attached:
-            Gtk.StyleContext.add_provider_for_screen(
-                self.screen, self.provider, _PROVIDER_PRIORITY
+        else:
+            animations_enabled: bool | None = None
+            if self.settings is not None:
+                try:
+                    animations_enabled = bool(self.settings.get_property("gtk-enable-animations"))
+                except TypeError:
+                    animations_enabled = None
+
+            runtime_css = _runtime_css(
+                appearance_from_theme(theme_name),
+                expression=expression_profile(),
+                clarity=clarity_profile(),
+                reduced_transparency=reduced_transparency_requested(),
+                reduced_motion=reduced_motion_requested(animations_enabled),
+                show_borders=show_borders_requested(),
             )
-            self.provider_attached = True
+            self.provider.load_from_data(runtime_css)
+            if not self.provider_attached:
+                Gtk.StyleContext.add_provider_for_screen(
+                    self.screen, self.provider, _PROVIDER_PRIORITY
+                )
+                self.provider_attached = True
 
         for window in Gtk.Window.list_toplevels():
             self._bind_window(window)
