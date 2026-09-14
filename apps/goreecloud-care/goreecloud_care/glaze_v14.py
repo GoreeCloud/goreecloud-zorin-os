@@ -1,17 +1,18 @@
-"""GLAZE UI V1.4 form-factor adaptation for GoreeCloud Care.
+"""GLAZE UI V1.4 Optical Intelligence adaptation for GoreeCloud Care.
 
-Glaze UI 1.4.0 is a historical Stable design-system release that extends the
-1.3 expressive/material foundation with first-class form-factor semantics.
-Downstream applications are not certified merely because the design-system
-release is Stable, so this module deliberately describes Care as an adoption
-candidate until application-specific validation is accepted.
+The current Glaze UI authority defines 1.4.0 as Official Stable and names the
+release Optical Intelligence. Care maps that contract to GTK3 conservatively:
+optical adaptation is local and deterministic, accessibility always outranks
+decoration, and unsupported compositor effects degrade before content, focus,
+or maintenance correctness.
 
-Care is a GTK3 desktop application. It therefore maps the V1.4 Desktop and Wide
-Desktop contracts to native GTK surfaces while keeping compact/narrow window
-behavior task-complete. Unsupported optical effects degrade before content,
-focus, readability, or maintenance correctness.
+Care's compact/narrow/desktop/wide window states remain application-owned GTK
+layout behavior. They are useful responsive behavior, but they are not treated
+as the definition of the V1.4 design-system release.
 """
 from __future__ import annotations
+
+import os
 
 import gi
 
@@ -27,17 +28,20 @@ from .glaze_v13 import (
     reduced_transparency_requested,
     show_borders_requested,
 )
+from .glaze_v14_optical import care_default_optical_state, optical_css_classes
 from .ui_contract import effective_layout_width, is_compact_width, is_high_contrast_theme
 
-GLAZE_UI_LABEL = "GLAZE UI V1.4 — Form-Factor Evolution"
+GLAZE_UI_LABEL = "GLAZE UI V1.4 — Optical Intelligence"
 GLAZE_UI_TARGET_VERSION = "1.4.0"
-GLAZE_UI_LIFECYCLE = "historical-stable-adoption"
+GLAZE_UI_LIFECYCLE = "official-stable-adoption"
 GLAZE_UI_ADOPTION_STATE = "development"
 GLAZE_UI_CONSUMER_ELIGIBLE = False
-# Canonical Stable promotion commit recorded by the Glaze UI 1.4.0 changelog.
-GLAZE_UI_SOURCE_REVISION = "01c86323f8b747373d308026adc8b0881855cdc5"
+GLAZE_UI_SOURCE_REVISION = "ee057ce9e729296aeaeda182d01db89f52bd66f3"
+GLAZE_UI_SOURCE_INTEGRATION_ANCHOR = "a20374734dae6a119b28448f5e6b3232253b6da7"
 GLAZE_UI_PREVIOUS_BASELINE = "1.3.0"
 MIN_TARGET_PX = 48
+
+INCREASED_CONTRAST_ENV = "GOREECLOUD_CARE_INCREASED_CONTRAST"
 
 FORM_FACTOR_COMPACT_MAX = 759
 FORM_FACTOR_NARROW_DESKTOP_MAX = 1023
@@ -49,15 +53,33 @@ FORM_FACTOR_CLASSES = (
     "form-factor-desktop",
     "form-factor-wide-desktop",
 )
+OPTICAL_CLASSES = (
+    "optical-adaptive-optical",
+    "optical-solid-accessible",
+    "optical-frost-soft",
+    "optical-frost-balanced",
+    "optical-frost-strong",
+    "optical-semantic-protected",
+    "optical-depth-base",
+    "optical-depth-raised",
+    "optical-depth-overlay",
+    "optical-depth-modal",
+    "optical-no-decorative-tint",
+)
+
+
+def _truthy(value: str | None) -> bool:
+    return (value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def increased_contrast_requested(value: str | None = None) -> bool:
+    """Return Care's explicit Increased Contrast preference when provided."""
+    raw = os.environ.get(INCREASED_CONTRAST_ENV) if value is None else value
+    return _truthy(raw)
 
 
 def form_factor_environment(effective_width: int, *, compact: bool = False) -> str:
-    """Resolve Care's V1.4 native composition state from effective width.
-
-    Width is only a native window-composition input here; it does not relabel a
-    desktop Care process as a Mobile, Tablet, or TV product. The V1.4 platform
-    contract remains Desktop/Wide Desktop for this application.
-    """
+    """Resolve Care-owned native desktop composition from effective width."""
     width = max(0, int(effective_width))
     if compact or width <= FORM_FACTOR_COMPACT_MAX:
         return "compact"
@@ -69,16 +91,13 @@ def form_factor_environment(effective_width: int, *, compact: bool = False) -> s
 
 
 def native_form_factor_for_window_width(raw_width: int) -> str:
-    """Resolve a GTK allocation through Care's DPI-aware width contract."""
     width = max(0, int(raw_width))
     return form_factor_environment(
-        int(effective_layout_width(width)),
-        compact=is_compact_width(width),
+        int(effective_layout_width(width)), compact=is_compact_width(width)
     )
 
 
 def layout_environment(effective_width: int, *, compact: bool) -> str:
-    """Compatibility layout result for existing Care composition code."""
     state = form_factor_environment(effective_width, compact=compact)
     if state == "compact":
         return "compact"
@@ -87,122 +106,99 @@ def layout_environment(effective_width: int, *, compact: bool) -> str:
     return "expanded"
 
 
+def window_optical_classes(
+    appearance: str,
+    *,
+    reduced_transparency: bool,
+    reduced_motion: bool,
+    increased_contrast: bool,
+    forced_colors: bool = False,
+) -> tuple[str, ...]:
+    state = care_default_optical_state(
+        appearance=appearance,
+        reduced_transparency=reduced_transparency,
+        reduced_motion=reduced_motion,
+        increased_contrast=increased_contrast,
+        forced_colors=forced_colors,
+        depth="base",
+        semantic_importance=0.80,
+    )
+    return optical_css_classes(state)
+
+
 V14_CSS = b"""
-/* GoreeCloud Care native adaptation of Glaze UI V1.4.
-   Functional glass is restricted to command chrome. Stable reading and
-   consequential-action surfaces remain opaque or near-opaque. */
-window.glaze-v14 headerbar,
-window.glaze-v14 .chrome-plane {
+/* Care maps V1.4 Optical Intelligence into bounded GTK3 native treatment.
+   GTK3 does not claim compositor-authoritative backdrop sampling or blur. */
+window.glaze-v14.optical-adaptive-optical headerbar,
+window.glaze-v14.optical-adaptive-optical .chrome-plane {
   border-bottom-width: 1px;
   box-shadow: 0 5px 20px rgba(34, 39, 48, 0.06);
 }
+window.glaze-v14.optical-frost-soft headerbar,
+window.glaze-v14.optical-frost-soft .chrome-plane { box-shadow: 0 3px 12px rgba(34, 39, 48, 0.04); }
+window.glaze-v14.optical-frost-balanced headerbar,
+window.glaze-v14.optical-frost-balanced .chrome-plane { box-shadow: 0 5px 20px rgba(34, 39, 48, 0.06); }
+window.glaze-v14.optical-frost-strong headerbar,
+window.glaze-v14.optical-frost-strong .chrome-plane { box-shadow: 0 7px 24px rgba(34, 39, 48, 0.08); }
+window.glaze-v14.optical-semantic-protected .content-plane,
+window.glaze-v14.optical-semantic-protected .maintenance-collection,
+window.glaze-v14.optical-semantic-protected .system-panel,
+window.glaze-v14.optical-semantic-protected .findings-plane,
+window.glaze-v14.optical-semantic-protected .status-banner { box-shadow: none; }
+window.glaze-v14.optical-solid-accessible headerbar,
+window.glaze-v14.optical-solid-accessible .chrome-plane,
+window.glaze-v14.optical-solid-accessible .hero-surface,
+window.glaze-v14.optical-no-decorative-tint .hero-surface { box-shadow: none; }
 
-window.glaze-v14 .hero-surface {
-  border-radius: 26px;
-  padding: 20px;
-}
+/* Care-owned responsive desktop composition remains separate from Glaze identity. */
+window.glaze-v14 .hero-surface { border-radius: 26px; padding: 20px; }
 window.glaze-v14 .maintenance-collection,
 window.glaze-v14 .system-panel,
 window.glaze-v14 .content-plane,
-window.glaze-v14 .findings-plane {
-  border-radius: 20px;
-}
-window.glaze-v14 .status-banner {
-  border-radius: 16px;
-}
-window.glaze-v14 button {
-  border-radius: 14px;
-}
-window.glaze-v14 button.command-capsule {
-  border-radius: 999px;
-}
-window.glaze-v14 button.resonant-action {
-  border-radius: 18px;
-}
-
-/* V1.4 compact/native-window adaptation. Task order is unchanged. */
+window.glaze-v14 .findings-plane { border-radius: 20px; }
+window.glaze-v14 .status-banner { border-radius: 16px; }
+window.glaze-v14 button { border-radius: 14px; }
+window.glaze-v14 button.command-capsule { border-radius: 999px; }
+window.glaze-v14 button.resonant-action { border-radius: 18px; }
 window.glaze-v14.form-factor-compact .hero-surface {
-  border-radius: 18px;
-  padding: 14px;
-  box-shadow: none;
+  border-radius: 18px; padding: 14px; box-shadow: none;
 }
 window.glaze-v14.form-factor-compact .maintenance-collection,
 window.glaze-v14.form-factor-compact .system-panel,
 window.glaze-v14.form-factor-compact .content-plane,
-window.glaze-v14.form-factor-compact .findings-plane {
-  border-radius: 16px;
-}
-window.glaze-v14.form-factor-compact .section-title {
-  font-size: 17px;
-}
-
-/* Narrow desktop preserves one reading column before multi-pane composition. */
-window.glaze-v14.form-factor-narrow-desktop .hero-surface {
-  padding: 17px;
-}
-
-/* Desktop is the canonical Care composition. */
-window.glaze-v14.form-factor-desktop .hero-surface {
-  padding: 20px;
-}
+window.glaze-v14.form-factor-compact .findings-plane { border-radius: 16px; }
+window.glaze-v14.form-factor-compact .section-title { font-size: 17px; }
+window.glaze-v14.form-factor-narrow-desktop .hero-surface { padding: 17px; }
+window.glaze-v14.form-factor-desktop .hero-surface { padding: 20px; }
 window.glaze-v14.form-factor-desktop .maintenance-row,
-window.glaze-v14.form-factor-desktop .system-action-row {
-  padding-top: 13px;
-  padding-bottom: 13px;
-}
-
-/* Wide Desktop increases breathing room, never target density or text scale
-   merely to fill pixels. */
+window.glaze-v14.form-factor-desktop .system-action-row { padding-top: 13px; padding-bottom: 13px; }
 window.glaze-v14.form-factor-wide-desktop .hero-surface {
-  padding: 24px;
-  box-shadow: 0 14px 34px rgba(37, 47, 65, 0.08);
+  padding: 24px; box-shadow: 0 14px 34px rgba(37, 47, 65, 0.08);
 }
-window.glaze-v14.form-factor-wide-desktop .section-title {
-  font-size: 19px;
-}
+window.glaze-v14.form-factor-wide-desktop .section-title { font-size: 19px; }
 window.glaze-v14.form-factor-wide-desktop .maintenance-row,
-window.glaze-v14.form-factor-wide-desktop .system-action-row {
-  padding-top: 15px;
-  padding-bottom: 15px;
-}
-
-/* Input semantics remain visible independently of material effects. */
+window.glaze-v14.form-factor-wide-desktop .system-action-row { padding-top: 15px; padding-bottom: 15px; }
 window.glaze-v14 button:focus,
 window.glaze-v14 checkbutton:focus,
-window.glaze-v14 label:focus {
-  outline-width: 3px;
-  outline-offset: 3px;
-}
-
-/* Accessibility precedence: remove embellishment before hierarchy or focus. */
+window.glaze-v14 label:focus { outline-width: 3px; outline-offset: 3px; }
 window.glaze-v14.reduced-transparency headerbar,
 window.glaze-v14.reduced-transparency .chrome-plane,
-window.glaze-v14.reduced-transparency .hero-surface {
-  box-shadow: none;
-}
+window.glaze-v14.reduced-transparency .hero-surface,
 window.glaze-v14.reduced-motion headerbar,
 window.glaze-v14.reduced-motion .chrome-plane,
 window.glaze-v14.reduced-motion .hero-surface,
-window.glaze-v14.reduced-motion button:hover {
-  box-shadow: none;
-}
+window.glaze-v14.reduced-motion button:hover { box-shadow: none; }
 window.glaze-v14.show-borders .hero-surface,
 window.glaze-v14.show-borders .maintenance-collection,
 window.glaze-v14.show-borders .system-panel,
 window.glaze-v14.show-borders .content-plane,
-window.glaze-v14.show-borders .findings-plane {
-  border-width: 2px;
-}
+window.glaze-v14.show-borders .findings-plane { border-width: 2px; }
 """
 
-# V1.4 intentionally inherits the accepted expressive/material semantics of the
-# V1.3 mapping and adds form-factor composition on top.
 CSS = V13_CSS + b"\n" + V14_CSS
 
 
 class GlazeV14Controller:
-    """Attach the V1.4 Care adaptation and form-factor state to one GTK3 window."""
-
     def __init__(self, window: Gtk.Window) -> None:
         self.window = window
         self.settings = Gtk.Settings.get_default()
@@ -211,7 +207,6 @@ class GlazeV14Controller:
         self.provider_attached = False
         self.window.connect("size-allocate", self._on_size_allocate)
         self.sync()
-
         if self.settings is not None:
             self.settings.connect("notify::gtk-theme-name", self._on_settings_changed)
             try:
@@ -227,21 +222,11 @@ class GlazeV14Controller:
 
     def _clear_classes(self) -> None:
         context = self.window.get_style_context()
-        for css_class in FORM_FACTOR_CLASSES:
-            context.remove_class(css_class)
-        for css_class in (
-            "care-shell",
-            "care-dark",
-            "care-deep-dark",
-            "expression-calm",
-            "expression-balanced",
-            "expression-expressive",
-            "clarity-clear",
-            "clarity-balanced",
-            "clarity-dense",
-            "reduced-transparency",
-            "reduced-motion",
-            "show-borders",
+        for css_class in FORM_FACTOR_CLASSES + OPTICAL_CLASSES + (
+            "care-shell", "care-dark", "care-deep-dark",
+            "expression-calm", "expression-balanced", "expression-expressive",
+            "clarity-clear", "clarity-balanced", "clarity-dense",
+            "reduced-transparency", "reduced-motion", "show-borders",
         ):
             context.remove_class(css_class)
 
@@ -252,9 +237,7 @@ class GlazeV14Controller:
         resolved_width = width
         if resolved_width is None:
             resolved_width, _ = self.window.get_size()
-        context.add_class(
-            f"form-factor-{native_form_factor_for_window_width(int(resolved_width))}"
-        )
+        context.add_class(f"form-factor-{native_form_factor_for_window_width(int(resolved_width))}")
 
     def sync(self) -> None:
         screen = self.window.get_screen()
@@ -268,7 +251,6 @@ class GlazeV14Controller:
                 Gtk.StyleContext.remove_provider_for_screen(screen, self.provider)
                 self.provider_attached = False
             return
-
         if not self.provider_attached:
             Gtk.StyleContext.add_provider_for_screen(
                 screen, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
@@ -285,7 +267,8 @@ class GlazeV14Controller:
             context.add_class("care-deep-dark")
         context.add_class(f"expression-{expression_profile()}")
         context.add_class(f"clarity-{clarity_profile()}")
-        if reduced_transparency_requested():
+        reduced_transparency = reduced_transparency_requested()
+        if reduced_transparency:
             context.add_class("reduced-transparency")
         animations_enabled: bool | None = None
         if self.settings is not None:
@@ -293,8 +276,16 @@ class GlazeV14Controller:
                 animations_enabled = bool(self.settings.get_property("gtk-enable-animations"))
             except TypeError:
                 animations_enabled = None
-        if reduced_motion_requested(animations_enabled):
+        reduced_motion = reduced_motion_requested(animations_enabled)
+        if reduced_motion:
             context.add_class("reduced-motion")
         if show_borders_requested():
             context.add_class("show-borders")
+        for css_class in window_optical_classes(
+            appearance,
+            reduced_transparency=reduced_transparency,
+            reduced_motion=reduced_motion,
+            increased_contrast=increased_contrast_requested(),
+        ):
+            context.add_class(css_class)
         self._sync_form_factor()
