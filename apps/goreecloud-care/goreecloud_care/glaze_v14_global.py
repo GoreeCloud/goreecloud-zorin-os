@@ -1,4 +1,4 @@
-"""Process-level Glaze UI V1.4 adaptation controller for GoreeCloud Care GTK3."""
+"""Process-level GLAZE UI V1.4 Optical Intelligence controller for Care GTK3."""
 from __future__ import annotations
 
 import gi
@@ -10,13 +10,16 @@ from gi.repository import Gdk, GLib, Gtk  # noqa: E402
 from .glaze_v14 import (
     CSS,
     FORM_FACTOR_CLASSES,
+    OPTICAL_CLASSES,
     appearance_from_theme,
     clarity_profile,
     expression_profile,
+    increased_contrast_requested,
     native_form_factor_for_window_width,
     reduced_motion_requested,
     reduced_transparency_requested,
     show_borders_requested,
+    window_optical_classes,
 )
 from .ui_contract import is_high_contrast_theme
 
@@ -37,7 +40,7 @@ _STATE_CLASSES = (
     "reduced-transparency",
     "reduced-motion",
     "show-borders",
-) + FORM_FACTOR_CLASSES[1:]
+) + FORM_FACTOR_CLASSES[1:] + OPTICAL_CLASSES
 
 
 def _runtime_css(
@@ -49,14 +52,7 @@ def _runtime_css(
     reduced_motion: bool,
     show_borders: bool,
 ) -> bytes:
-    """Resolve safety-critical V1.4 state before any window binding occurs.
-
-    Care installs its process provider before Gtk.Application creates the first
-    window. Appearance, clarity and accessibility state therefore cannot depend
-    on the asynchronous window-added/size-allocate lifecycle. Form-factor
-    selectors intentionally remain class-bound because they require a realized
-    window allocation.
-    """
+    """Resolve safety-critical state before any window binding occurs."""
     data = CSS.replace(b"window.care-shell", b"window")
     data = data.replace(b"window.glaze-v14", b"window")
     if appearance == "dark":
@@ -75,7 +71,7 @@ def _runtime_css(
 
 
 class GlobalGlazeV14Controller:
-    """Synchronize V1.4 appearance and native form-factor state process-wide."""
+    """Synchronize current V1.4 optical/accessibility/layout state process-wide."""
 
     def __init__(self) -> None:
         self.settings = Gtk.Settings.get_default()
@@ -92,9 +88,6 @@ class GlobalGlazeV14Controller:
             except TypeError:
                 pass
 
-        # Install resolved process state immediately. Application/window binding
-        # may happen afterward because only V1.4 form-factor geometry depends on
-        # a concrete window allocation.
         self.sync()
         GLib.timeout_add(100, self._attach_application)
 
@@ -104,7 +97,6 @@ class GlobalGlazeV14Controller:
             for window in Gtk.Window.list_toplevels():
                 self._bind_window(window)
             return True
-
         for window in app.get_windows():
             self._bind_window(window)
         if self._application_handler_id is None:
@@ -142,40 +134,49 @@ class GlobalGlazeV14Controller:
         resolved_width = width
         if resolved_width is None:
             resolved_width, _ = window.get_size()
-        state = native_form_factor_for_window_width(int(resolved_width))
-        context.add_class(f"form-factor-{state}")
+        context.add_class(f"form-factor-{native_form_factor_for_window_width(int(resolved_width))}")
 
     def _sync_window(self, window: Gtk.Window) -> None:
         self._clear_window_state(window)
         theme_name = self.settings.get_property("gtk-theme-name") if self.settings is not None else None
         if is_high_contrast_theme(theme_name):
+            # HighContrast retains system palette authority: Care's provider is
+            # detached in sync(), so no product optical class may override it.
             return
 
         context = window.get_style_context()
         context.add_class("care-shell")
         context.add_class("glaze-v14")
-
         appearance = appearance_from_theme(theme_name)
         if appearance == "dark":
             context.add_class("care-dark")
         elif appearance == "deep-dark":
             context.add_class("care-deep-dark")
-
         context.add_class(f"expression-{expression_profile()}")
         context.add_class(f"clarity-{clarity_profile()}")
-        if reduced_transparency_requested():
-            context.add_class("reduced-transparency")
 
+        reduced_transparency = reduced_transparency_requested()
+        if reduced_transparency:
+            context.add_class("reduced-transparency")
         animations_enabled: bool | None = None
         if self.settings is not None:
             try:
                 animations_enabled = bool(self.settings.get_property("gtk-enable-animations"))
             except TypeError:
                 animations_enabled = None
-        if reduced_motion_requested(animations_enabled):
+        reduced_motion = reduced_motion_requested(animations_enabled)
+        if reduced_motion:
             context.add_class("reduced-motion")
         if show_borders_requested():
             context.add_class("show-borders")
+
+        for css_class in window_optical_classes(
+            appearance,
+            reduced_transparency=reduced_transparency,
+            reduced_motion=reduced_motion,
+            increased_contrast=increased_contrast_requested(),
+        ):
+            context.add_class(css_class)
         self._sync_form_factor(window)
 
     def sync(self) -> None:
@@ -195,7 +196,6 @@ class GlobalGlazeV14Controller:
                     animations_enabled = bool(self.settings.get_property("gtk-enable-animations"))
                 except TypeError:
                     animations_enabled = None
-
             runtime_css = _runtime_css(
                 appearance_from_theme(theme_name),
                 expression=expression_profile(),
@@ -217,7 +217,6 @@ class GlobalGlazeV14Controller:
 
 
 def install_glaze_v14_global_style() -> GlobalGlazeV14Controller:
-    """Install exactly one process-local V1.4 adoption provider."""
     global _controller
     if _controller is None:
         _controller = GlobalGlazeV14Controller()
