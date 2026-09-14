@@ -50,9 +50,12 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
         self.assertIn("source_revision=$SOURCE_REVISION", self.source)
         self.assertIn("package_sha256=$PACKAGE_SHA256", self.source)
         self.assertIn("lifecycle=development", self.source)
-        self.assertIn("glaze_ui_target=2.2.0", self.source)
-        self.assertIn("glaze_ui_release_tag=v2.2.0", self.source)
-        self.assertIn("glaze_ui_source_revision=6731098b28dd0393faa878c70d989a221d714a20", self.source)
+        self.assertIn('GLAZE_TARGET="2.2.0"', self.source)
+        self.assertIn('GLAZE_RELEASE_TAG="v2.2.0"', self.source)
+        self.assertIn('GLAZE_SOURCE_REVISION="6731098b28dd0393faa878c70d989a221d714a20"', self.source)
+        self.assertIn("glaze_ui_target=$GLAZE_TARGET", self.source)
+        self.assertIn("glaze_ui_release_tag=$GLAZE_RELEASE_TAG", self.source)
+        self.assertIn("glaze_ui_source_revision=$GLAZE_SOURCE_REVISION", self.source)
 
     def test_preparation_harness_gates_installed_status_on_exact_runtime(self) -> None:
         self.assertIn('INSTALLED_PROBE_DIR=$(mktemp -d)', self.source)
@@ -67,7 +70,7 @@ class RepresentativeAcceptanceContractTests(unittest.TestCase):
             "Narrow Desktop uses a readable single-column composition",
             "Desktop uses the intended canonical Care composition",
             "Wide Desktop adds breathing room/hierarchy",
-            "Orca scan/completion/cancellation/failure",
+            "Orca/AT-SPI scan, completion, cancellation, failure",
             "Light, Dark, Deep Dark, and HighContrast",
             "Stable-0.1.0-downgrade/0.2.0~dev2-restore/final-state",
             "Glaze UI 2.2 exact-candidate human/native consumer review",
