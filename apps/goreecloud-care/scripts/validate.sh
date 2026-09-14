@@ -159,7 +159,8 @@ grep -F 'is_high_contrast_theme' goreecloud_care/glaze_v22_global.py >/dev/null
 grep -F 'def _runtime_css(' goreecloud_care/glaze_v22_global.py >/dev/null
 grep -F 'self.provider.load_from_data(runtime_css)' goreecloud_care/glaze_v22_global.py >/dev/null
 grep -F 'self.sync()' goreecloud_care/glaze_v22_global.py >/dev/null
-grep -F 'GLib.timeout_add(100, self._attach_application)' goreecloud_care/glaze_v22_global.py >/dev/null
+grep -F 'GLib.idle_add(self._attach_application)' goreecloud_care/glaze_v22_global.py >/dev/null
+! grep -F 'GLib.timeout_add(100, self._attach_application)' goreecloud_care/glaze_v22_global.py >/dev/null
 
 grep -F 'glaze_ui_required: "2.2.0"' goreecloud.platform.yaml >/dev/null
 grep -F 'glaze-ui==2.2.0' goreecloud.platform.yaml >/dev/null
