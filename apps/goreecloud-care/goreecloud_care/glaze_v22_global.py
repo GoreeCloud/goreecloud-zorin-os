@@ -103,7 +103,11 @@ class GlobalGlazeV22Controller:
         # Safety/accessibility state is process-resolved before the first window;
         # only allocation-derived form-factor state waits for concrete windows.
         self.sync()
-        GLib.timeout_add(100, self._attach_application)
+        # Bind on the next GTK idle cycle rather than a fixed-delay timer. This
+        # removes a startup race where a fast-created native window could render
+        # process-level accessibility CSS before receiving its semantic state
+        # classes (for example Touch Assistance) and window-added subscription.
+        GLib.idle_add(self._attach_application)
 
     def _attach_application(self) -> bool:
         app = Gtk.Application.get_default()
