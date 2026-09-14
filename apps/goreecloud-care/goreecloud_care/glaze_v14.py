@@ -27,7 +27,7 @@ from .glaze_v13 import (
     reduced_transparency_requested,
     show_borders_requested,
 )
-from .ui_contract import is_high_contrast_theme
+from .ui_contract import effective_layout_width, is_compact_width, is_high_contrast_theme
 
 GLAZE_UI_LABEL = "GLAZE UI V1.4 — Form-Factor Evolution"
 GLAZE_UI_TARGET_VERSION = "1.4.0"
@@ -66,6 +66,15 @@ def form_factor_environment(effective_width: int, *, compact: bool = False) -> s
     if width <= FORM_FACTOR_DESKTOP_MAX:
         return "desktop"
     return "wide-desktop"
+
+
+def native_form_factor_for_window_width(raw_width: int) -> str:
+    """Resolve a GTK allocation through Care's DPI-aware width contract."""
+    width = max(0, int(raw_width))
+    return form_factor_environment(
+        int(effective_layout_width(width)),
+        compact=is_compact_width(width),
+    )
 
 
 def layout_environment(effective_width: int, *, compact: bool) -> str:
@@ -244,7 +253,7 @@ class GlazeV14Controller:
         if resolved_width is None:
             resolved_width, _ = self.window.get_size()
         context.add_class(
-            f"form-factor-{form_factor_environment(max(0, int(resolved_width)))}"
+            f"form-factor-{native_form_factor_for_window_width(int(resolved_width))}"
         )
 
     def sync(self) -> None:
@@ -278,7 +287,6 @@ class GlazeV14Controller:
         context.add_class(f"clarity-{clarity_profile()}")
         if reduced_transparency_requested():
             context.add_class("reduced-transparency")
-
         animations_enabled: bool | None = None
         if self.settings is not None:
             try:
