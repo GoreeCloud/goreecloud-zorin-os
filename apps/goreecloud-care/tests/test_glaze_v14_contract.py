@@ -48,6 +48,16 @@ class GlazeV14ContractTests(unittest.TestCase):
         self.assertIn("native_form_factor_for_window_width", source)
         self.assertIn("native_form_factor_for_window_width", global_source)
 
+    def test_v14_resolves_safety_critical_state_before_window_binding(self) -> None:
+        global_source = _source("glaze_v14_global.py")
+        self.assertIn("def _runtime_css(", global_source)
+        self.assertIn('data = data.replace(b"window.glaze-v14", b"window")', global_source)
+        self.assertIn("self.provider.load_from_data(runtime_css)", global_source)
+        self.assertLess(
+            global_source.index("self.sync()"),
+            global_source.index("GLib.timeout_add(100, self._attach_application)"),
+        )
+
     def test_v14_preserves_accessibility_degradation_contract(self) -> None:
         source = _source("glaze_v14.py")
         self.assertIn("reduced-transparency", source)
