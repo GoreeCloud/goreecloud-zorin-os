@@ -42,8 +42,8 @@ dpkg --compare-versions "$previous_version" lt "$candidate_version" || {
 candidate_runtime=$(printf '%s' "$candidate_version" | sed 's/~/-/')
 previous_runtime=$(printf '%s' "$previous_version" | sed 's/~/-/')
 
-[ "$candidate_version" = "0.2.0~dev1" ] || {
-  echo "This lifecycle qualification probe expects 0.2.0~dev1; got $candidate_version" >&2
+[ "$candidate_version" = "0.2.0~dev2" ] || {
+  echo "This lifecycle qualification probe expects 0.2.0~dev2; got $candidate_version" >&2
   exit 2
 }
 [ "$previous_version" = "0.1.0" ] || {
@@ -58,7 +58,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 printf '%s\n' "Package lifecycle qualification will temporarily remove and downgrade GoreeCloud Care."
-printf '%s\n' "V1.4 development candidate: $candidate_version"
+printf '%s\n' "Glaze UI 2.2 development candidate: $candidate_version"
 printf '%s\n' "Stable rollback package: $previous_version"
 printf '%s\n' "Representative user: $(id -un) (uid $(id -u))"
 printf '%s\n' "Both candidate and Stable rollback launchers are validated from clean/controlled runtime directories."
@@ -88,11 +88,11 @@ assert_version_from() {
   }
 }
 
-printf '%s\n' "[1/6] Install/upgrade 0.2.0~dev1 candidate"
+printf '%s\n' "[1/6] Install/upgrade 0.2.0~dev2 candidate"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
-printf '%s\n' "[2/6] Remove 0.2.0~dev1 candidate"
+printf '%s\n' "[2/6] Remove 0.2.0~dev2 candidate"
 sudo apt remove -y goreecloud-care
 if dpkg-query -W -f='${Status}' goreecloud-care 2>/dev/null | grep -qx 'install ok installed'; then
   echo "Package still installed after removal" >&2
@@ -117,7 +117,7 @@ done
   exit 1
 }
 
-printf '%s\n' "[3/6] Reinstall 0.2.0~dev1 candidate as a fresh package state"
+printf '%s\n' "[3/6] Reinstall 0.2.0~dev2 candidate as a fresh package state"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
@@ -126,11 +126,11 @@ install_package "$PREVIOUS"
 assert_version_from "$previous_version" "$previous_runtime" "$PREVIOUS_PROBE_DIR"
 (cd "$PREVIOUS_PROBE_DIR" && goreecloud-care --report-json >/dev/null)
 
-printf '%s\n' "[5/6] Restore 0.2.0~dev1 candidate after Stable rollback"
+printf '%s\n' "[5/6] Restore 0.2.0~dev2 candidate after Stable rollback"
 install_package "$CANDIDATE"
 sh "$ROOT/scripts/validate-installed.sh" "$candidate_version" "$candidate_runtime"
 
-printf '%s\n' "[6/6] Final 0.2.0~dev1 candidate package state"
+printf '%s\n' "[6/6] Final 0.2.0~dev2 candidate package state"
 assert_version_from "$candidate_version" "$candidate_runtime" "$ROOT"
 printf '%s\n' "Representative package install/remove/reinstall/stable-downgrade/restore acceptance: passed"
-printf '%s\n' "The 0.2.0~dev1 candidate is installed at the end of the probe; no Care cleanup action was invoked."
+printf '%s\n' "The 0.2.0~dev2 candidate is installed at the end of the probe; no Care cleanup action was invoked."
