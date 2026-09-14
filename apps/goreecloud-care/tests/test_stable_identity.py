@@ -14,25 +14,26 @@ class DevelopmentArtifactIdentityTests(unittest.TestCase):
     def test_platform_manifest_declares_nonconformant_0_2_development_line(self) -> None:
         manifest = (ROOT / "goreecloud.platform.yaml").read_text(encoding="utf-8")
         self.assertIn("\nlifecycle: development\n", manifest)
-        self.assertIn("version: 0.2.0-dev1", manifest)
+        self.assertIn("version: 0.2.0-dev2", manifest)
         self.assertIn("status: nonconformant", manifest)
-        self.assertIn("glaze_ui_required: \"1.4.0\"", manifest)
+        self.assertIn("glaze_ui_required: \"2.2.0\"", manifest)
         self.assertNotIn("\nlifecycle: stable\n", manifest)
 
     def test_runtime_and_python_metadata_are_0_2_development_identity(self) -> None:
         init_source = (ROOT / "goreecloud_care" / "__init__.py").read_text(encoding="utf-8")
         pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-        self.assertIn('__version__ = "0.2.0-dev1"', init_source)
-        self.assertIn('version = "0.2.0-dev1"', pyproject)
+        self.assertIn('__version__ = "0.2.0-dev2"', init_source)
+        self.assertIn('version = "0.2.0-dev2"', pyproject)
         self.assertIn('Development Status :: 3 - Alpha', pyproject)
         self.assertNotIn('Development Status :: 5 - Production/Stable', pyproject)
 
-    def test_core_gtk_identity_is_canonical_and_v14_specific(self) -> None:
+    def test_core_gtk_identity_is_canonical_and_v22_specific(self) -> None:
         source = (ROOT / "goreecloud_care" / "app.py").read_text(encoding="utf-8")
         self.assertIn('APP_ID = "com.goreecloud.care"', source)
         self.assertIn('title="GoreeCloud Care"', source)
-        self.assertIn('from .glaze_v14 import layout_environment', source)
-        self.assertIn('self.header_subtitle = "Local maintenance • Glaze UI V1.4"', source)
+        self.assertIn('from .glaze_v22 import layout_environment', source)
+        self.assertIn('self.header_subtitle = "Local maintenance • Glaze UI 2.2"', source)
+        self.assertNotIn('from .glaze_v14 import layout_environment', source)
         self.assertNotIn('Adaptive Resonance preview', source)
 
     def test_insights_identity_remains_canonical_and_lifecycle_neutral(self) -> None:
@@ -41,7 +42,7 @@ class DevelopmentArtifactIdentityTests(unittest.TestCase):
         self.assertIn('self.header_subtitle = "Read-only local review"', source)
         self.assertNotIn('Release Candidate •', source)
 
-    def test_appstream_preserves_stable_history_and_adds_0_2_development(self) -> None:
+    def test_appstream_preserves_history_and_adds_dev2(self) -> None:
         desktop_path = ROOT / "packaging" / "com.goreecloud.care.desktop"
         metainfo_path = ROOT / "packaging" / "com.goreecloud.care.metainfo.xml"
         desktop = desktop_path.read_text(encoding="utf-8")
@@ -49,13 +50,14 @@ class DevelopmentArtifactIdentityTests(unittest.TestCase):
         self.assertIn("Name=GoreeCloud Care", desktop)
         self.assertIn("StartupWMClass=com.goreecloud.care", desktop)
         self.assertIn("<id>com.goreecloud.care</id>", metainfo)
+        self.assertIn('<release version="0.2.0-dev2" date="2026-09-14" type="development"/>', metainfo)
         self.assertIn('<release version="0.2.0-dev1" date="2026-09-13" type="development"/>', metainfo)
         self.assertIn('<release version="0.1.0" date="2026-09-07" type="stable"/>', metainfo)
 
-    def test_package_build_uses_distinct_0_2_artifact_identity(self) -> None:
+    def test_package_build_uses_distinct_dev2_artifact_identity(self) -> None:
         build = (ROOT / "scripts" / "build-deb.sh").read_text(encoding="utf-8")
-        self.assertIn('VERSION="0.2.0~dev1"', build)
-        self.assertIn('RUNTIME_VERSION="0.2.0-dev1"', build)
+        self.assertIn('VERSION="0.2.0~dev2"', build)
+        self.assertIn('RUNTIME_VERSION="0.2.0-dev2"', build)
         self.assertIn("Description: GoreeCloud Care local-first maintenance utility", build)
         self.assertIn("packaging/com.goreecloud.care.desktop", build)
         self.assertIn("packaging/com.goreecloud.care.metainfo.xml", build)
@@ -63,7 +65,7 @@ class DevelopmentArtifactIdentityTests(unittest.TestCase):
 
     def test_platform_status_package_identity_matches_candidate(self) -> None:
         source = (ROOT / "goreecloud_care" / "platform_status.py").read_text(encoding="utf-8")
-        self.assertIn('PACKAGE_VERSION = "0.2.0~dev1"', source)
+        self.assertIn('PACKAGE_VERSION = "0.2.0~dev2"', source)
         self.assertNotIn('PACKAGE_VERSION = "0.1.0"', source)
 
     def test_stable_0_1_0_acceptance_is_retained_as_historical_only(self) -> None:
@@ -76,11 +78,12 @@ class DevelopmentArtifactIdentityTests(unittest.TestCase):
         self.assertIn(STABLE_PACKAGE_SHA, manifest)
         self.assertIn("Historical Stable 0.1.0 evidence remains here for provenance only", manifest)
 
-    def test_v14_candidate_does_not_inherit_external_platform_acceptance(self) -> None:
+    def test_v14_candidate_is_historical_and_dev2_does_not_inherit_external_acceptance(self) -> None:
         manifest = (ROOT / "goreecloud.platform.yaml").read_text(encoding="utf-8")
         for system in ("privacy_shield", "wardveil_security", "everkeep", "glaze_ui"):
             self.assertIn(f"  {system}:\n    result: applicable-nonconformant", manifest)
-        self.assertIn("0.2.0-dev1 intentionally targets Glaze UI V1.4", manifest)
+        self.assertIn("The qualified 0.2.0-dev1 / Glaze UI V1.4 candidate remains historical migration", manifest)
+        self.assertIn("V1.4 remains historical migration/regression evidence only", manifest)
         self.assertIn("Stable promotion requires a later exact release candidate", manifest)
 
     def test_local_status_producers_still_do_not_self_assign_external_governance(self) -> None:
@@ -88,11 +91,12 @@ class DevelopmentArtifactIdentityTests(unittest.TestCase):
         self.assertIn('"protected_by_wardveil": False', platform_status)
         self.assertIn('production_approved: bool = False', platform_status)
 
-    def test_ci_is_v14_candidate_qualification_not_stable_republication(self) -> None:
+    def test_ci_is_v22_candidate_qualification_not_stable_republication(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "care-ci.yml").read_text(encoding="utf-8")
-        self.assertIn("name: GoreeCloud Care 0.2.0-dev1 Glaze UI V1.4 Qualification", workflow)
-        self.assertIn("goreecloud-care_0.2.0~dev1_all.deb", workflow)
+        self.assertIn("name: GoreeCloud Care 0.2.0-dev2 Glaze UI 2.2 Qualification", workflow)
+        self.assertIn("goreecloud-care_0.2.0~dev2_all.deb", workflow)
         self.assertIn("lifecycle=development", workflow)
+        self.assertIn("glaze_ui_target=2.2.0", workflow)
         self.assertIn("stable_promotion_authorized=false", workflow)
         self.assertIn("build-stable-0.1.0-rollback-package.sh", workflow)
 
