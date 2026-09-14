@@ -14,8 +14,8 @@ NOW = datetime(2026, 9, 7, 19, 10, tzinfo=timezone.utc)
 REVISION = "1" * 40
 TREE = "2" * 40
 PACKAGE_SHA = "3" * 64
-RUNTIME_VERSION = "0.2.0-dev1"
-PACKAGE_VERSION = "0.2.0~dev1"
+RUNTIME_VERSION = "0.2.0-dev2"
+PACKAGE_VERSION = "0.2.0~dev2"
 
 
 class ContinuityTargetBindingTests(unittest.TestCase):
@@ -67,7 +67,7 @@ class ContinuityTargetBindingTests(unittest.TestCase):
                 "exact_revision_accepted": True,
                 "everkeep_integration_promoted": promoted,
                 "everkeep_ready_promoted": promoted,
-                "freshness_rule": "Exact 0.2.0-dev1 candidate and representative target only.",
+                "freshness_rule": "Exact 0.2.0-dev2 candidate and representative target only.",
             },
         }
 
