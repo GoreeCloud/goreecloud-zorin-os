@@ -42,6 +42,7 @@ from goreecloud_care.glaze_v22 import (
 from goreecloud_care.glaze_v22_global import install_glaze_v22_global_style
 from goreecloud_care.insights import CacheGroupInsight, FileInsight, InsightsSnapshot
 import goreecloud_care.insights_window as insights_window
+from goreecloud_care.ui_contract import is_high_contrast_theme
 
 
 def drain_events(limit: int = 500) -> None:
@@ -187,6 +188,31 @@ def test_v22_accessibility_degradation_source_contract() -> None:
     assert "transition:" not in css
     assert "animation:" not in css
     print("Glaze UI 2.2 native accessibility degradation source contract: passed")
+
+
+def test_high_contrast_palette_authority(app: Gtk.Application, glaze) -> None:
+    if not is_high_contrast_theme(os.environ.get("GTK_THEME")):
+        return
+
+    assert not glaze.provider_attached, (
+        "Glaze UI 2.2 provider must be detached while GTK HighContrast owns the palette"
+    )
+    window = CareWindow(app)
+    window.show_all()
+    drain_events()
+    context = window.get_style_context()
+    for application_palette_class in (
+        "care-shell",
+        "glaze-v22",
+        "care-dark",
+        "care-deep-dark",
+        "touch-assistance",
+        "increased-contrast",
+        "effects-reduced",
+    ):
+        assert not context.has_class(application_palette_class), application_palette_class
+    print("GTK HighContrast palette authority: passed (Glaze palette provider detached)")
+    window.destroy()
 
 
 def test_dark_headerbar_runtime_contrast(app: Gtk.Application) -> None:
@@ -364,11 +390,18 @@ def main() -> int:
     if not ok:
         raise SystemExit("GTK could not initialize; run this probe under Xvfb or a desktop session")
 
+    high_contrast = is_high_contrast_theme(os.environ.get("GTK_THEME"))
     glaze = install_glaze_v22_global_style()
-    assert glaze.provider_attached, "Glaze UI 2.2 provider was not attached"
+    if high_contrast:
+        assert not glaze.provider_attached, (
+            "Glaze UI 2.2 provider must be detached while GTK HighContrast owns the palette"
+        )
+    else:
+        assert glaze.provider_attached, "Glaze UI 2.2 provider was not attached"
 
     app = make_app()
     test_v22_system_shell_runtime_contract()
+    test_high_contrast_palette_authority(app, glaze)
     test_core_status_accessible_mutation_and_layout(app)
     test_v22_form_factor_runtime_contract()
     test_v22_accessibility_degradation_source_contract()
