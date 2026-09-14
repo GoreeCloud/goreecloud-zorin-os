@@ -6,11 +6,11 @@ component:
   product_name: GoreeCloud Care
   repository: GoreeCloud/goreecloud-zorin-os
 
-# The immutable Stable 0.1.0 release remains governed by RELEASE-ACCEPTANCE.md.
-# This manifest describes the active Glaze UI V1.4 development line and must not
-# inherit exact-artifact acceptance from that historical release.
+# Immutable Stable 0.1.0 remains governed by RELEASE-ACCEPTANCE.md.
+# This manifest describes the active 0.2.0-dev3 Optical Intelligence adoption
+# candidate and must not inherit exact-artifact acceptance from earlier builds.
 lifecycle: development
-version: 0.2.0-dev1
+version: 0.2.0-dev3
 
 supported_platforms:
   - linux
@@ -49,7 +49,7 @@ platform_systems:
       - contracts/privacy-shield.adapter.json
       - goreecloud_care/platform_status.py
       - RELEASE-ACCEPTANCE.md
-    notes: Stable 0.1.0 has historical Privacy Shield acceptance, but the 0.2.0-dev1 source/package identity requires fresh runtime/production acceptance. Local source evidence intentionally fails closed and cannot self-promote that external governance decision.
+    notes: Stable 0.1.0 has historical Privacy Shield acceptance, but 0.2.0-dev3 is a new exact source/package identity and requires fresh authority acceptance. The Optical Intelligence adapter itself collects no environmental context and local source evidence cannot self-promote production privacy authorization.
   wardveil_security:
     result: applicable-nonconformant
     version: null
@@ -62,7 +62,7 @@ platform_systems:
       - tests/test_helper.py
       - tests/test_privilege.py
       - RELEASE-ACCEPTANCE.md
-    notes: Stable 0.1.0 has historical scoped Wardveil acceptance. The new 0.2.0-dev1 package must independently prove and obtain governance for the local-maintenance-privilege-boundary before any Wardveil protection claim transfers.
+    notes: Stable 0.1.0 has historical scoped Wardveil acceptance. The 0.2.0-dev3 package must independently prove and obtain governance for the local-maintenance-privilege-boundary before any Wardveil protection claim transfers.
   everkeep:
     result: applicable-nonconformant
     version: null
@@ -74,7 +74,7 @@ platform_systems:
       - goreecloud_care/platform_status.py
       - scripts/validate-package-lifecycle.sh
       - scripts/run-representative-acceptance.sh
-    notes: Historical 0.1.0 recovery readiness is exact-build scoped. 0.2.0-dev1 requires new package lifecycle, representative-target, exact package SHA, and separate Everkeep promotion evidence.
+    notes: Historical 0.1.0 recovery readiness is exact-build scoped. 0.2.0-dev3 requires new package lifecycle, representative-target, exact package SHA, and separate Everkeep promotion evidence.
   glaze_ui:
     result: applicable-nonconformant
     version: "1.4.0"
@@ -83,6 +83,7 @@ platform_systems:
       - GLAZE-UI-V1.4-MIGRATION.md
       - BRANDING.md
       - goreecloud_care/glaze_v14.py
+      - goreecloud_care/glaze_v14_optical.py
       - goreecloud_care/glaze_v14_global.py
       - goreecloud_care/glaze_v13.py
       - tests/test_glaze_v14_contract.py
@@ -90,8 +91,8 @@ platform_systems:
       - tests/test_focus_resilience.py
       - tests/test_accessibility_identity.py
       - tests/runtime_ui_acceptance.py
-      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/01c86323f8b747373d308026adc8b0881855cdc5
-    notes: GoreeCloud Care 0.2.0-dev1 intentionally targets Glaze UI V1.4 / 1.4.0. Platform Contract 0.3 permits a Development component to declare that forward target without treating it as Stable acceptance. The design-system release and automated implementation evidence do not independently grant downstream Care conformance; exact representative rendered/native and consumer acceptance remain required.
+      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/ee057ce9e729296aeaeda182d01db89f52bd66f3
+    notes: The live Glaze lifecycle and consumer registries require GLAZE UI V1.4 / 1.4.0 Optical Intelligence and mark Care adoption-required / productionEligible=false. Dev3 implements a repository-local deterministic adapter against current main authority ee057ce9e729296aeaeda182d01db89f52bd66f3. Implementation and automated evidence do not independently grant downstream Care conformance; exact qualification and application-specific acceptance remain required.
   mesh:
     result: not-applicable-justified
     version: null
@@ -124,7 +125,7 @@ continuity:
   restore:
     required: true
     requirements:
-      - The exact 0.2.0-dev1 / 0.2.0~dev1 candidate must pass install, remove/reinstall, downgrade, restore, final installed validation, provenance, and representative-target handoff before release promotion.
+      - The exact 0.2.0-dev3 / 0.2.0~dev3 candidate must pass install, remove/reinstall, downgrade, restore, final installed validation, provenance, and representative-target handoff before release promotion.
       - Historical Stable 0.1.0 recovery evidence remains audit/rollback context and does not accept the new candidate.
       - Permanent Trash deletion is irreversible maintenance behavior and is not represented as recoverable application data.
   export:
@@ -167,8 +168,8 @@ compatibility:
 
 evidence:
   acceptance_tests:
-    # Historical Stable 0.1.0 evidence remains here for provenance only. These
-    # records do not grant acceptance to the active 0.2.0-dev1 candidate.
+    # Historical Stable 0.1.0 evidence is retained for provenance only. These
+    # records do not grant acceptance to the active 0.2.0-dev3 candidate.
     - id: care-0.1.0-api
       category: api
       path: apps/goreecloud-care/API.md
@@ -256,11 +257,13 @@ conformance:
     - apps/goreecloud-care/GLAZE-UI-CONFORMANCE.md
     - apps/goreecloud-care/GLAZE-UI-V1.4-MIGRATION.md
     - apps/goreecloud-care/goreecloud_care/glaze_v14.py
+    - apps/goreecloud-care/goreecloud_care/glaze_v14_optical.py
     - apps/goreecloud-care/goreecloud_care/glaze_v14_global.py
   blockers:
-    - Exact 0.2.0-dev1 automated qualification must pass after the new artifact identity split.
-    - Glaze UI V1.4 representative rendered/native acceptance is required on Zorin OS 17.3 for the exact candidate.
-    - Privacy Shield must independently accept the exact 0.2.0 candidate before production privacy status can be claimed.
-    - Wardveil must independently govern the exact 0.2.0 privilege-boundary evidence before protection permission can transfer.
-    - Everkeep must independently accept exact 0.2.0 restore/rollback evidence before continuity can become ready.
-    - Stable promotion requires a later exact release candidate and cannot be inferred from historical 0.1.0 acceptance.
+    - Exact 0.2.0-dev3 automated qualification must pass for the new source/package identity.
+    - GLAZE UI V1.4 / 1.4.0 consumer acceptance is not granted merely by implementing the Stable design-system contract.
+    - Representative rendered/native acceptance on Zorin OS 17.3 is required for the exact dev3 candidate where the applicable consumer authority requires it.
+    - Privacy Shield must independently accept the exact dev3 candidate before production privacy status can be claimed.
+    - Wardveil must independently govern the exact dev3 privilege-boundary evidence before protection permission can transfer.
+    - Everkeep must independently accept exact dev3 restore/rollback evidence before continuity can become ready.
+    - Stable promotion requires a later explicit exact-candidate decision and cannot be inferred from historical 0.1.0, dev1, or dev2 evidence.
