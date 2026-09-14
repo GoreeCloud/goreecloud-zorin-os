@@ -4,8 +4,11 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 OUT=${1:-"$ROOT/dist/representative-runtime"}
-EXPECTED_RUNTIME_VERSION="0.2.0-dev1"
-EXPECTED_PACKAGE_VERSION="0.2.0~dev1"
+EXPECTED_RUNTIME_VERSION="0.2.0-dev2"
+EXPECTED_PACKAGE_VERSION="0.2.0~dev2"
+GLAZE_TARGET="2.2.0"
+GLAZE_SOURCE_REVISION="6731098b28dd0393faa878c70d989a221d714a20"
+GLAZE_RELEASE_TAG="v2.2.0"
 CANDIDATE="$ROOT/dist/goreecloud-care_${EXPECTED_PACKAGE_VERSION}_all.deb"
 ROLLBACK_DIR="$ROOT/dist/rollback"
 ROLLBACK="$ROLLBACK_DIR/goreecloud-care_0.1.0_all.deb"
@@ -38,7 +41,7 @@ case "${PRETTY_NAME:-}" in
     ;;
 esac
 
-TRACKED_CHANGES=$(git -C "$REPO_ROOT" status --porcelain --untracked-files=no -- apps/goreecloud-care .github/workflows/care-ci.yml)
+TRACKED_CHANGES=$(git -C "$REPO_ROOT" status --porcelain --untracked-files=no -- apps/goreecloud-care .github/workflows/care-ci.yml .github/workflows/care-platform-contract.yml)
 [ -z "$TRACKED_CHANGES" ] || {
   echo "Tracked Care/CI changes are present. Commit or stash them before exact-candidate acceptance." >&2
   printf '%s\n' "$TRACKED_CHANGES" >&2
@@ -55,15 +58,19 @@ RUNTIME_VERSION=$(PYTHONPATH="$ROOT" python3 -c 'from goreecloud_care import __v
 }
 
 grep -Fx 'lifecycle: development' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Representative 0.2.0-dev1 acceptance requires lifecycle: development in goreecloud.platform.yaml." >&2
+  echo "Representative 0.2.0-dev2 acceptance requires lifecycle: development in goreecloud.platform.yaml." >&2
   exit 2
 }
 grep -F 'status: nonconformant' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Representative 0.2.0-dev1 acceptance must remain nonconformant until separate governed promotion." >&2
+  echo "Representative 0.2.0-dev2 acceptance must remain nonconformant until separate governed promotion." >&2
   exit 2
 }
-grep -F 'glaze_ui_required: "1.4.0"' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
-  echo "Representative 0.2.0-dev1 acceptance requires Glaze UI 1.4.0." >&2
+grep -F 'glaze_ui_required: "2.2.0"' "$ROOT/goreecloud.platform.yaml" >/dev/null || {
+  echo "Representative 0.2.0-dev2 acceptance requires Glaze UI 2.2.0." >&2
+  exit 2
+}
+grep -F "$GLAZE_SOURCE_REVISION" "$ROOT/goreecloud_care/glaze_v22.py" >/dev/null || {
+  echo "Representative acceptance requires pinned Glaze UI 2.2 source $GLAZE_SOURCE_REVISION." >&2
   exit 2
 }
 
@@ -79,16 +86,17 @@ rm -f \
   "$OUT/continuity-installed.json" \
   "$OUT/SOURCE_REVISION"
 
-printf '%s\n' "GoreeCloud Care exact 0.2.0-dev1 Glaze UI V1.4 representative-target acceptance"
+printf '%s\n' "GoreeCloud Care exact 0.2.0-dev2 Glaze UI 2.2 representative-target acceptance"
 printf '%s\n' "Target:          ${PRETTY_NAME}"
 printf '%s\n' "Source branch:   $SOURCE_BRANCH"
 printf '%s\n' "Source revision: $SOURCE_REVISION"
 printf '%s\n' "Source tree:     $SOURCE_TREE"
 printf '%s\n' "Runtime:         $RUNTIME_VERSION"
+printf '%s\n' "Glaze UI:        $GLAZE_TARGET ($GLAZE_RELEASE_TAG @ $GLAZE_SOURCE_REVISION)"
 printf '%s\n' "Governed lifecycle: Development / nonconformant"
 printf '%s\n' "This runner performs package install/remove/reinstall/Stable-0.1.0-downgrade/restore through the lifecycle probe."
 printf '%s\n' "It never invokes a Care cleanup action and never writes or promotes an Everkeep governance record."
-printf '%s\n' "It also does not self-accept Glaze UI V1.4 human/native review, Privacy Shield, Wardveil, or Stable promotion."
+printf '%s\n' "It also does not self-accept Glaze UI 2.2 human/native review, Privacy Shield, Wardveil, Platform Contract, or Stable promotion."
 
 (
   cd "$ROOT"
@@ -176,7 +184,9 @@ lifecycle=development
 runtime_version=$EXPECTED_RUNTIME_VERSION
 package_version=$EXPECTED_PACKAGE_VERSION
 package_sha256=$PACKAGE_SHA256
-glaze_ui_target=1.4.0
+glaze_ui_target=$GLAZE_TARGET
+glaze_ui_release_tag=$GLAZE_RELEASE_TAG
+glaze_ui_source_revision=$GLAZE_SOURCE_REVISION
 glaze_ui_manual_acceptance=false
 stable_promotion_authorized=false
 representative_target=${PRETTY_NAME}
@@ -190,7 +200,8 @@ EOF
 
 python3 - "$OUT/representative-target.json" \
   "$SOURCE_REVISION" "$SOURCE_TREE" "$EXPECTED_RUNTIME_VERSION" \
-  "$EXPECTED_PACKAGE_VERSION" "$PACKAGE_SHA256" "$LOCAL_TESTS" "$PRETTY_NAME" <<'PY'
+  "$EXPECTED_PACKAGE_VERSION" "$PACKAGE_SHA256" "$LOCAL_TESTS" "$PRETTY_NAME" \
+  "$GLAZE_SOURCE_REVISION" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -204,6 +215,7 @@ from pathlib import Path
     package_sha256,
     local_tests,
     target_name,
+    glaze_source_revision,
 ) = sys.argv[1:]
 payload = {
     "schema_version": 1,
@@ -215,7 +227,9 @@ payload = {
         "runtime_version": runtime_version,
         "package_version": package_version,
         "package_sha256": package_sha256,
-        "glaze_ui_target": "1.4.0",
+        "glaze_ui_target": "2.2.0",
+        "glaze_ui_release_tag": "v2.2.0",
+        "glaze_ui_source_revision": glaze_source_revision,
     },
     "target": {
         "name": target_name,
@@ -233,6 +247,7 @@ payload = {
         "source_validation": "passed",
         "package_lifecycle": "passed",
         "glaze_ui_manual_acceptance": "pending",
+        "glaze_ui_authority_acceptance": "pending",
         "references": [
             "source-validation.log",
             "reproducible-package.log",
@@ -250,8 +265,9 @@ payload = {
         "freshness_rule": (
             "This Care-produced representative-target record applies only to the exact source revision, "
             "Care source tree, package version, package SHA-256, and representative target named here. "
-            "It proves package/runtime target acceptance only and cannot grant Glaze UI human/native acceptance, "
-            "Privacy Shield production approval, Wardveil governance, Everkeep readiness, or Stable promotion."
+            "It proves package/runtime target acceptance only and cannot grant Glaze UI 2.2 human/native or "
+            "authority acceptance, Privacy Shield production approval, Wardveil governance, Everkeep readiness, "
+            "Platform Contract promotion, release acceptance, or Stable promotion."
         ),
     },
 }
@@ -278,12 +294,14 @@ PY
 
 goreecloud-care --continuity-status-json > "$OUT/continuity-installed.json"
 
-printf '%s\n' "Representative 0.2.0-dev1 target runtime/package acceptance: passed"
+printf '%s\n' "Representative 0.2.0-dev2 target runtime/package acceptance: passed"
 printf '%s\n' "Local tests: $LOCAL_TESTS"
 printf '%s\n' "Candidate SHA-256: $PACKAGE_SHA256"
 printf '%s\n' "Care-owned target handoff: $OUT/representative-target.json"
 printf '%s\n' "Protected local target handoff: $REPRESENTATIVE_RECORD"
-printf '%s\n' "Glaze UI V1.4 human/native acceptance: pending"
+printf '%s\n' "Glaze UI 2.2 human/native acceptance: pending"
+printf '%s\n' "Glaze UI 2.2 authority acceptance: pending"
 printf '%s\n' "Everkeep promotion: not performed by this runner"
+printf '%s\n' "Platform Contract promotion: not performed by this runner"
 printf '%s\n' "Stable promotion authorized: false"
-printf '%s\n' "The exact 0.2.0-dev1 source remains Development / nonconformant until V1.4 human/native review and separate applicable platform governance are satisfied."
+printf '%s\n' "The exact 0.2.0-dev2 source remains Development / nonconformant until current Glaze UI 2.2 human/native review and all separately applicable platform governance are satisfied."
