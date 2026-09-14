@@ -22,15 +22,15 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
         self.assertIn("Zorin OS 17.3", self.source)
         self.assertIn("PRETTY_NAME", self.source)
 
-    def test_runner_requires_clean_exact_v14_candidate_source_and_tree(self) -> None:
+    def test_runner_requires_clean_exact_v22_candidate_source_and_tree(self) -> None:
         self.assertIn('status --porcelain --untracked-files=no -- apps/goreecloud-care .github/workflows/care-ci.yml', self.source)
         self.assertIn('SOURCE_REVISION=$(git -C "$REPO_ROOT" rev-parse HEAD)', self.source)
         self.assertIn('SOURCE_TREE=$(git -C "$REPO_ROOT" rev-parse HEAD:apps/goreecloud-care)', self.source)
-        self.assertIn('EXPECTED_RUNTIME_VERSION="0.2.0-dev1"', self.source)
-        self.assertIn('EXPECTED_PACKAGE_VERSION="0.2.0~dev1"', self.source)
+        self.assertIn('EXPECTED_RUNTIME_VERSION="0.2.0-dev2"', self.source)
+        self.assertIn('EXPECTED_PACKAGE_VERSION="0.2.0~dev2"', self.source)
         self.assertIn("requires lifecycle: development", self.source)
         self.assertIn("status: nonconformant", self.source)
-        self.assertIn('glaze_ui_required: \"1.4.0\"', self.source)
+        self.assertIn('glaze_ui_required: \"2.2.0\"', self.source)
 
     def test_runner_executes_all_automatable_exact_candidate_gates(self) -> None:
         for required in (
@@ -52,7 +52,8 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
             '"schema_version": 1',
             '"application": "GoreeCloud Care"',
             '"producer": "GoreeCloud/goreecloud-zorin-os/apps/goreecloud-care"',
-            '"glaze_ui_target": "1.4.0"',
+            '"glaze_ui_target": "2.2.0"',
+            '"glaze_ui_release_tag": "v2.2.0"',
             '"restore_capability"',
             '"migration"',
             '"documentation"',
@@ -60,14 +61,16 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
             '"target_runtime_status": "passed"',
             '"exact_revision_accepted": True',
             '"glaze_ui_manual_acceptance": "pending"',
+            '"glaze_ui_authority_acceptance": "pending"',
             '"everkeep_integration_promoted": False',
             '"everkeep_ready_promoted": False',
             '"stable_promotion_authorized": False',
         ):
             self.assertIn(required, self.source)
+        self.assertIn("6731098b28dd0393faa878c70d989a221d714a20", self.source)
         self.assertIn("lifecycle=development", self.source)
         self.assertIn("package_version=$EXPECTED_PACKAGE_VERSION", self.source)
-        self.assertIn("glaze_ui_target=1.4.0", self.source)
+        self.assertIn("glaze_ui_target=2.2.0", self.source)
         self.assertIn("stable_promotion_authorized=false", self.source)
 
     def test_runner_installs_only_care_owned_root_protected_target_record(self) -> None:
@@ -86,8 +89,9 @@ class RepresentativeRuntimeRunnerContractTests(unittest.TestCase):
         self.assertIn("Everkeep promotion: not performed by this runner", self.source)
 
     def test_runner_reports_candidate_acceptance_without_glaze_or_stable_claim(self) -> None:
-        self.assertIn("Representative 0.2.0-dev1 target runtime/package acceptance: passed", self.source)
-        self.assertIn("Glaze UI V1.4 human/native acceptance: pending", self.source)
+        self.assertIn("Representative 0.2.0-dev2 target runtime/package acceptance: passed", self.source)
+        self.assertIn("Glaze UI 2.2 human/native acceptance: pending", self.source)
+        self.assertIn("Glaze UI 2.2 authority acceptance: pending", self.source)
         self.assertIn("Stable promotion authorized: false", self.source)
         self.assertIn("remains Development / nonconformant", self.source)
         self.assertNotIn("Stable / conformant", self.source)
