@@ -1,21 +1,22 @@
-"""Deterministic GoreeCloud Care adapter for GLAZE UI V1.4 Optical Intelligence.
+"""Deterministic GoreeCloud Care adapter for GLAZE UI V1.4.1 Optical Intelligence.
 
-This module mirrors the bounded resolver contract in the current Glaze UI
-``js/glaze-v1.4-optical-engine.mjs`` authority. It does not collect signals.
-Callers may provide already-derived local context only through independently
-approved Privacy Shield / Wardveil boundaries. Care's default adapter uses no
-camera, wallpaper inspection, telemetry, analytics, network, or remote context.
+The V1.4.0 resolver remains the bounded optical foundation. V1.4.1 adds a
+fail-safe consumer-adapter boundary plus bounded downgrade-only performance
+governance. Care does not collect environmental signals itself. Its default
+runtime uses only already-known local UI state and requires no camera, wallpaper
+inspection, telemetry, analytics, network, remote context, or device identity.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping, Protocol
 
 LUMINANCE = frozenset({"dark", "mid", "bright", "unknown"})
 COMPLEXITY = frozenset({"simple", "moderate", "complex", "unknown"})
 DEPTH = frozenset({"base", "raised", "overlay", "modal"})
 DAYPART = frozenset({"dawn", "day", "dusk", "night", "unknown"})
 APPEARANCE = frozenset({"light", "dark", "deep-dark"})
+PERFORMANCE_LEVELS = ("full", "balanced", "efficient", "durable")
 MAX_MEMORY_TINT_INFLUENCE = 0.08
 
 
@@ -81,6 +82,20 @@ class OpticalState:
     accessibility: OpticalAccessibility
 
 
+@dataclass(frozen=True)
+class OpticalResolution:
+    state: OpticalState
+    adapter_status: str
+    requested_performance_level: str
+    accepted_performance_level: str
+    downgrade_reason: str | None
+
+
+class SignalAdapter(Protocol):
+    def resolve(self) -> Mapping[str, Any]:
+        ...
+
+
 def _normalize_accessibility(value: Any) -> OpticalAccessibility:
     source = value if isinstance(value, Mapping) else {}
     return OpticalAccessibility(
@@ -108,7 +123,7 @@ def _normalize_memory_tint(value: Any) -> MemoryTint | None:
 
 
 def resolve_glaze_optics(options: Mapping[str, Any] | None = None) -> OpticalState:
-    """Resolve the bounded V1.4 optical state without collecting any context."""
+    """Resolve the bounded V1.4 optical foundation without collecting context."""
     source: Mapping[str, Any] = options if isinstance(options, Mapping) else {}
     complexity = _bounded(source.get("backgroundComplexity"), COMPLEXITY, "unknown")
     luminance = _bounded(source.get("backgroundLuminance"), LUMINANCE, "unknown")
@@ -172,6 +187,154 @@ def resolve_glaze_optics(options: Mapping[str, Any] | None = None) -> OpticalSta
     )
 
 
+def _normalize_performance_level(value: Any, fallback: str = "full") -> str:
+    if isinstance(value, str) and value in PERFORMANCE_LEVELS:
+        return value
+    return fallback
+
+
+def accept_performance_level(
+    requested: str,
+    *,
+    current: str = "full",
+) -> tuple[str, str | None]:
+    """Apply V1.4.1 downgrade-only in-session optical performance governance."""
+    current_level = _normalize_performance_level(current)
+    requested_level = _normalize_performance_level(requested, current_level)
+    current_rank = PERFORMANCE_LEVELS.index(current_level)
+    requested_rank = PERFORMANCE_LEVELS.index(requested_level)
+    if requested_rank < current_rank:
+        return current_level, "upgrade-blocked-downgrade-only"
+    if requested_rank > current_rank:
+        return requested_level, "capability-or-performance-downgrade"
+    return current_level, None
+
+
+def _apply_performance_level(state: OpticalState, level: str) -> OpticalState:
+    if state.mode == "solid-accessible" or level == "full":
+        return state
+    semantic_floor = {
+        "balanced": 0.88,
+        "efficient": 0.94,
+        "durable": 1.0,
+    }[level]
+    blur_cap = {
+        "balanced": 0.58,
+        "efficient": 0.30,
+        "durable": 0.0,
+    }[level]
+    memory_tint = state.memory_tint if level == "balanced" else None
+    decorative = state.decorative_tint_allowed and level == "balanced"
+    frost_strength = max(state.frost_strength, 0.66 if level == "balanced" else 0.82)
+    if level == "durable":
+        return OpticalState(
+            mode="solid-accessible",
+            appearance=state.appearance,
+            background_complexity=state.background_complexity,
+            background_luminance=state.background_luminance,
+            depth=state.depth,
+            daypart=state.daypart,
+            frost_strength=1.0,
+            blur_scale=0.0,
+            semantic_protection=1.0,
+            depth_hue_shift=0.0,
+            warmth=0.0,
+            memory_tint=None,
+            decorative_tint_allowed=False,
+            accessibility=state.accessibility,
+        )
+    return OpticalState(
+        mode=state.mode,
+        appearance=state.appearance,
+        background_complexity=state.background_complexity,
+        background_luminance=state.background_luminance,
+        depth=state.depth,
+        daypart=state.daypart,
+        frost_strength=_clamp(frost_strength, 0.20, 0.92),
+        blur_scale=min(state.blur_scale, blur_cap),
+        semantic_protection=max(state.semantic_protection, semantic_floor),
+        depth_hue_shift=state.depth_hue_shift if level == "balanced" else 0.0,
+        warmth=state.warmth if level == "balanced" else 0.0,
+        memory_tint=memory_tint,
+        decorative_tint_allowed=decorative,
+        accessibility=state.accessibility,
+    )
+
+
+def resolve_glaze_optics_v141(
+    *,
+    signal_adapter: SignalAdapter | None = None,
+    overrides: Mapping[str, Any] | None = None,
+    on_adapter_error: Callable[[Exception], None] | None = None,
+    requested_performance_level: str = "full",
+    current_performance_level: str = "full",
+) -> OpticalResolution:
+    """Resolve V1.4.1 with fail-safe adapter handling and bounded performance.
+
+    Raw adapter errors never appear in the returned resolution. Optional local
+    diagnostics may observe the exception, but observer failures are swallowed.
+    """
+    override_map = dict(overrides) if isinstance(overrides, Mapping) else {}
+    adapter_status = "not-configured"
+    source: dict[str, Any] = {}
+
+    if signal_adapter is not None:
+        try:
+            resolved = signal_adapter.resolve()
+            if isinstance(resolved, Mapping):
+                source.update(resolved)
+                adapter_status = "resolved"
+            else:
+                adapter_status = "resolved-bounded"
+        except Exception as exc:  # fail closed at the consumer adapter boundary
+            if on_adapter_error is not None:
+                try:
+                    on_adapter_error(exc)
+                except Exception:
+                    pass
+            source.update(override_map)
+            accessibility = source.get("accessibility")
+            accessibility_map = (
+                dict(accessibility) if isinstance(accessibility, Mapping) else {}
+            )
+            accessibility_map["forcedColors"] = True
+            accessibility_map["reducedTransparency"] = True
+            source["accessibility"] = accessibility_map
+            state = resolve_glaze_optics(source)
+            accepted_level, downgrade_reason = accept_performance_level(
+                requested_performance_level,
+                current=current_performance_level,
+            )
+            return OpticalResolution(
+                state=state,
+                adapter_status="failed-safe",
+                requested_performance_level=_normalize_performance_level(
+                    requested_performance_level,
+                    current_performance_level,
+                ),
+                accepted_performance_level=accepted_level,
+                downgrade_reason=downgrade_reason or "adapter-failure-solid-accessible",
+            )
+
+    source.update(override_map)
+    state = resolve_glaze_optics(source)
+    accepted_level, downgrade_reason = accept_performance_level(
+        requested_performance_level,
+        current=current_performance_level,
+    )
+    state = _apply_performance_level(state, accepted_level)
+    return OpticalResolution(
+        state=state,
+        adapter_status=adapter_status,
+        requested_performance_level=_normalize_performance_level(
+            requested_performance_level,
+            current_performance_level,
+        ),
+        accepted_performance_level=accepted_level,
+        downgrade_reason=downgrade_reason,
+    )
+
+
 def care_default_optical_state(
     *,
     appearance: str,
@@ -181,16 +344,11 @@ def care_default_optical_state(
     forced_colors: bool = False,
     depth: str = "base",
     semantic_importance: float = 0.80,
+    performance_level: str = "full",
 ) -> OpticalState:
-    """Resolve Care's privacy-safe default state from already-known local UI state.
-
-    Background complexity, wallpaper/content luminance, daypart, and memory tint
-    intentionally remain unknown/disabled unless a separately governed adapter is
-    introduced later. This keeps the default implementation local, deterministic,
-    minimized, and independent from environmental data collection.
-    """
-    return resolve_glaze_optics(
-        {
+    """Resolve Care's privacy-safe default V1.4.1 state from local UI state."""
+    resolution = resolve_glaze_optics_v141(
+        overrides={
             "appearance": appearance,
             "backgroundComplexity": "unknown",
             "backgroundLuminance": "dark" if appearance in {"dark", "deep-dark"} else "bright",
@@ -203,8 +361,11 @@ def care_default_optical_state(
                 "increasedContrast": increased_contrast,
                 "reducedMotion": reduced_motion,
             },
-        }
+        },
+        requested_performance_level=performance_level,
+        current_performance_level="full",
     )
+    return resolution.state
 
 
 def optical_css_classes(state: OpticalState) -> tuple[str, ...]:
@@ -226,17 +387,24 @@ def optical_css_classes(state: OpticalState) -> tuple[str, ...]:
     return tuple(classes)
 
 
-GLAZE_OPTICAL_ENGINE_V14 = {
-    "version": "1.4.0",
-    "lifecycle": "stable",
+GLAZE_OPTICAL_ENGINE_V14_1 = {
+    "version": "1.4.1",
+    "stable_baseline": "1.4.0",
+    "lifecycle": "stable-adoption-target",
     "telemetry_required": False,
     "remote_context_required": False,
     "preserves_token_system": True,
     "additive_component_api": True,
     "max_memory_tint_influence": MAX_MEMORY_TINT_INFLUENCE,
+    "performance_levels": PERFORMANCE_LEVELS,
+    "performance_governance": "downgrade-only-in-session",
+    "adapter_failure_mode": "solid-accessible",
+    "adapter_failure_status": "failed-safe",
     "accessibility_precedence": (
         "forced-colors",
         "reduced-transparency",
         "increased-contrast",
     ),
 }
+
+GLAZE_OPTICAL_ENGINE_V14 = GLAZE_OPTICAL_ENGINE_V14_1

@@ -1,10 +1,10 @@
-"""GLAZE UI V1.4 Optical Intelligence adaptation for GoreeCloud Care.
+"""GLAZE UI V1.4.1 Optical Intelligence adaptation for GoreeCloud Care.
 
-The current Glaze UI authority defines 1.4.0 as Official Stable and names the
-release Optical Intelligence. Care maps that contract to GTK3 conservatively:
+The current Glaze UI authority defines 1.4.1 as Official Stable in the V1.4
+Optical Intelligence family. Care maps that contract to GTK3 conservatively:
 optical adaptation is local and deterministic, accessibility always outranks
-decoration, and unsupported compositor effects degrade before content, focus,
-or maintenance correctness.
+decoration, adapter faults fail safe, and unsupported compositor effects
+degrade before content, focus, or maintenance correctness.
 
 Care's compact/narrow/desktop/wide window states remain application-owned GTK
 layout behavior. They are useful responsive behavior, but they are not treated
@@ -32,13 +32,15 @@ from .glaze_v14_optical import care_default_optical_state, optical_css_classes
 from .ui_contract import effective_layout_width, is_compact_width, is_high_contrast_theme
 
 GLAZE_UI_LABEL = "GLAZE UI V1.4 — Optical Intelligence"
-GLAZE_UI_TARGET_VERSION = "1.4.0"
+GLAZE_UI_TARGET_VERSION = "1.4.1"
 GLAZE_UI_LIFECYCLE = "official-stable-adoption"
 GLAZE_UI_ADOPTION_STATE = "development"
 GLAZE_UI_CONSUMER_ELIGIBLE = False
-GLAZE_UI_SOURCE_REVISION = "ee057ce9e729296aeaeda182d01db89f52bd66f3"
+GLAZE_UI_SOURCE_REVISION = "4fab9da0fad2e5c974e0e66ec88632c61745751c"
+GLAZE_UI_SOURCE_QUALIFICATION_ANCHOR = "66478aed461b83c49b2ed027c3e4afc26520e98c"
+# Historical V1.4.0 integration anchor retained for audit/reference compatibility.
 GLAZE_UI_SOURCE_INTEGRATION_ANCHOR = "a20374734dae6a119b28448f5e6b3232253b6da7"
-GLAZE_UI_PREVIOUS_BASELINE = "1.3.0"
+GLAZE_UI_PREVIOUS_BASELINE = "1.4.0"
 MIN_TARGET_PX = 48
 
 INCREASED_CONTRAST_ENV = "GOREECLOUD_CARE_INCREASED_CONTRAST"
@@ -127,7 +129,7 @@ def window_optical_classes(
 
 
 V14_CSS = b"""
-/* Care maps V1.4 Optical Intelligence into bounded GTK3 native treatment.
+/* Care maps V1.4.1 Optical Intelligence into bounded GTK3 native treatment.
    GTK3 does not claim compositor-authoritative backdrop sampling or blur. */
 window.glaze-v14.optical-adaptive-optical headerbar,
 window.glaze-v14.optical-adaptive-optical .chrome-plane {

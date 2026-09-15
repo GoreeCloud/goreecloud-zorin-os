@@ -71,7 +71,9 @@ case "$SOURCE_DATE_EPOCH" in
     exit 2
     ;;
 esac
-export SOURCE_DATE_EPOCH LC_ALL=C TZ=UTC
+export SOURCE_DATE_EPOCH
+export LC_ALL=C
+export TZ=UTC
 
 STAGE=$(mktemp -d)
 chmod 0755 "$STAGE"
@@ -125,6 +127,7 @@ import sys
 from pathlib import Path
 
 out, revision, tree, runtime_version, package_version, epoch = sys.argv[1:]
+# The package digest is intentionally external: embedding a package's own hash is circular.
 payload = {
     "schema_version": 1,
     "application": "GoreeCloud Care",
@@ -139,7 +142,11 @@ payload = {
 Path(out).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 PY
 chmod 0644 "$STAGE/usr/share/goreecloud-care/build-provenance.json"
+
+# Caller umask is not part of package identity. Canonicalize generated/staged modes.
 find "$STAGE" -type d -exec chmod 0755 {} +
+chmod 0644 "$STAGE/DEBIAN/control"
+chmod 0644 "$STAGE/usr/lib/goreecloud-care/goreecloud_care.pth"
 find "$STAGE" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +
 dpkg-deb --root-owner-group --deb-format=2.0 -Znone --build "$STAGE" "$OUT/${PKG}_${VERSION}_${ARCH}.deb" >/dev/null
 printf '%s\n' "$OUT/${PKG}_${VERSION}_${ARCH}.deb"
