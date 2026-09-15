@@ -120,8 +120,9 @@ def test_core_status_accessible_mutation_and_layout(app: Gtk.Application) -> Non
 
 
 def test_v14_form_factor_runtime_contract() -> None:
-    # GDK_DPI_SCALE=2 is set for this acceptance probe. V1.4 classification must
-    # therefore follow Care's effective-width contract instead of raw pixels.
+    # GDK_DPI_SCALE=2 is set for this acceptance probe. Care's responsive
+    # composition remains application-owned behavior beneath V1.4.1 Optical
+    # Intelligence, and must continue to use effective rather than raw width.
     assert native_form_factor_for_window_width(480) == "compact"
     assert native_form_factor_for_window_width(1800) == "narrow-desktop"
     assert native_form_factor_for_window_width(2200) == "desktop"
@@ -131,7 +132,7 @@ def test_v14_form_factor_runtime_contract() -> None:
     assert "window.glaze-v14.form-factor-narrow-desktop" in css
     assert "window.glaze-v14.form-factor-desktop" in css
     assert "window.glaze-v14.form-factor-wide-desktop" in css
-    print("Glaze UI V1.4 DPI-aware form-factor runtime contract: passed")
+    print("Glaze UI V1.4.1 DPI-aware responsive runtime contract: passed")
 
 
 def test_dark_headerbar_runtime_contrast(app: Gtk.Application) -> None:
@@ -299,12 +300,12 @@ def main() -> int:
         raise SystemExit("GTK could not initialize; run this probe under Xvfb or a desktop session")
 
     glaze = install_glaze_v14_global_style()
-    assert GLAZE_UI_TARGET_VERSION == "1.4.0"
-    assert GLAZE_UI_LIFECYCLE == "historical-stable-adoption"
+    assert GLAZE_UI_TARGET_VERSION == "1.4.1"
+    assert GLAZE_UI_LIFECYCLE == "official-stable-adoption"
     assert GLAZE_UI_ADOPTION_STATE == "development"
-    assert GLAZE_UI_PREVIOUS_BASELINE == "1.3.0"
+    assert GLAZE_UI_PREVIOUS_BASELINE == "1.4.0"
     assert not GLAZE_UI_CONSUMER_ELIGIBLE
-    assert glaze.provider_attached, "GLAZE UI V1.4 provider was not attached"
+    assert glaze.provider_attached, "GLAZE UI V1.4.1 provider was not attached"
 
     app = make_app()
     test_core_status_accessible_mutation_and_layout(app)
@@ -315,7 +316,7 @@ def main() -> int:
     test_insights_focus_resize_and_rendering(app)
     print(
         "Headless GTK runtime acceptance probe: passed "
-        "(GLAZE UI V1.4 form-factor adoption; application acceptance remains evidence-bound)"
+        "(GLAZE UI V1.4.1 Optical Intelligence adoption; application acceptance remains evidence-bound)"
     )
     return 0
 
