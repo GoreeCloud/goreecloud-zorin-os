@@ -1,106 +1,116 @@
-# GoreeCloud Care — GLAZE UI consumer record
+# GoreeCloud Care — GLAZE UI Consumer Record
 
 ## Current development authority
 
-GoreeCloud Care `0.2.0-dev1` is the active **Glaze UI V1.4 / `1.4.0` implementation candidate**.
+GoreeCloud Care `0.2.0-dev3` is the active **GLAZE UI V1.4.1 / `1.4.1` — Optical Intelligence** implementation candidate.
 
-It is not yet a Stable or accepted-v1.4 consumer. The exact V1.4 implementation must earn new application-specific evidence because its source, runtime/package identity, responsive composition, and active design-system provider differ from the immutable Stable `0.1.0` release.
+The repository-local 1.4.1 migration is implemented, but Care is not yet a Stable or accepted 1.4.1 consumer. Glaze UI becoming Stable does not transfer downstream application acceptance. Care must preserve exact-source evidence and complete its remaining product-specific authority and representative-runtime gates before consumer eligibility, release, or Stable status can be claimed.
 
-Current V1.4 design-system source authority:
+Current design-system authority:
 
-- Glaze UI target version: `1.4.0`
-- Glaze UI source revision: `01c86323f8b747373d308026adc8b0881855cdc5`
-- Care runtime identity: `0.2.0-dev1`
-- Care Debian identity: `0.2.0~dev1`
+- Glaze UI target version: `1.4.1`
+- Glaze UI Stable source authority: `4fab9da0fad2e5c974e0e66ec88632c61745751c`
+- Glaze UI qualified implementation anchor: `66478aed461b83c49b2ed027c3e4afc26520e98c`
+- Previous Stable baseline: `1.4.0`
+- Care runtime identity: `0.2.0-dev3`
+- Care Debian identity: `0.2.0~dev3`
 - Care adoption state: Development / Implementation Candidate
-- consumer eligibility: false until exact Care acceptance is promoted
+- Consumer eligibility: false until exact Care acceptance is explicitly governed
 
-The active Care entrypoint installs the V1.4 process controller. The main Care layout resolves through `glaze_v14.layout_environment`; V1.3 remains in-tree only as the expressive/material foundation inherited by V1.4 and as historical compatibility context.
+The active Care entrypoint installs the V1.4-family process controller. The main Care layout resolves through `glaze_v14.layout_environment`; V1.3 remains in-tree only as the inherited expressive/material foundation and historical compatibility context.
 
-## V1.4 native GTK3 mapping
+## V1.4.1 Optical Intelligence behavior
 
-Care is a GTK3 desktop application. Its V1.4 adaptation therefore maps Glaze form-factor semantics into native resizable desktop composition rather than pretending the application is a Mobile, Tablet, or TV client.
+Care retains the bounded V1.4.0 optical foundation and implements the V1.4.1 hardening contract conservatively for GTK3.
 
-The mapping defines:
+The current source includes:
 
-- Compact — narrow Care windows with reduced radius and density while preserving every task;
-- Narrow Desktop — single-reading-column composition before multi-pane presentation is appropriate;
-- Desktop — canonical Care desktop composition;
-- Wide Desktop — increased breathing room and hierarchy without inflating targets or text merely to fill width.
+- bounded Content-Aware Frost and Semantic Blur Protection behavior;
+- semantic protection that strengthens as decorative work is reduced;
+- fail-safe signal-adapter handling;
+- `Full`, `Balanced`, `Efficient`, and `Durable` optical performance levels;
+- downgrade-only in-session performance governance;
+- bounded runtime evidence of requested and accepted performance state;
+- local, deterministic defaults without telemetry, analytics, network access, remote context, wallpaper inspection, camera access, or device identity.
 
-The form-factor classifier uses Care's DPI-aware effective-width contract. Raw physical pixel width is not treated as logical composition width.
+If a future governed signal adapter throws while resolving context, Care fails closed to `solid-accessible`, forces the Reduced Transparency and Forced Colors path, disables blur and decorative memory tint, prevents caller overrides from re-enabling those failed optics, and exposes only the bounded `failed-safe` status. An optional local error observer may receive the exception for diagnostics, but observer failure cannot escape the fallback path.
 
-## Material, hierarchy, and interaction boundary
+Care does not treat the design system as permission to collect environmental data. Any future context source remains separately subject to Privacy Shield and Wardveil authority.
 
-V1.4 preserves the accepted content-first principles while evolving the shell:
+## Native GTK3 mapping
 
-- functional glass is restricted to command/navigation chrome;
-- reading, status, findings, and consequential-action surfaces remain opaque or near-opaque;
-- one signature hero surface establishes product hierarchy without repetitive cardification;
-- maintenance collections and system actions stay semantically grouped;
-- destructive and privileged actions remain visually and behaviorally distinct;
-- semantic shape roles are used instead of universal pills;
-- focus indication remains independent of material effects;
-- minimum interactive target intent remains 48 pixels;
-- keyboard traversal and task order do not change merely because the window changes form-factor state.
+Care is a GTK3 desktop application. Its responsive states remain application-owned composition rather than Glaze product-form-factor claims:
 
-GTK3 does not claim compositor-authoritative Living Glaze backdrop sampling or physical parity with rendering capabilities it does not provide.
+- Compact;
+- Narrow Desktop;
+- Desktop;
+- Wide Desktop.
+
+The classifier uses Care's DPI-aware effective-width contract. Raw physical pixel width is not treated as logical composition width.
+
+GTK3 does not claim compositor-authoritative backdrop sampling or unsupported blur behavior. Unsupported optical effects degrade before content, focus, accessibility, or maintenance correctness. Durable reading, findings, status, and consequential-action surfaces remain solid or near-solid.
 
 ## Accessibility precedence
 
-Care's V1.4 provider must degrade embellishment before hierarchy, meaning, focus, or task completion.
+Care must degrade embellishment before hierarchy, meaning, focus, or task completion.
 
 Required precedence remains:
 
-- HighContrast is system-authoritative and removes Care palette authority;
-- Reduced Transparency removes decorative translucency/elevation before content distinction;
+- HighContrast/system authority can remove Care palette authority;
+- Forced Colors and Reduced Transparency fail closed to solid accessible presentation;
+- Increased Contrast suppresses decorative tint and warmth while strengthening readability;
 - Reduced Motion removes nonessential application-owned motion/elevation;
 - Show Borders strengthens surface boundaries without requiring saturation;
 - enlarged text reflows through the effective-width contract;
 - visible focus remains explicit and non-color-only;
 - AT-SPI status delivery and read-only Maintenance Insights remain first-class acceptance gates.
 
-Safety-critical appearance/accessibility state is resolved before asynchronous window binding. Form-factor geometry remains allocation-driven.
+## Verified automated evidence before this documentation reconciliation
 
-## Current automated evidence
+Exact Care candidate `b4bde3d39bfb508c34d564ba0efb2fa110ad0878` passed the repository's then-current automated gates on September 15, 2026:
 
-The V1.4 migration has already demonstrated green automated evidence for its pre-version-split implementation head, including:
-
-- V1.4 static contract coverage;
-- DPI-aware V1.4 headless GTK runtime acceptance;
-- safe maintenance task-flow acceptance;
+- Care qualification run `35003753561` — success;
+- theme-source validation run `35003753557` — success;
+- Platform Contract run `35003754330` — success;
+- exact caller revision verification;
+- source/unit/contract validation;
+- headless GTK runtime and safe task-flow acceptance;
 - live core and Maintenance Insights AT-SPI acceptance;
-- Dark and Deep Dark HeaderBar contrast checks;
-- Clear, Balanced, and Dense clarity geometry;
-- Reduced Motion behavior;
-- deterministic package construction;
+- Dark and Deep Dark contrast checks;
+- Clear, Balanced, and Dense clarity checks;
+- Reduced Motion, Reduced Transparency, and Increased Contrast acceptance;
+- `0.2.0-dev3` / `0.2.0~dev3` package construction and inspection;
+- same-source reproducible package verification;
+- Ubuntu 22.04 / Ubuntu 24.04 byte-for-byte package reproducibility;
+- immutable Stable `0.1.0` rollback reconstruction;
 - installed package lifecycle and Wardveil privilege-boundary prequalification;
-- Ubuntu 22.04 / Ubuntu 24.04 byte-for-byte reproducibility.
+- Contract 0.2 validation with exactly seven Integral Platform Systems.
 
-That evidence does not automatically accept `0.2.0-dev1`. The artifact identity split intentionally requires the same gates to pass again for the exact new candidate bytes.
+That evidence is immutable predecessor evidence for that exact revision. This documentation correction creates a new source head, so exact-head CI must pass again before the new revision can inherit an automated-qualification claim.
 
-## Required V1.4 human/native acceptance
+The Platform Contract workflow is temporarily pinned to corrective central Contract 0.2 candidate `822e5fa65f1f253cf681f3dc6a0150e5949f6072` while central PR #33 remains unmerged. This preserves the current authoritative seven-system model without pretending central `main` has already changed.
 
-Before Care can claim V1.4 consumer acceptance or Stable eligibility, the exact `0.2.0` candidate must pass representative Zorin OS review covering at least:
+## Remaining application-specific acceptance
 
-1. Orca scan/completion announcement quality;
-2. Orca cancellation/failure/success announcement quality;
-3. Maintenance Insights status/results announcement quality;
-4. Compact, Narrow Desktop, Desktop, and Wide Desktop rendered composition;
-5. native window-control/compositor optical quality;
-6. Light, Dark, Deep Dark, and HighContrast physical presentation;
-7. Reduced Transparency, Reduced Motion, Show Borders, and enlarged-text behavior;
-8. keyboard-only traversal, visible focus, and task order across resize states;
-9. canonical Care icon and launcher rendering;
-10. confirmation, empty, failure, success, and controlled privileged-task UX.
+Before Care can claim Glaze 1.4.1 consumer acceptance, production eligibility, release readiness, or Stable status, the exact candidate must still obtain all applicable evidence and authority, including:
 
-A blank, inferred, inherited, or screenshot-only result is not accepted evidence for an observation that requires physical/native review.
+1. fresh exact-head automated qualification after every source change;
+2. representative Zorin OS 17.3/native review where current Care acceptance requires physical or native observation;
+3. application-specific Glaze UI consumer acceptance for the exact candidate;
+4. fresh Privacy Shield acceptance for the exact dev3 privacy scope;
+5. fresh Wardveil governance for the exact dev3 local-maintenance privilege boundary;
+6. fresh Everkeep integration/readiness decision for exact dev3 rollback/restore evidence;
+7. explicit Ready-for-Review, merge, release, and Stable decisions under GoreeCloud governance.
+
+Representative/native review includes the governed Care observations that automation cannot honestly substitute for: Orca spoken quality, compositor/window-control optical quality, rendered responsive composition, physical Light/Dark/Deep Dark/HighContrast presentation, enlarged-text and keyboard behavior, canonical icon/launcher rendering, and confirmation/failure/privileged-task UX.
+
+A blank, inherited, inferred, screenshot-only, or design-system-level result is not application acceptance.
 
 ## Historical Stable 0.1.0 authority
 
-Stable GoreeCloud Care `0.1.0` remains an accepted-v1 consumer of **Glaze UI V1.2 / `1.2.0`**.
+Stable GoreeCloud Care `0.1.0` remains an accepted consumer of **Glaze UI V1.2 / `1.2.0`** for that immutable release.
 
-That immutable historical authority remains:
+Historical authority remains:
 
 - release source: `bbc4779454c2887b810aa0ddc9e8a686a4c68ebd`
 - Care tree: `ebe028347c978b6d09fb1d2af011729249f63bc3`
@@ -111,10 +121,10 @@ That immutable historical authority remains:
 - target version: `1.2.0`
 - evidence: `acceptance/goreecloud-care-v1.2-0.1.0-exact-source-bridge.json`
 
-The old acceptance is retained as release history, not as authority for the V1.4 development line.
+The old acceptance is release history only. It does not authorize the dev3 / Glaze 1.4.1 development line.
 
 ## Fail-closed rule
 
-Glaze acceptance is exact-source and exact-artifact scoped. Any change to Care presentation behavior, canonical icon, focus/accessibility behavior, supported target/form factor, required Glaze version, runtime/package identity, or active Glaze provider invalidates assumptions that earlier acceptance transfers automatically.
+Glaze acceptance is exact-source and exact-artifact scoped. Any change to governed Care presentation behavior, canonical icon, focus/accessibility behavior, supported target, required Glaze version, runtime/package identity, active provider, or evidence-producing source resets affected acceptance assumptions.
 
-`0.2.0-dev1` must therefore remain Development / nonconformant for Glaze promotion purposes until its own exact candidate evidence is complete and explicitly governed.
+`0.2.0-dev3` therefore remains **Development / nonconformant / not Stable-promoted** until the exact candidate's remaining acceptance and authority gates are complete and explicitly governed.
