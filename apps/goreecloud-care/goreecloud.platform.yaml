@@ -7,8 +7,9 @@ component:
   repository: GoreeCloud/goreecloud-zorin-os
 
 # Immutable Stable 0.1.0 remains governed by RELEASE-ACCEPTANCE.md.
-# This manifest describes the active 0.2.0-dev3 V1.4.1 Optical Intelligence
-# adoption candidate. Historical exact-artifact acceptance does not transfer.
+# This manifest describes the active 0.2.0-dev3 migration candidate. Care's
+# active GTK optical implementation remains V1.4.1 while V1.5.0 is the current
+# required Stable target. Historical exact-artifact acceptance does not transfer.
 lifecycle: development
 version: 0.2.0-dev3
 
@@ -78,11 +79,14 @@ platform_systems:
     evidence:
       - apps/goreecloud-care/GLAZE-UI-CONFORMANCE.md
       - apps/goreecloud-care/GLAZE-UI-V1.4-MIGRATION.md
+      - apps/goreecloud-care/GLAZE-UI-V1.5-MIGRATION.md
       - apps/goreecloud-care/goreecloud_care/glaze_v14.py
       - apps/goreecloud-care/goreecloud_care/glaze_v14_optical.py
+      - apps/goreecloud-care/goreecloud_care/glaze_v15.py
       - apps/goreecloud-care/tests/test_glaze_v14_contract.py
-      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/4fab9da0fad2e5c974e0e66ec88632c61745751c
-    notes: Current Stable target is Glaze UI 1.4.1 in the V1.4 Optical Intelligence family. Dev3 implements the repository-local migration target and V1.4.1 fail-safe optical hardening, but repository-local exact-head and application-specific consumer acceptance remain required before conformance can be claimed.
+      - apps/goreecloud-care/tests/test_glaze_v15_contract.py
+      - https://github.com/GoreeCloud/goreecloud-glaze-ui/commit/b7fa8164bfdeaa1dc0acb21b770e7601120da04e
+    notes: Current required Stable target is Glaze UI 1.5.0. Care still runs the inherited V1.4.1 optical GTK implementation and now has a bounded V1.5 context/capability presentation resolver in source, but that resolver is not yet wired across the active GTK surfaces and no fresh application-specific V1.5 consumer acceptance exists. Migration therefore remains required.
   mesh:
     result: not-applicable-justified
     version: null
@@ -147,10 +151,10 @@ external_dependencies:
 
 compatibility:
   platform_contract: "0.2"
-  glaze_ui_required: "1.4.1"
+  glaze_ui_required: "1.5.0"
   requires:
     - goreecloud-platform-contract==0.2
-    - glaze-ui==1.4.1
+    - glaze-ui==1.5.0
   provides:
     - goreecloud-care-local-maintenance
     - goreecloud-care-read-only-maintenance-report
@@ -252,16 +256,18 @@ conformance:
   evidence:
     - apps/goreecloud-care/GLAZE-UI-CONFORMANCE.md
     - apps/goreecloud-care/GLAZE-UI-V1.4-MIGRATION.md
+    - apps/goreecloud-care/GLAZE-UI-V1.5-MIGRATION.md
     - apps/goreecloud-care/goreecloud_care/glaze_v14.py
     - apps/goreecloud-care/goreecloud_care/glaze_v14_optical.py
+    - apps/goreecloud-care/goreecloud_care/glaze_v15.py
   blockers:
     - Exact 0.2.0-dev3 automated qualification must pass for the current source/package identity.
-    - Glaze UI 1.4.1 repository-local adoption and application-specific acceptance are not established merely by implementing the Stable design-system contract.
-    - Representative rendered/native Zorin OS 17.3 acceptance remains required where the current consumer authority requires it.
+    - Glaze UI 1.5.0 repository-local migration is incomplete; the bounded V1.5 resolver is not yet wired across the active GTK surfaces and application-specific acceptance is absent.
+    - Representative rendered/native Zorin OS 17.3 V1.5 acceptance remains required.
     - Privacy Shield must independently accept the exact dev3 identity before production privacy status can be claimed.
     - Wardveil must independently govern exact dev3 privilege-boundary evidence before protection permission can transfer.
     - Everkeep must independently accept exact dev3 restore/rollback evidence before continuity can become ready.
-    - Stable promotion requires a later explicit exact-candidate decision and cannot be inferred from historical 0.1.0, dev1, dev2, or prior 1.4.0 evidence.
+    - Stable promotion requires a later explicit exact-candidate decision and cannot be inferred from historical 0.1.0, dev1, dev2, V1.4.0, or V1.4.1 evidence.
 
 # GoreeCloud Sync is separately governed application/service functionality and is
 # intentionally not represented as an eighth Integral Platform System. Care
